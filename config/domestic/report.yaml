@@ -1,4 +1,4 @@
-schema_version: 1
+schema_version: 2
 report_id: domestic_cn_v1
 display_name: 纯国内交易晨报
 timezone: Asia/Shanghai
@@ -25,6 +25,9 @@ load_order:
 
 domestic_extension_load_order:
   - config/domestic/preferences.yaml
+  - config/domestic/user_experience.yaml
+  - config/domestic/client_presentation.yaml
+  - config/domestic/content_integrity.yaml
   - config/domestic/watchlist.yaml
   - config/domestic/research_ledger.yaml
   - config/domestic/event_watchlist.yaml
@@ -72,13 +75,23 @@ market_map:
     - iron_ore_dominant
     - rebar_dominant
     - ah_premium
-  columns:
+  underlying_fields:
     - asset
     - latest_value
     - daily_change
     - market_timestamp
     - quality_status
+    - source_id
+    - source_url
+    - fetched_at
     - explanation
+  client_visible_columns:
+    - asset
+    - latest_value
+    - daily_change
+    - market_timestamp
+    - explanation
+  quality_codes_visible_only_in_sources: true
 
 macro_module:
   fixed: true
@@ -138,6 +151,20 @@ report_sections:
   - charts
   - sources_and_methodology
 
+visible_section_names:
+  decision_90_seconds: 90秒摘要
+  overnight_macro_and_policy: 隔夜宏观与政策
+  domestic_market_map: 市场概览
+  current_pricing_three_themes: 市场主线
+  structural_research_two_to_four: 研究更新
+  five_quick_updates: 重点信息
+  flow_positioning_industry: 资金、仓位与产业数据
+  dual_ledger: 跟踪表
+  prior_view_review: 前期观点复盘
+  catalysts_and_seven_day_calendar: 今日关注与未来7天事件
+  charts: 数据图表
+  sources_and_methodology: 来源与口径
+
 chat_summary:
   include_only:
     - decision_90_seconds
@@ -176,6 +203,18 @@ html:
   preserve_baseline_layout: true
   source_toggle: true
   print_pdf_action: true
+  reader_modes: true
+  details_collapsible: true
+  print_forces_full_mode: true
+  client_presentation_file: config/domestic/client_presentation.yaml
+  user_experience_file: config/domestic/user_experience.yaml
+  no_internal_taxonomy_badges: true
+  no_self_certifying_copy: true
+
+content_integrity:
+  config_path: config/domestic/content_integrity.yaml
+  render_only_verified_claims: true
+  shrink_report_instead_of_filling_gaps: true
 
 quality_gate:
   overseas_data_requires_domestic_transmission: true
@@ -184,3 +223,6 @@ quality_gate:
   unavailable_text_from_contract: true
   industry_taxonomy: SW2021
   themes_must_be_separate_from_industries: true
+  suspected_stale_action: exclude
+  noncritical_missing_action: omit
+  internal_quality_codes_client_visible: false
