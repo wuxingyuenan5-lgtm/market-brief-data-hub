@@ -1,4 +1,4 @@
-schema_version: 2
+schema_version: 3
 report_id: cross_asset_v4
 display_name: 每日跨资产交易晨报 V4
 timezone: Asia/Shanghai
@@ -22,6 +22,9 @@ load_order:
   - config/shared/quality_rules.yaml
   - config/shared/instruments.yaml
   - config/cross_asset/format_baseline.yaml
+  - config/cross_asset/research_accumulation.yaml
+  - config/cross_asset/research_ledger.yaml
+  - config/cross_asset/user_experience.yaml
   - config/cross_asset/report.yaml
 
 coverage:
@@ -74,6 +77,15 @@ macro_module:
     - yield_curve
     - dollar
 
+decision_layer:
+  preserve_original: true
+  no_new_systematic_decision_framework: true
+  sections:
+    - decision_90_seconds
+    - current_pricing_three_themes
+    - catalysts_and_risks
+  rule: 保持2026-07-31基线原有表达，不增加仓位建议、交易指令、阈值触发或最优表达工具栏目
+
 crypto_policy:
   daily_policy_section: false
   include_only_if_material: true
@@ -95,6 +107,7 @@ report_sections:
   - market_map
   - current_pricing_three_themes
   - structural_research_two_to_four
+  - research_accumulation_trial
   - five_quick_updates
   - flow_positioning_industry
   - dual_ledger
@@ -102,6 +115,39 @@ report_sections:
   - catalysts_and_seven_day_calendar
   - sources_and_methodology
   - disclaimer
+
+research_accumulation:
+  enabled: true
+  trial: true
+  config_path: config/cross_asset/research_accumulation.yaml
+  ledger_path: config/cross_asset/research_ledger.yaml
+  first_review_date: '2026-08-01'
+  removable_without_format_migration: true
+  display_increment_only: true
+
+user_experience:
+  enabled: true
+  config_path: config/cross_asset/user_experience.yaml
+  default_view: full
+  preserve_baseline_reading_order: true
+  features:
+    - reading_modes
+    - change_highlighting
+    - traceable_claim_links
+  detailed_audit_client_visible: false
+
+archive_policy:
+  enabled: true
+  repository: wuxingyuenan5-lgtm/market-brief-data-hub
+  branch: main
+  target_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
+  archive_same_artifact_as_delivery: true
+  archive_only_completed_report: true
+  commit_message_pattern: 'archive: add cross-asset morning brief {date}'
+  on_write_failure:
+    deliver_report_anyway: true
+    disclose_backup_failure: true
+    do_not_claim_success: true
 
 chat_summary:
   include_only:
@@ -159,6 +205,12 @@ format_change_control:
     - visual_theme_replacement
     - dual_ledger_structure_change
     - pricing_vs_research_partition_change
+
+internal_quality_operations:
+  enabled: true
+  governed_by_shared_config: true
+  client_facing_section: false
+  purpose: 保证数据真实性、稳定性和持续优化，不作为晨报客户阅读栏目
 
 quality_gate:
   no_template_numbers: true
