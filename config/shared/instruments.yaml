@@ -1,0 +1,208 @@
+schema_version: 1
+canonical_instruments:
+  SPX:
+    display_name: 标普500
+    asset_class: equity_index
+    market: US
+    currency: USD
+    aliases: ['^GSPC', 'SPX', 'usSPX']
+  NDX:
+    display_name: 纳斯达克100
+    asset_class: equity_index
+    market: US
+    currency: USD
+    aliases: ['^NDX', 'NDX']
+  SOX:
+    display_name: 费城半导体指数
+    asset_class: equity_index
+    market: US
+    currency: USD
+    aliases: ['^SOX', 'SOX']
+  SHCOMP:
+    display_name: 上证综指
+    asset_class: equity_index
+    market: CN-SH
+    currency: CNY
+    aliases: ['sh000001', '000001.SH']
+    reject_aliases: ['sz000001']
+  CSI300:
+    display_name: 沪深300
+    asset_class: equity_index
+    market: CN
+    currency: CNY
+    aliases: ['sh000300', '000300.SH', 'CSI300']
+  CSI500:
+    display_name: 中证500
+    asset_class: equity_index
+    market: CN
+    currency: CNY
+    aliases: ['sh000905', '000905.SH', 'CSI500']
+  CSI1000:
+    display_name: 中证1000
+    asset_class: equity_index
+    market: CN
+    currency: CNY
+    aliases: ['sh000852', '000852.SH', 'CSI1000']
+  CHINEXT:
+    display_name: 创业板指
+    asset_class: equity_index
+    market: CN-SZ
+    currency: CNY
+    aliases: ['sz399006', '399006.SZ']
+  STAR50:
+    display_name: 科创50
+    asset_class: equity_index
+    market: CN-SH
+    currency: CNY
+    aliases: ['sh000688', '000688.SH']
+  HSI:
+    display_name: 恒生指数
+    asset_class: equity_index
+    market: HK
+    currency: HKD
+    aliases: ['HSI', '^HSI']
+  HSCEI:
+    display_name: 恒生国企指数
+    asset_class: equity_index
+    market: HK
+    currency: HKD
+    aliases: ['HSCEI', '^HSCE']
+  HSTECH:
+    display_name: 恒生科技指数
+    asset_class: equity_index
+    market: HK
+    currency: HKD
+    aliases: ['HSTECH', '^HSTECH']
+  BTCUSDT:
+    display_name: BTC/USDT
+    asset_class: crypto
+    market: CRYPTO
+    currency: USDT
+    aliases: ['BTCUSDT']
+  ETHUSDT:
+    display_name: ETH/USDT
+    asset_class: crypto
+    market: CRYPTO
+    currency: USDT
+    aliases: ['ETHUSDT']
+  GOLD_SPOT:
+    display_name: 现货黄金
+    asset_class: precious_metal
+    market: GLOBAL
+    currency: USD
+    unit: USD/troy_oz
+    aliases: ['XAUUSD']
+  SILVER_SPOT:
+    display_name: 现货白银
+    asset_class: precious_metal
+    market: GLOBAL
+    currency: USD
+    unit: USD/troy_oz
+    aliases: ['XAGUSD']
+  SHFE_GOLD:
+    display_name: 沪金
+    asset_class: futures
+    market: CN-SHFE
+    currency: CNY
+    unit: CNY/gram
+    aliases: ['AU']
+    contract_rule: dominant_contract_must_be_named
+  SHFE_SILVER:
+    display_name: 沪银
+    asset_class: futures
+    market: CN-SHFE
+    currency: CNY
+    unit: CNY/kg
+    aliases: ['AG']
+    contract_rule: dominant_contract_must_be_named
+  LME_COPPER:
+    display_name: LME铜
+    asset_class: industrial_metal
+    market: LME
+    currency: USD
+    unit: USD/tonne
+    aliases: ['LME Copper']
+  SHFE_COPPER:
+    display_name: 沪铜
+    asset_class: futures
+    market: CN-SHFE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['CU']
+    contract_rule: dominant_contract_must_be_named
+  GFEX_LITHIUM:
+    display_name: 碳酸锂
+    asset_class: futures
+    market: CN-GFEX
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['LC']
+    contract_rule: exact_contract_required
+  DXY:
+    display_name: 美元指数
+    asset_class: fx_index
+    market: GLOBAL
+    currency: index_point
+    aliases: ['DXY', 'DX-Y.NYB']
+  US2Y:
+    display_name: 美国2年期国债收益率
+    asset_class: rates
+    market: US
+    currency: percent
+    aliases: ['2Y']
+  US10Y:
+    display_name: 美国10年期国债收益率
+    asset_class: rates
+    market: US
+    currency: percent
+    aliases: ['10Y']
+  US10Y_REAL:
+    display_name: 美国10年期实际利率
+    asset_class: real_yield
+    market: US
+    currency: percent
+    aliases: ['DFII10']
+  CN10Y:
+    display_name: 中国10年期国债收益率
+    asset_class: rates
+    market: CN
+    currency: percent
+    aliases: ['CN10Y']
+  DR007:
+    display_name: DR007
+    asset_class: money_market_rate
+    market: CN
+    currency: percent
+    aliases: ['DR007']
+  USDCNY:
+    display_name: 美元兑人民币
+    asset_class: fx
+    market: CN-ONSHORE
+    currency: CNY_per_USD
+    aliases: ['USDCNY']
+  USDCNH:
+    display_name: 美元兑离岸人民币
+    asset_class: fx
+    market: HK-OFFSHORE
+    currency: CNH_per_USD
+    aliases: ['USDCNH']
+  BRENT:
+    display_name: Brent原油
+    asset_class: energy
+    market: ICE
+    currency: USD
+    unit: USD/barrel
+    aliases: ['Brent', 'BZ']
+  VIX:
+    display_name: VIX
+    asset_class: volatility_index
+    market: US
+    currency: index_point
+    aliases: ['^VIX', 'VIX']
+
+normalization_rules:
+  never_infer_market_from_ambiguous_six_digit_code: true
+  preserve_exchange_and_contract: true
+  futures_latest_value_requires_contract: true
+  index_proxy_etf_not_interchangeable: true
+  onshore_offshore_fx_not_interchangeable: true
