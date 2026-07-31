@@ -1,0 +1,58 @@
+schema_version: 1
+config_id: domestic_event_watchlist_v1
+timezone: Asia/Shanghai
+
+recurring_macro:
+  - id: china_official_pmi
+    agency: 国家统计局
+    fields: [actual, consensus, previous, revision, release_time, statistical_period]
+  - id: china_cpi_ppi
+    agency: 国家统计局
+    fields: [actual, consensus, previous, revision, release_time, statistical_period]
+  - id: china_trade
+    agency: 海关总署
+    fields: [actual, consensus, previous, revision, release_time, statistical_period]
+  - id: china_credit_social_financing
+    agency: 中国人民银行
+    fields: [actual, consensus, previous, revision, release_time, statistical_period]
+  - id: china_activity_data
+    agency: 国家统计局
+    fields: [industrial_production, retail_sales, fixed_asset_investment, property]
+  - id: china_industrial_profit
+    agency: 国家统计局
+    fields: [actual, previous, statistical_period]
+
+policy_events:
+  - 中国人民银行公开市场操作
+  - 国务院常务会议
+  - 中央政治局会议
+  - 财政部政策与发行安排
+  - 证监会与交易所制度变化
+  - 地方地产与消费政策
+
+capital_market_events:
+  - earnings
+  - preannouncement
+  - unlock
+  - ipo
+  - placement
+  - rights_issue
+  - buyback
+  - shareholder_increase_or_reduction
+  - trading_monitoring
+  - major_asset_restructuring
+
+commodity_events:
+  - exchange_inventory
+  - exchange_warrant
+  - settlement_and_position
+  - dominant_contract_roll
+  - delivery_notice
+  - smelter_maintenance
+  - mine_disruption
+  - production_restart_or_cut
+  - downstream_schedule
+  - industry_conference
+
+calendar_horizon_days: 7
+include_today: true
