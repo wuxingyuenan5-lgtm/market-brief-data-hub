@@ -1,0 +1,105 @@
+schema_version: 1
+config_id: domestic_watchlist_v1
+timezone: Asia/Shanghai
+
+equity_indices:
+  required:
+    - SHCOMP
+    - CSI300
+    - CSI500
+    - CSI1000
+    - CHINEXT
+    - STAR50
+  hk_mapping:
+    - HSI
+    - HSCEI
+    - HSTECH
+
+rates_fx:
+  required:
+    - CN10Y
+    - DR007
+    - USDCNY
+    - USDCNH
+
+domestic_futures:
+  core:
+    - SHFE_GOLD
+    - SHFE_SILVER
+    - SHFE_COPPER
+    - GFEX_LITHIUM
+  extended:
+    - SHFE_ALUMINUM
+    - SHFE_ZINC
+    - SHFE_NICKEL
+    - SHFE_STAINLESS
+    - DCE_IRON_ORE
+    - SHFE_REBAR
+    - SHFE_HOT_ROLLED_COIL
+    - DCE_COKING_COAL
+    - DCE_COKE
+
+sw_industry:
+  taxonomy: SW2021
+  cover_all_level1: true
+  priority_level1:
+    - 电子
+    - 通信
+    - 计算机
+    - 电力设备
+    - 机械设备
+    - 国防军工
+    - 汽车
+    - 有色金属
+    - 钢铁
+    - 煤炭
+    - 基础化工
+    - 银行
+    - 非银金融
+    - 食品饮料
+    - 家用电器
+    - 房地产
+    - 商贸零售
+    - 社会服务
+  priority_level2:
+    - 半导体
+    - 元件
+    - 光学光电子
+    - 通信设备
+    - 计算机设备
+    - 软件开发
+    - 电池
+    - 光伏设备
+    - 风电设备
+    - 电网设备
+    - 自动化设备
+    - 工程机械
+    - 贵金属
+    - 工业金属
+    - 能源金属
+
+themes:
+  separate_from_industry: true
+  priority:
+    - 人工智能
+    - 国产算力
+    - 半导体国产替代
+    - HBM与存储
+    - CPO与光模块
+    - 机器人
+    - 低空经济
+    - 固态电池
+    - 储能
+    - 国企改革
+    - 地产政策
+    - 消费以旧换新
+
+dynamic_equity_selection:
+  include:
+    - turnover_top
+    - sw_industry_leaders
+    - sw_industry_laggards
+    - limit_up_core
+    - unusual_volume
+    - major_announcement
+  hundred_billion_turnover_threshold_cny: 10000000000
