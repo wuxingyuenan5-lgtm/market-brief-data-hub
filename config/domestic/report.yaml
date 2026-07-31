@@ -1,13 +1,13 @@
 schema_version: 2
 report_id: domestic_cn_v1
-display_name: 纯国内交易晨报
+display_name: 国内交易晨报
 timezone: Asia/Shanghai
 scheduled_time: '08:00'
-filename_pattern: 纯国内交易晨报_{date}.html
+filename_pattern: 国内交易晨报_{date}.html
 
 format_baseline:
   baseline_id: domestic_v1_2026_07_31
-  reference_filename: 纯国内交易晨报_2026-07-31.html
+  reference_filename: 国内交易晨报_2026-07-31.html
   preferences_file: config/domestic/preferences.yaml
   locked_default: true
   change_requires_explicit_user_approval: true
@@ -215,6 +215,7 @@ content_integrity:
   config_path: config/domestic/content_integrity.yaml
   render_only_verified_claims: true
   shrink_report_instead_of_filling_gaps: true
+  format_preview_must_follow_same_fact_gate: true
 
 quality_gate:
   overseas_data_requires_domestic_transmission: true
