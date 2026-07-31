@@ -1,0 +1,91 @@
+schema_version: 1
+config_id: domestic_research_ledger_v1
+timezone: Asia/Shanghai
+
+status_values:
+  - 新增
+  - 强化
+  - 弱化
+  - 被证伪
+  - 暂无新增证据
+
+trading_logic_ledger:
+  max_active_items: 5
+  required_fields:
+    - ledger_id
+    - asset_or_industry
+    - current_logic
+    - current_status
+    - priced_in_degree
+    - next_validation
+    - invalidation
+    - updated_at
+  items: []
+
+fundamental_research_ledger:
+  required_fields:
+    - ledger_id
+    - asset_or_industry
+    - long_term_core_variables
+    - latest_development
+    - current_conclusion
+    - pending_validation
+    - evidence_status
+    - updated_at
+  topics:
+    - ledger_id: china_ai_semiconductor
+      asset_or_industry: 中国AI与半导体
+      long_term_core_variables: [国产化率, 资本开支, 订单, 产能利用率, 折旧, 自由现金流, 股权稀释]
+      latest_development: null
+      current_conclusion: null
+      pending_validation: []
+      evidence_status: 暂无新增证据
+      updated_at: null
+    - ledger_id: advanced_manufacturing_robotics
+      asset_or_industry: 高端制造与机器人
+      long_term_core_variables: [订单, 单机价值量, 量产良率, 产能, 海外收入, 现金流]
+      latest_development: null
+      current_conclusion: null
+      pending_validation: []
+      evidence_status: 暂无新增证据
+      updated_at: null
+    - ledger_id: new_energy
+      asset_or_industry: 新能源
+      long_term_core_variables: [排产, 价格, 库存, 单位盈利, 产能退出, 海外需求]
+      latest_development: null
+      current_conclusion: null
+      pending_validation: []
+      evidence_status: 暂无新增证据
+      updated_at: null
+    - ledger_id: gold
+      asset_or_industry: 黄金
+      long_term_core_variables: [国内实际利率, 人民币, 央行购金, 上海金溢价, ETF与实物需求, 回收供应]
+      latest_development: null
+      current_conclusion: null
+      pending_validation: []
+      evidence_status: 暂无新增证据
+      updated_at: null
+    - ledger_id: copper
+      asset_or_industry: 铜
+      long_term_core_variables: [矿端资本开支, 品位, 项目审批, TC_RC, 冶炼产能, 库存与仓单, 电网与新能源需求, 全球贸易流向]
+      latest_development: null
+      current_conclusion: null
+      pending_validation: []
+      evidence_status: 暂无新增证据
+      updated_at: null
+    - ledger_id: lithium
+      asset_or_industry: 锂
+      long_term_core_variables: [成本曲线, 盐湖与硬岩供给, 江西云母, 锂盐厂利润, 电池排产, 储能需求, 产能退出与复产]
+      latest_development: null
+      current_conclusion: null
+      pending_validation: []
+      evidence_status: 暂无新增证据
+      updated_at: null
+    - ledger_id: property_consumption
+      asset_or_industry: 地产与消费
+      long_term_core_variables: [新房销售, 二手房价格, 土地成交, 房企融资, 居民杠杆, 零售销售, 服务消费, 以旧换新政策]
+      latest_development: null
+      current_conclusion: null
+      pending_validation: []
+      evidence_status: 暂无新增证据
+      updated_at: null
