@@ -1,4 +1,4 @@
-schema_version: 1
+schema_version: 2
 baseline_id: cross_asset_v4_2026_07_31
 baseline_name: 跨资产交易晨报2026-07-31格式
 status: locked_default
@@ -9,6 +9,13 @@ purpose:
   - 固定跨资产交易晨报V4的默认HTML结构与视觉层级
   - 后续默认只更新数据、观点、图表和来源，不随意重构版式
   - 优化以增量方式进行，未经确认不得删除模块或调整主顺序
+
+document_identity:
+  config_path: config/cross_asset/artifact_naming.yaml
+  report_name: 跨资产交易晨报
+  display_title_pattern: 跨资产交易晨报｜{date}
+  filename_pattern: 跨资产交易晨报_{date}.html
+  prohibit_generic_download_name: true
 
 page:
   language: zh-CN
@@ -70,6 +77,7 @@ section_order:
   - market_map
   - current_pricing_three_themes
   - structural_research_two_to_four
+  - research_accumulation_trial
   - five_quick_updates
   - flow_positioning_industry
   - dual_ledger
@@ -90,6 +98,9 @@ section_contracts:
       - data_cutoff
       - main_market_timestamps
       - coverage
+    naming:
+      h1_pattern: 跨资产交易晨报｜{date}
+      html_title_pattern: 跨资产交易晨报｜{date}
   decision_90_seconds:
     layout: three_cards
     required:
@@ -122,25 +133,92 @@ section_contracts:
     required_count: 3
     card_accent: pricing_blue
     details_collapsible: true
+    design_spec: config/cross_asset/section_design.yaml
+    required_inside_each_card:
+      - headline
+      - new_fact_or_catalyst
+      - cross_asset_price_expression
+      - sector_rotation
+      - flow_or_positioning_confirmation
+      - industry_or_fundamental_confirmation
+      - pricing_stage
+      - divergence_or_unresolved_point
+      - next_validation_node
+    add_below_cards:
+      - sector_rotation_strip
+    rotation_strip:
+      maximum_items: 8
+      use_relative_benchmark: true
+      include_one_day_and_five_day_when_available: true
+      include_breadth_or_turnover_when_available: true
+      describe_not_recommend: true
   structural_research_two_to_four:
     layout: two_column_cards
     minimum_count: 2
     maximum_count: 4
     card_accent: research_violet
     details_collapsible: true
+  research_accumulation_trial:
+    layout: compact_increment_panel
+    show_changes_only: true
+    removable: true
   five_quick_updates:
     required_count: 5
     label_each_as:
       - current_pricing
       - structural_accumulation
   flow_positioning_industry:
-    layout: four_metric_cards_when_possible
-    missing_data_must_be_explicit: true
+    design_spec: config/cross_asset/section_design.yaml
+    layout:
+      - market_flow_layer
+      - positioning_layer
+      - industry_validation_layer
+      - evidence_alignment_table
+    rules:
+      - market_flow_positioning_and_industry_dates_must_be_separate
+      - show_only_material_updates
+      - do_not_convert_alignment_to_trade_advice
+      - missing_data_must_be_explicit
+    evidence_alignment_columns:
+      - theme_or_asset
+      - price_signal
+      - flow_signal
+      - positioning_signal
+      - industry_signal
+      - evidence_alignment
+      - key_gap
   dual_ledger:
     layout: two_tables
+    design_spec: config/cross_asset/section_design.yaml
     required:
-      - trading_logic_ledger
+      - market_pricing_ledger
       - fundamental_research_ledger
+    market_pricing_ledger_fields:
+      - stable_id
+      - theme
+      - current_state
+      - price_and_rotation_confirmation
+      - flow_and_positioning_confirmation
+      - what_changed_today
+      - next_validation_node
+      - falsification_condition
+      - last_updated
+    fundamental_research_ledger_fields:
+      - stable_id
+      - topic
+      - maturity_stage
+      - core_assumption
+      - new_evidence
+      - valuation_fundamental_bridge
+      - contrary_evidence
+      - relation_to_market_pricing
+      - next_research_node
+      - last_updated
+    rules:
+      - stable_ids_persist_across_days
+      - highlight_changes_only_on_screen
+      - preserve_full_rows_for_print
+      - closed_or_falsified_items_move_to_history_not_delete
   prior_view_review:
     layout: two_cards
     required:
@@ -168,12 +246,14 @@ allowed_without_user_approval:
   - 在2至4条范围内调整系统性研究数量
   - 调整卡片内文字长度以适配内容
   - 修复浏览器兼容性、打印和移动端问题
+  - 按已批准的section_design优化当下定价、资金仓位产业数据和双账本内部呈现
+  - 确保正式附件使用固定文件名而非preview等临时名称
 
 requires_user_approval:
   - 改变主模块顺序
   - 删除固定模块
   - 改变导航项目
-  - 改变双账本结构
+  - 超出section_design已批准范围再次改变双账本结构
   - 改成深色或完全不同的视觉主题
   - 将聊天摘要替代完整HTML
   - 改变市场地图核心列
@@ -185,3 +265,5 @@ quality_rules:
   - 缺失数据保留明确缺失表达
   - 不使用历史值冒充最新值
   - 不因模块固定而强行制造无增量观点
+  - 三条当下定价必须包含板块轮动或明确说明无清晰轮动
+  - 正式下载文件名必须匹配日期，不得为preview或其他临时名称
