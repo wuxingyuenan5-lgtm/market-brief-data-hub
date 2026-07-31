@@ -138,6 +138,78 @@ canonical_instruments:
     unit: CNY/tonne
     aliases: ['LC']
     contract_rule: exact_contract_required
+  SHFE_ALUMINUM:
+    display_name: 沪铝
+    asset_class: futures
+    market: CN-SHFE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['AL']
+    contract_rule: dominant_contract_must_be_named
+  SHFE_ZINC:
+    display_name: 沪锌
+    asset_class: futures
+    market: CN-SHFE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['ZN']
+    contract_rule: dominant_contract_must_be_named
+  SHFE_NICKEL:
+    display_name: 沪镍
+    asset_class: futures
+    market: CN-SHFE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['NI']
+    contract_rule: dominant_contract_must_be_named
+  SHFE_STAINLESS:
+    display_name: 不锈钢
+    asset_class: futures
+    market: CN-SHFE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['SS']
+    contract_rule: dominant_contract_must_be_named
+  DCE_IRON_ORE:
+    display_name: 铁矿石
+    asset_class: futures
+    market: CN-DCE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['I']
+    contract_rule: dominant_contract_must_be_named
+  SHFE_REBAR:
+    display_name: 螺纹钢
+    asset_class: futures
+    market: CN-SHFE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['RB']
+    contract_rule: dominant_contract_must_be_named
+  SHFE_HOT_ROLLED_COIL:
+    display_name: 热轧卷板
+    asset_class: futures
+    market: CN-SHFE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['HC']
+    contract_rule: dominant_contract_must_be_named
+  DCE_COKING_COAL:
+    display_name: 焦煤
+    asset_class: futures
+    market: CN-DCE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['JM']
+    contract_rule: dominant_contract_must_be_named
+  DCE_COKE:
+    display_name: 焦炭
+    asset_class: futures
+    market: CN-DCE
+    currency: CNY
+    unit: CNY/tonne
+    aliases: ['J']
+    contract_rule: dominant_contract_must_be_named
   DXY:
     display_name: 美元指数
     asset_class: fx_index
@@ -200,9 +272,33 @@ canonical_instruments:
     currency: index_point
     aliases: ['^VIX', 'VIX']
 
+industry_taxonomy:
+  canonical:
+    taxonomy_id: SW2021
+    display_name: 申万2021行业分类
+    provider: swsresearch
+    levels:
+      level1: 一级行业
+      level2: 二级行业
+      level3: 三级行业
+    default_market_view_level: level1
+    default_research_drilldown_level: level2
+    membership_as_of_report_date: true
+    classification_history_required: true
+    concepts_and_themes_separate: true
+    alternate_industry_taxonomies_prohibited_in_report: true
+  aggregation:
+    official_index_return_preferred: true
+    turnover_breadth_and_stock_count: aggregate_constituents_locally
+    fund_flow: aggregate_individual_stock_flow_locally
+    constituent_mapping_fields: [stock_code, industry_code, start_date, update_date]
+    mapping_version_and_download_time_required: true
+
 normalization_rules:
   never_infer_market_from_ambiguous_six_digit_code: true
   preserve_exchange_and_contract: true
   futures_latest_value_requires_contract: true
+  futures_product_alias_not_latest_value: true
+  dominant_contract_must_be_derived_not_hardcoded: true
   index_proxy_etf_not_interchangeable: true
   onshore_offshore_fx_not_interchangeable: true
