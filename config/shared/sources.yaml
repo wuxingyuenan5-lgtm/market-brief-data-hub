@@ -42,14 +42,14 @@ sources:
     type: market_data
     role: fallback
     markets: [CN, US, HK]
-    datasets: [quote, kline, statements, options]
+    datasets: [quote, kline, statements, options, futures_quote]
     compliance: personal_research
 
   eastmoney:
     type: market_data_portal
     role: unique_fields_and_fallback
     markets: [CN, US, HK]
-    datasets: [quote, fund_flow, board_flow, research, financials, financing, block_trade, unlock, news]
+    datasets: [quote, futures_quote, fund_flow, board_flow, research, financials, financing, block_trade, unlock, news]
     compliance: personal_research
     controls: [rate_limit, retry, cache, empty_result_validation]
 
@@ -87,6 +87,50 @@ sources:
     markets: [CN]
     datasets: [announcements, trading_disclosure, calendar]
     compliance: official_public
+
+  shfe:
+    type: exchange
+    role: official_primary
+    markets: [CN-SHFE]
+    datasets: [delayed_quote, daily_settlement, volume_open_interest, position_ranking, warrant, inventory, delivery_notice, calendar]
+    compliance: official_public
+    notes: 实时行情可能受授权限制；公开延时行情、日行情、仓单与库存优先使用
+
+  gfex:
+    type: exchange
+    role: official_primary
+    markets: [CN-GFEX]
+    datasets: [delayed_quote, daily_settlement, volume_open_interest, position_ranking, warrant, delivery_notice, calendar]
+    compliance: official_public
+
+  dce:
+    type: exchange
+    role: official_primary
+    markets: [CN-DCE]
+    datasets: [delayed_quote, daily_settlement, volume_open_interest, position_ranking, warrant, inventory, delivery_notice, calendar]
+    compliance: official_public
+
+  czce:
+    type: exchange
+    role: official_primary
+    markets: [CN-CZCE]
+    datasets: [delayed_quote, daily_settlement, volume_open_interest, position_ranking, warrant, delivery_notice, calendar]
+    compliance: official_public
+
+  sge:
+    type: exchange
+    role: official_primary
+    markets: [CN-SGE]
+    datasets: [gold_spot_quote, silver_spot_quote, benchmark_price, volume, delivery, calendar]
+    compliance: official_public
+
+  swsresearch:
+    type: index_and_taxonomy_provider
+    role: official_taxonomy_primary
+    markets: [CN]
+    datasets: [sw2021_classification_history, sw_index_quote, sw_index_history, sw_index_components]
+    compliance: public_research_download_verify_terms
+    notes: 申万行业仅使用SW2021；分类必须按报告日有效日期还原
 
   yahoo_finance:
     type: market_data_portal
@@ -180,14 +224,15 @@ sources:
     type: industry_data
     role: primary_or_cross_check
     markets: [CN, GLOBAL]
-    datasets: [metals_price, inventory, premium, industry]
+    datasets: [metals_spot_price, inventory, premium, tc_rc, import_profit, operating_rate, margin, production_schedule]
     compliance: personal_research
+    notes: 用于现货和产业数据，不作为国内期货合约行情的统一主源
 
   mysteel:
     type: industry_data
     role: primary_or_cross_check
     markets: [CN]
-    datasets: [ferrous, inventory, production, margin]
+    datasets: [ferrous_spot, inventory, production, operating_rate, margin]
     compliance: personal_research
 
 rules:
@@ -195,3 +240,5 @@ rules:
   - 公开仓库只存路由和代码，不存受限源原始数据库
   - 权威媒体主要用于事件和市场解释，不替代可获得的官方数字
   - 不允许把同一集团或同一底层接口伪装成两个独立来源
+  - 交易所期货数据与产业现货数据必须分路由
+  - 申万行业与概念主题必须分离
