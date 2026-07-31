@@ -1,0 +1,28 @@
+schema_version: 1
+config_id: domestic_source_overrides_v1
+report_id: domestic_cn_v1
+
+policy:
+  may_reorder_existing_shared_sources: true
+  may_add_domestic_only_coverage: true
+  may_lower_shared_quality_gate: false
+  may_change_shared_units_or_statuses: false
+  may_define_secret_values: false
+
+overrides:
+  cn_sector_performance:
+    taxonomy_requirement: SW2021
+    theme_and_concept_data_use: separate_tag_only
+  cn_sector_fund_flow:
+    aggregation_requirement: aggregate_constituent_stock_flow_by_sw2021
+    portal_sector_flow_use: research_cross_check_only
+  metals_cn:
+    split_required:
+      - futures_market_data
+      - exchange_warrant_inventory
+      - industry_spot_and_premium
+    current_status: pending_shared_route_upgrade
+
+secrets:
+  allowed_in_repository: false
+  environment_variables_only: true
