@@ -1,0 +1,162 @@
+schema_version: 1
+report_id: domestic_cn_v1
+display_name: 纯国内交易晨报
+timezone: Asia/Shanghai
+scheduled_time: '08:00'
+filename_pattern: 纯国内交易晨报_{date}.html
+
+load_order:
+  - vendor/upstreams.lock.yaml
+  - config/shared/data_contract.yaml
+  - config/shared/sources.yaml
+  - config/shared/routing.yaml
+  - config/shared/quality_rules.yaml
+  - config/shared/instruments.yaml
+  - config/domestic/report.yaml
+
+scope:
+  primary:
+    - china_macro
+    - monetary_and_fiscal_policy
+    - renminbi
+    - china_rates_and_liquidity
+    - a_shares
+    - hong_kong_equities
+    - domestic_commodities
+    - china_ai_and_technology
+    - advanced_manufacturing
+    - new_energy
+    - property_and_consumption
+  overseas_only_if_direct_transmission: true
+  excluded_as_fixed_sections:
+    - us_equity_market
+    - crypto
+    - overseas_politics
+
+market_map:
+  required:
+    - SHCOMP
+    - CSI300
+    - CSI500
+    - CSI1000
+    - CHINEXT
+    - STAR50
+    - HSI
+    - HSCEI
+    - HSTECH
+    - SHFE_GOLD
+    - SHFE_COPPER
+    - GFEX_LITHIUM
+    - CN10Y
+    - DR007
+    - USDCNY
+    - USDCNH
+  optional:
+    - SHFE_SILVER
+    - iron_ore_dominant
+    - rebar_dominant
+    - ah_premium
+  columns:
+    - asset
+    - latest_value
+    - daily_change
+    - market_timestamp
+    - quality_status
+    - explanation
+
+macro_module:
+  fixed: true
+  topics:
+    - gdp
+    - industrial_production
+    - retail_sales
+    - fixed_asset_investment
+    - manufacturing_investment
+    - cpi
+    - ppi
+    - pmi
+    - trade
+    - social_financing
+    - credit
+    - m1_m2
+    - fiscal
+    - property
+    - central_bank_operations
+  fields: [actual, consensus, previous, revision, market_reaction, domestic_transmission]
+
+flow_and_positioning:
+  daily:
+    - turnover
+    - market_breadth
+    - etf_creation_redemption
+    - southbound_flow
+    - renminbi
+    - government_bond_yields
+    - commodity_basis_and_warrants
+  weekly:
+    - margin_financing
+    - industry_inventory
+    - operating_rate
+    - major_etf_holdings
+  monthly:
+    - social_financing
+    - credit
+    - m1_m2
+    - industrial_profit
+    - fiscal_data
+    - property_sales_and_investment
+    - trade
+
+report_sections:
+  - data_cutoff
+  - decision_90_seconds
+  - overnight_macro_and_policy
+  - domestic_market_map
+  - current_pricing_three_themes
+  - structural_research_two_to_four
+  - five_quick_updates
+  - flow_positioning_industry
+  - dual_ledger
+  - prior_view_review
+  - catalysts_and_seven_day_calendar
+  - charts
+  - sources_and_methodology
+
+chat_summary:
+  include_only:
+    - decision_90_seconds
+    - current_pricing_three_themes
+    - top_two_structural_updates
+    - catalysts_and_risks
+
+research_frameworks:
+  a_h_equities:
+    short_term: [turnover, breadth, margin, etf_flow, southbound, rotation, policy_trade, unlock, placement, ipo]
+    long_term: [earnings_cycle, capital_market_rules, equity_supply, buybacks, foreign_allocation, ah_valuation]
+  china_ai:
+    short_term: [earnings, orders, valuation, crowding, export_controls, rotation]
+    long_term: [localization, capex, depreciation, free_cash_flow, gpu, hbm, servers, optical, power, model_cost, monetization, dilution]
+  gold:
+    short_term: [real_yield, renminbi, dollar, shanghai_premium, etf, safe_haven]
+    long_term: [central_bank_buying, fiscal_credit, reserves, physical_demand, recycling, household_allocation]
+  copper:
+    short_term: [shfe_price, inventory, warrants, premium, import_window, comex_lme_spread]
+    long_term: [mine_capex, grade, project_approval, tc_rc, smelting, grid, energy_transition, trade_policy]
+  lithium:
+    short_term: [futures, spot, basis, warrants, positions, short_covering, cathode_procurement]
+    long_term: [cost_curve, brine, hard_rock, jiangxi_mica, converter_margin, battery_schedule, ev_penetration, storage, supply_exit]
+  property_consumption:
+    variables: [new_home_sales, second_hand_prices, land_sales, developer_financing, local_fiscal, household_leverage, retail_sales, services, trade_in_policy]
+
+html:
+  self_contained: true
+  fixed_navigation: true
+  responsive: true
+  print_friendly: true
+  external_dependencies: false
+
+quality_gate:
+  overseas_data_requires_domestic_transmission: true
+  no_forced_section_without_incremental_information: true
+  official_or_cross_source_for_headlines: true
+  unavailable_text_from_contract: true
