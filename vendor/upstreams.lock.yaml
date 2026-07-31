@@ -1,0 +1,39 @@
+schema_version: 1
+updated_at: '2026-07-31T13:50:00+08:00'
+update_policy: notify_only
+
+upstreams:
+  a_stock_data:
+    repository: simonlin1212/a-stock-data
+    url: https://github.com/simonlin1212/a-stock-data
+    ref_type: commit
+    ref: 715b9f47f098aef393713a03f1f37cb3c7eef93b
+    version: 3.6.0
+    skill_path: SKILL.md
+    raw_skill_url: https://raw.githubusercontent.com/simonlin1212/a-stock-data/715b9f47f098aef393713a03f1f37cb3c7eef93b/SKILL.md
+    purpose:
+      - A股与ETF行情、K线和盘口
+      - 板块、资金流、融资融券、龙虎榜、解禁
+      - 公告、研报、财务、新闻、打板和ETF期权
+    upgrade_rule: 人工审阅变更日志和静默失败修复后再更新ref
+
+  global_stock_data:
+    repository: simonlin1212/global-stock-data
+    url: https://github.com/simonlin1212/global-stock-data
+    ref_type: commit
+    ref: c0b3ed8d8a1fdff0932e5899fc64a5994308a5ef
+    version: 2.0.3
+    skill_path: SKILL.md
+    raw_skill_url: https://raw.githubusercontent.com/simonlin1212/global-stock-data/c0b3ed8d8a1fdff0932e5899fc64a5994308a5ef/SKILL.md
+    purpose:
+      - 美股与港股行情、K线、基本面和资金流
+      - SEC申报与XBRL
+      - Treasury收益率曲线、CFTC COT和财报日历
+      - 美股期权、空头成交量和市场筛选
+    upgrade_rule: 人工审阅合规、字段和回归结果后再更新ref
+
+rules:
+  - 晨报不得自动跟随上游main分支
+  - 每次执行优先读取锁定commit对应的SKILL.md
+  - 上游读取失败时可使用本仓库缓存规则，但不得假称已运行上游代码
+  - 更新ref必须同步检查字段、单位、限流、合规和静默失败处理
