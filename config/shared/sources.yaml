@@ -1,0 +1,197 @@
+schema_version: 1
+source_priority:
+  - official_regulator_exchange
+  - licensed_or_primary_vendor
+  - established_market_portal
+  - authoritative_media
+  - research_institution
+  - specialist_commentary
+
+sources:
+  a_stock_data:
+    type: upstream_toolkit
+    upstream_key: a_stock_data
+    role: primary_router
+    markets: [CN]
+    quality: implementation_reference
+
+  global_stock_data:
+    type: upstream_toolkit
+    upstream_key: global_stock_data
+    role: primary_router
+    markets: [US, HK, GLOBAL]
+    quality: implementation_reference
+
+  mootdx:
+    type: market_data
+    role: primary
+    markets: [CN]
+    datasets: [quote, order_book, trades, kline]
+    compliance: personal_research
+    notes: 使用真实取数验活；连接成功不等于可取数
+
+  tencent_finance:
+    type: market_data
+    role: primary_or_fallback
+    markets: [CN, US, HK]
+    datasets: [quote, index, etf, valuation, kline]
+    compliance: personal_research
+    notes: 必须校验市场前缀、标的名称、成交量和陈旧报价
+
+  sina_finance:
+    type: market_data
+    role: fallback
+    markets: [CN, US, HK]
+    datasets: [quote, kline, statements, options]
+    compliance: personal_research
+
+  eastmoney:
+    type: market_data_portal
+    role: unique_fields_and_fallback
+    markets: [CN, US, HK]
+    datasets: [quote, fund_flow, board_flow, research, financials, financing, block_trade, unlock, news]
+    compliance: personal_research
+    controls: [rate_limit, retry, cache, empty_result_validation]
+
+  baidu_finance:
+    type: market_data_portal
+    role: fallback
+    markets: [CN]
+    datasets: [kline]
+    compliance: personal_research
+
+  ths:
+    type: market_data_portal
+    role: specialist
+    markets: [CN]
+    datasets: [themes, consensus, limit_up_reason, sentiment]
+    compliance: personal_research
+
+  cninfo:
+    type: official_disclosure
+    role: primary
+    markets: [CN]
+    datasets: [announcements]
+    compliance: official_public
+
+  sse:
+    type: exchange
+    role: official_fallback
+    markets: [CN]
+    datasets: [announcements, trading_disclosure, calendar]
+    compliance: official_public
+
+  szse:
+    type: exchange
+    role: official_fallback
+    markets: [CN]
+    datasets: [announcements, trading_disclosure, calendar]
+    compliance: official_public
+
+  yahoo_finance:
+    type: market_data_portal
+    role: fallback
+    markets: [US, HK, GLOBAL]
+    datasets: [quote, kline, fundamentals, analyst, holdings, options, news]
+    compliance: personal_use_only
+    controls: [cookie_refresh, crumb_refresh, retry]
+
+  sec_edgar:
+    type: regulator
+    role: primary
+    markets: [US]
+    datasets: [filings, xbrl, insider, institutional, screener]
+    compliance: official_public
+    controls:
+      max_requests_per_second: 8
+      declared_user_agent_required: true
+
+  us_treasury:
+    type: government
+    role: primary
+    markets: [US]
+    datasets: [yield_curve]
+    compliance: official_public
+
+  cftc:
+    type: regulator
+    role: primary
+    markets: [US, GLOBAL]
+    datasets: [cot]
+    compliance: official_public
+
+  finra:
+    type: self_regulatory
+    role: specialist
+    markets: [US]
+    datasets: [short_volume]
+    compliance: restricted_noncommercial_verify
+
+  cboe:
+    type: exchange
+    role: specialist
+    markets: [US]
+    datasets: [options, greeks, iv, zero_dte]
+    compliance: prior_approval_required
+
+  nasdaq_calendar:
+    type: exchange_portal
+    role: fallback
+    markets: [US]
+    datasets: [earnings_calendar]
+    compliance: terms_unverified
+
+  binance_public:
+    type: exchange_api
+    role: primary
+    markets: [CRYPTO]
+    datasets: [spot_quote, futures_quote, funding, open_interest, kline]
+    compliance: public_api_personal_research
+
+  reuters:
+    type: authoritative_media
+    role: event_context_and_cross_check
+    markets: [GLOBAL]
+    datasets: [news, macro_context, market_close]
+    compliance: citation_only
+
+  bloomberg:
+    type: authoritative_media
+    role: event_context
+    markets: [GLOBAL]
+    datasets: [news, market_context]
+    compliance: citation_only
+
+  financial_times:
+    type: authoritative_media
+    role: structural_research
+    markets: [GLOBAL]
+    datasets: [news, analysis]
+    compliance: citation_only
+
+  ap:
+    type: authoritative_media
+    role: event_cross_check
+    markets: [GLOBAL]
+    datasets: [news]
+    compliance: citation_only
+
+  smm:
+    type: industry_data
+    role: primary_or_cross_check
+    markets: [CN, GLOBAL]
+    datasets: [metals_price, inventory, premium, industry]
+    compliance: personal_research
+
+  mysteel:
+    type: industry_data
+    role: primary_or_cross_check
+    markets: [CN]
+    datasets: [ferrous, inventory, production, margin]
+    compliance: personal_research
+
+rules:
+  - 数据源条款优先于便利性
+  - 公开仓库只存路由和代码，不存受限源原始数据库
+  - 权威媒体主要用于事件和市场解释，不替代可获得的官方数字
+  - 不允许把同一集团或同一底层接口伪装成两个独立来源
