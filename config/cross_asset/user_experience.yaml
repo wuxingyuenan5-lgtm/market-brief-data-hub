@@ -1,0 +1,98 @@
+schema_version: 1
+module_id: cross_asset_reader_experience
+status: enabled
+baseline_compatibility: cross_asset_v4_2026_07_31
+
+principles:
+  - 默认完整视图保持2026-07-31版原始阅读顺序
+  - 不增加新的决策建议体系
+  - 不改变固定导航和主模块顺序
+  - 交互必须在单文件离线HTML中可用
+  - 打印和导出PDF时自动恢复完整内容
+
+reading_modes:
+  enabled: true
+  default_mode: full
+  controls_location: hero_secondary_controls
+  modes:
+    full:
+      label: 完整晨报
+      behavior: 展示全部固定模块，保持默认基线
+    trading:
+      label: 交易速览
+      show_sections:
+        - hero
+        - decision_90_seconds
+        - overnight_macro
+        - market_map
+        - current_pricing_three_themes
+        - catalysts_and_seven_day_calendar
+      keep_research_summary: true
+      keep_sources_links: true
+    research:
+      label: 研究模式
+      show_sections:
+        - hero
+        - overnight_macro
+        - validated_charts
+        - market_map
+        - structural_research_two_to_four
+        - research_accumulation_trial
+        - flow_positioning_industry
+        - dual_ledger
+        - prior_view_review
+        - sources_and_methodology
+  implementation:
+    javascript_inline_only: true
+    persist_during_session: true
+    external_dependency: false
+    print_forces_full_mode: true
+
+change_highlighting:
+  enabled: true
+  compare_to: previous_completed_report
+  statuses:
+    new:
+      label: 新增
+      emphasis: high
+    strengthened:
+      label: 强化
+      emphasis: medium
+    weakened:
+      label: 弱化
+      emphasis: medium
+    falsified:
+      label: 证伪
+      emphasis: high
+    unchanged:
+      label: 延续
+      emphasis: low
+  rules:
+    - 只有相较上一份完整晨报发生实质变化时标记
+    - 不把措辞变化误判为研究变化
+    - unchanged默认降低视觉权重但不删除关键背景
+    - 高亮不得依赖颜色作为唯一识别方式
+
+traceability:
+  enabled: true
+  key_claim_anchor_links: true
+  source_links_open_new_tab_when_online: true
+  internal_links:
+    - source_and_methodology
+    - related_ledger_id
+    - previous_view_review
+  key_claim_metadata:
+    - source
+    - market_or_release_timestamp
+    - methodology
+    - related_ledger_id
+  display_policy:
+    default: compact
+    expand_on_click: true
+    audit_diagnostics_client_visible: false
+
+mobile:
+  sticky_mode_switch: false
+  minimum_touch_target_px: 40
+  tables_horizontal_scroll: true
+  preserve_heading_hierarchy: true
