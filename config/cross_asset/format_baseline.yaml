@@ -1,4 +1,4 @@
-schema_version: 2
+schema_version: 3
 baseline_id: cross_asset_v4_2026_07_31
 baseline_name: 跨资产交易晨报2026-07-31格式
 status: locked_default
@@ -8,7 +8,7 @@ change_policy: explicit_user_approval_required
 purpose:
   - 固定跨资产交易晨报V4的默认HTML结构与视觉层级
   - 后续默认只更新数据、观点、图表和来源，不随意重构版式
-  - 优化以增量方式进行，未经确认不得删除模块或调整主顺序
+  - 客户页面只保留有信息价值的文字，不展示内部分类或生成过程术语
 
 document_identity:
   config_path: config/cross_asset/artifact_naming.yaml
@@ -31,29 +31,28 @@ navigation:
   sticky: true
   items:
     - id: decision
-      label: 90秒决策
+      label: 摘要
     - id: macro
-      label: 隔夜宏观
+      label: 宏观
     - id: map
-      label: 市场地图
+      label: 市场
     - id: pricing
-      label: 当下定价
+      label: 主线
     - id: research
-      label: 系统研究
+      label: 研究
     - id: data
-      label: 资金仓位
+      label: 数据
     - id: ledger
-      label: 双账本
+      label: 跟踪
     - id: calendar
-      label: 事件日历
+      label: 日历
   controls:
+    - reading_mode
     - expand_collapse_all
     - print_or_pdf
 
 visual_tokens:
   primary: navy
-  pricing_accent: blue
-  research_accent: violet
   positive: green
   negative: red
   warning: amber
@@ -86,18 +85,36 @@ section_order:
   - sources_and_methodology
   - disclaimer
 
+visible_section_names:
+  decision_90_seconds: 90秒摘要
+  overnight_macro: 隔夜宏观
+  validated_charts: 数据图表
+  market_map: 市场概览
+  current_pricing_three_themes: 市场主线
+  structural_research_two_to_four: 研究更新
+  research_accumulation_trial: 研究跟踪
+  five_quick_updates: 重点信息
+  flow_positioning_industry: 资金、仓位与产业数据
+  dual_ledger: 跟踪表
+  prior_view_review: 前期观点复盘
+  catalysts_and_seven_day_calendar: 今日关注与未来7天事件
+  sources_and_methodology: 来源与口径
+
 section_contracts:
   hero:
+    visible_badges: false
     required:
-      - pricing_tag
-      - structural_research_tag
-      - real_data_tag
       - report_title
       - one_paragraph_thesis
       - report_date
       - data_cutoff
       - main_market_timestamps
       - coverage
+    prohibited_visible_copy:
+      - 当下定价
+      - 系统性积累
+      - 真实数据版
+      - AI生成
     naming:
       h1_pattern: 跨资产交易晨报｜{date}
       html_title_pattern: 跨资产交易晨报｜{date}
@@ -107,6 +124,7 @@ section_contracts:
       - one_sentence_mainline
       - three_new_changes
       - priority_validation_and_risk
+    prohibit_redundant_badges: true
   overnight_macro:
     required:
       - actual_consensus_previous_table
@@ -126,14 +144,14 @@ section_contracts:
       - latest_value
       - change
       - market_timestamp
-      - status
       - explanation
+    hide_internal_quality_status_column: true
   current_pricing_three_themes:
     layout: three_cards
     required_count: 3
-    card_accent: pricing_blue
     details_collapsible: true
     design_spec: config/cross_asset/section_design.yaml
+    prohibit_card_number_badges: true
     required_inside_each_card:
       - headline
       - new_fact_or_catalyst
@@ -156,17 +174,16 @@ section_contracts:
     layout: two_column_cards
     minimum_count: 2
     maximum_count: 4
-    card_accent: research_violet
     details_collapsible: true
+    prohibit_taxonomy_badges: true
   research_accumulation_trial:
     layout: compact_increment_panel
     show_changes_only: true
     removable: true
+    visible_title: 研究跟踪
   five_quick_updates:
     required_count: 5
-    label_each_as:
-      - current_pricing
-      - structural_accumulation
+    prohibit_internal_category_labels: true
   flow_positioning_industry:
     design_spec: config/cross_asset/section_design.yaml
     layout:
@@ -178,7 +195,7 @@ section_contracts:
       - market_flow_positioning_and_industry_dates_must_be_separate
       - show_only_material_updates
       - do_not_convert_alignment_to_trade_advice
-      - missing_data_must_be_explicit
+      - omit_noncritical_missing_rows
     evidence_alignment_columns:
       - theme_or_asset
       - price_signal
@@ -188,32 +205,12 @@ section_contracts:
       - evidence_alignment
       - key_gap
   dual_ledger:
+    visible_title: 跟踪表
     layout: two_tables
     design_spec: config/cross_asset/section_design.yaml
     required:
       - market_pricing_ledger
       - fundamental_research_ledger
-    market_pricing_ledger_fields:
-      - stable_id
-      - theme
-      - current_state
-      - price_and_rotation_confirmation
-      - flow_and_positioning_confirmation
-      - what_changed_today
-      - next_validation_node
-      - falsification_condition
-      - last_updated
-    fundamental_research_ledger_fields:
-      - stable_id
-      - topic
-      - maturity_stage
-      - core_assumption
-      - new_evidence
-      - valuation_fundamental_bridge
-      - contrary_evidence
-      - relation_to_market_pricing
-      - next_research_node
-      - last_updated
     rules:
       - stable_ids_persist_across_days
       - highlight_changes_only_on_screen
@@ -221,17 +218,21 @@ section_contracts:
       - closed_or_falsified_items_move_to_history_not_delete
   prior_view_review:
     layout: two_cards
-    required:
-      - short_term_trading_review
-      - medium_long_term_research_review
   catalysts_and_seven_day_calendar:
     layout: timeline
-    distinguish:
-      - short_term_price_catalyst
-      - structural_research_node
   sources_and_methodology:
     clickable_sources: true
     include_data_methodology: true
+
+client_presentation:
+  config_path: config/cross_asset/client_presentation.yaml
+  remove_internal_taxonomy_from_visible_copy: true
+  remove_self_certifying_copy: true
+
+content_integrity:
+  config_path: config/cross_asset/content_integrity.yaml
+  render_only_verified_claims: true
+  shrink_report_instead_of_filling_gaps: true
 
 mobile_behavior:
   hide_full_navigation_below_px: 740
@@ -240,30 +241,31 @@ mobile_behavior:
   preserve_controls: true
 
 allowed_without_user_approval:
-  - 更新当日数据、来源、时间戳和质量状态
+  - 更新当日数据、来源、时间戳和核验状态
   - 更新研究内容和结论
   - 在既定上限内调整图表数量
-  - 在2至4条范围内调整系统性研究数量
+  - 在2至4条范围内调整研究更新数量
   - 调整卡片内文字长度以适配内容
   - 修复浏览器兼容性、打印和移动端问题
-  - 按已批准的section_design优化当下定价、资金仓位产业数据和双账本内部呈现
+  - 按已批准的section_design优化市场主线、资金仓位产业数据和跟踪表内部呈现
+  - 删除客户页面中的内部分类、装饰性徽章和自我证明式文案
   - 确保正式附件使用固定文件名而非preview等临时名称
 
 requires_user_approval:
   - 改变主模块顺序
   - 删除固定模块
-  - 改变导航项目
-  - 超出section_design已批准范围再次改变双账本结构
+  - 超出section_design已批准范围再次改变跟踪表结构
   - 改成深色或完全不同的视觉主题
   - 将聊天摘要替代完整HTML
-  - 改变市场地图核心列
-  - 取消当下定价链与系统研究链的视觉分区
+  - 改变市场概览核心数据列
 
 quality_rules:
   - 格式固定不代表填充占位内容
   - 没有有效数据的图表直接不生成
-  - 缺失数据保留明确缺失表达
+  - 非关键缺失数据直接省略，关键缺失数据简洁标注数据暂缺
   - 不使用历史值冒充最新值
   - 不因模块固定而强行制造无增量观点
-  - 三条当下定价必须包含板块轮动或明确说明无清晰轮动
+  - 三条市场主线必须包含板块轮动或明确说明无清晰轮动
   - 正式下载文件名必须匹配日期，不得为preview或其他临时名称
+  - 客户页面不得出现内部研究分类术语
+  - 所有精确数字必须通过content_integrity核验门槛
