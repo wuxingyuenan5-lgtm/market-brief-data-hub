@@ -173,7 +173,7 @@ flow_positioning_industry:
     missing_data_explicit: true
     maximum_primary_rows: 10
 
- dual_ledger:
+dual_ledger:
   title: 双账本
   preserve_two_table_layout: true
   trading_pricing_ledger:
