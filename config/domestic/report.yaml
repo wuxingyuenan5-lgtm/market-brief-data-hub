@@ -5,6 +5,13 @@ timezone: Asia/Shanghai
 scheduled_time: '08:00'
 filename_pattern: 纯国内交易晨报_{date}.html
 
+format_baseline:
+  baseline_id: domestic_v1_2026_07_31
+  reference_filename: 纯国内交易晨报_2026-07-31.html
+  preferences_file: config/domestic/preferences.yaml
+  locked_default: true
+  change_requires_explicit_user_approval: true
+
 load_order:
   - vendor/upstreams.lock.yaml
   - config/shared/data_contract.yaml
@@ -13,6 +20,15 @@ load_order:
   - config/shared/quality_rules.yaml
   - config/shared/instruments.yaml
   - config/domestic/report.yaml
+  - docs/DATA_PROTOCOL.md
+  - docs/OPERATIONS.md
+
+domestic_extension_load_order:
+  - config/domestic/preferences.yaml
+  - config/domestic/watchlist.yaml
+  - config/domestic/research_ledger.yaml
+  - config/domestic/event_watchlist.yaml
+  - config/domestic/source_overrides.yaml
 
 scope:
   primary:
@@ -125,6 +141,9 @@ report_sections:
 chat_summary:
   include_only:
     - decision_90_seconds
+    - market_snapshot
+    - a_share_morning_features
+    - five_quick_updates
     - current_pricing_three_themes
     - top_two_structural_updates
     - catalysts_and_risks
@@ -154,9 +173,14 @@ html:
   responsive: true
   print_friendly: true
   external_dependencies: false
+  preserve_baseline_layout: true
+  source_toggle: true
+  print_pdf_action: true
 
 quality_gate:
   overseas_data_requires_domestic_transmission: true
   no_forced_section_without_incremental_information: true
   official_or_cross_source_for_headlines: true
   unavailable_text_from_contract: true
+  industry_taxonomy: SW2021
+  themes_must_be_separate_from_industries: true
