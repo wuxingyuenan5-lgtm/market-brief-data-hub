@@ -1,0 +1,121 @@
+schema_version: 1
+contract_name: market_brief_canonical_observation
+timezone: Asia/Shanghai
+missing_display_text: 未取得同一时点可核验数据
+
+observation:
+  required_fields:
+    - instrument_id
+    - display_name
+    - asset_class
+    - market
+    - value
+    - unit
+    - currency
+    - market_timestamp
+    - fetched_at
+    - source_id
+    - source_url
+    - quality_status
+  optional_fields:
+    - previous_value
+    - change_absolute
+    - change_percent
+    - period
+    - session
+    - statistical_date
+    - methodology
+    - source_timezone
+    - raw_symbol
+    - normalized_symbol
+    - validation_notes
+    - fallback_level
+
+conventions:
+  timestamps:
+    storage: ISO-8601 with timezone
+    report_display: 北京时间；同时保留市场本地交易日期
+    no_fake_alignment: true
+  percentage:
+    storage: decimal
+    display: percent_with_sign
+    example_only_for_schema: '0.0123 -> +1.23%'
+  prices:
+    use_official_close_when_available: true
+    intraday_requires_timestamp: true
+    adjusted_price_must_be_labeled: true
+  yields:
+    unit: percent
+    daily_change_unit: basis_point
+  flows:
+    default_currency: CNY
+    magnitude_display: auto_yi_wan
+    net_flow_sign: inflow_positive
+  returns:
+    default_method: close_to_close
+    rolling_24h_only_for_continuous_markets: true
+  macro:
+    fields:
+      - actual
+      - consensus
+      - previous
+      - revision
+      - release_time
+      - statistical_period
+    revision_must_not_overwrite_previous_silently: true
+
+quality_statuses:
+  official_verified:
+    rank: 1
+    description: 官方、交易所或监管来源已核验
+  cross_source_consistent:
+    rank: 2
+    description: 两个独立来源在容许误差和同一时点内一致
+  single_source_pending:
+    rank: 3
+    description: 单一来源有效但尚未交叉验证
+  time_mismatch:
+    rank: 4
+    description: 来源或资产时点不同，不适合直接横向比较
+  suspected_stale:
+    rank: 5
+    description: 疑似定格、旧代码、过期缓存或无成交报价
+  unavailable:
+    rank: 6
+    description: 未取得可靠数据
+
+freshness_defaults:
+  continuous_crypto_minutes: 5
+  intraday_equity_minutes: 20
+  equity_close_hours: 18
+  futures_intraday_minutes: 20
+  futures_close_hours: 18
+  fx_intraday_minutes: 20
+  rates_daily_hours: 36
+  macro_release_hours: 72
+  weekly_dataset_days: 10
+  monthly_dataset_days: 45
+
+comparison_tolerance:
+  equity_index_percent: 0.05
+  single_stock_percent: 0.10
+  crypto_percent: 0.10
+  commodity_percent: 0.10
+  yield_basis_points: 1.0
+  fx_percent: 0.03
+
+missing_value_rules:
+  latest_column_accepts_historical_value: false
+  historical_value_allowed_in_notes: true
+  historical_value_requires_date: true
+  estimate_allowed: false
+  average_conflicting_sources: false
+  empty_result_means_no_event: false
+
+reporting_rules:
+  show_source_and_timestamp_for_key_numbers: true
+  disclose_single_source_data: true
+  disclose_time_mismatch: true
+  charts_require_validated_inputs: true
+  charts_must_state_formula_and_period: true
+  derived_metrics_must_preserve_input_lineage: true
