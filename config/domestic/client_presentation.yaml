@@ -4,8 +4,8 @@ status: active
 purpose: 面向投研交易使用者输出简洁、自然、专业的国内晨报页面，减少信息堆叠，不暴露内部分类和生成过程术语
 
 client_copy_rules:
-  report_title: 纯国内交易晨报
-  h1_pattern: 纯国内交易晨报｜{date}
+  report_title: 国内交易晨报
+  h1_pattern: 国内交易晨报｜{date}
   allow_internal_taxonomy_in_visible_copy: false
   prohibited_visible_labels:
     - 当下定价
@@ -157,6 +157,7 @@ quality_checks:
   - 每张卡片不得重复显示所属模块名称
   - 客户页面不得出现真实数据版或类似自我证明式文案
   - 页面标题、下载文件名和归档文件名必须一致
+  - 页面标题与文件名必须使用国内交易晨报，不得再使用纯国内交易晨报
   - 客户可见文字只说明事实、结论和必要限制，不说明生成流程
   - 内部质量代码只保留在来源与口径或可展开详情中
   - 非关键缺失项直接省略，关键缺失项使用共享契约文本
