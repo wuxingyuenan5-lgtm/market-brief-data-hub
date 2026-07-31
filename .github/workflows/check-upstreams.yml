@@ -1,0 +1,66 @@
+name: Check upstream data toolkits
+
+on:
+  schedule:
+    - cron: '20 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check pinned versions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_CHECK_OUTPUT: upstream-status.json
+        run: python scripts/check_upstreams.py
+
+      - name: Detect updates
+        id: detect
+        run: |
+          python - <<'PY'
+          import json, os
+          data = json.load(open('upstream-status.json', encoding='utf-8'))
+          changed = any(x['update_available'] for x in data['results'])
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
+              f.write(f"changed={'true' if changed else 'false'}\n")
+          PY
+
+      - name: Create or refresh notification issue
+        if: steps.detect.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE='[upstream] Data toolkit update available'
+          COUNT=$(gh issue list --state open --search "$TITLE in:title" --json number --jq 'length')
+          python - <<'PY' > upstream-issue.md
+          import json
+          data = json.load(open('upstream-status.json', encoding='utf-8'))
+          print('检测到锁定版本与上游默认分支不同。不会自动升级，请人工审阅：\n')
+          for x in data['results']:
+              if x['update_available']:
+                  print(f"- **{x['repository']}**")
+                  print(f"  - pinned: `{x['pinned']}`")
+                  print(f"  - latest: `{x['latest']}`")
+                  print(f"  - message: {x['latest_message']}")
+                  print(f"  - url: {x['latest_url']}\n")
+          print('升级前请检查字段、单位、合规、限流、缓存与静默失败处理，并运行配置校验。')
+          PY
+          if [ "$COUNT" = "0" ]; then
+            gh issue create --title "$TITLE" --body-file upstream-issue.md
+          else
+            echo 'An open upstream notification issue already exists.'
+          fi
