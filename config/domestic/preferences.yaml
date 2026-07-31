@@ -5,7 +5,7 @@ timezone: Asia/Shanghai
 
 format_baseline:
   baseline_id: domestic_v1_2026_07_31
-  reference_filename: 纯国内交易晨报_2026-07-31.html
+  reference_filename: 国内交易晨报_2026-07-31.html
   status: locked_default
   lock:
     - fixed_navigation
@@ -132,6 +132,14 @@ content_priorities:
     - industry_price_or_order_change
     - capital_market_event
     - direct_overseas_transmission
+
+preview_and_demo:
+  same_fact_gate_as_formal_report: true
+  synthetic_market_values_prohibited: true
+  invented_timestamps_prohibited: true
+  fabricated_source_chain_prohibited: true
+  layout_only_preview_must_remove_unverified_facts: true
+  use_missing_text_instead_of_example_numbers: true
 
 visual_semantics:
   decision: decision
