@@ -1,0 +1,163 @@
+schema_version: 1
+policy_id: domestic_client_presentation_v1
+status: active
+purpose: 面向投研交易使用者输出简洁、自然、专业的国内晨报页面，减少信息堆叠，不暴露内部分类和生成过程术语
+
+client_copy_rules:
+  report_title: 国内交易晨报
+  h1_pattern: 国内交易晨报｜{date}
+  allow_internal_taxonomy_in_visible_copy: false
+  prohibited_visible_labels:
+    - 当下定价
+    - 系统性积累
+    - 真实数据版
+    - 当前定价
+    - 结构性积累
+    - 交易层
+    - 研究层
+    - 模型判断
+    - AI生成
+    - 数据体检
+    - 质量状态
+    - official_verified
+    - cross_source_consistent
+    - single_source_pending
+    - time_mismatch
+    - suspected_stale
+    - unavailable
+  prohibited_decorative_badges:
+    - 主线01
+    - 主线02
+    - 主线03
+    - 定价01
+    - 定价02
+    - 定价03
+  exceptions:
+    - 来源与口径章节可出现必要的数据质量和方法术语
+    - 内部HTML属性、CSS类名、配置文件和仓库日志可保留内部分类
+
+preferred_visible_section_names:
+  decision_90_seconds: 90秒摘要
+  overnight_macro_and_policy: 隔夜宏观与政策
+  domestic_market_map: 市场概览
+  current_pricing_three_themes: 市场主线
+  structural_research_two_to_four: 研究更新
+  five_quick_updates: 重点信息
+  flow_positioning_industry: 资金、仓位与产业数据
+  dual_ledger: 跟踪表
+  prior_view_review: 前期观点复盘
+  catalysts_and_seven_day_calendar: 今日关注与未来7天事件
+  charts: 数据图表
+  sources_and_methodology: 来源与口径
+
+navigation_labels:
+  decision: 摘要
+  macro: 宏观
+  map: 市场
+  pricing: 主线
+  research: 研究
+  data: 数据
+  ledger: 跟踪
+  calendar: 日历
+
+hero:
+  visible_badges: false
+  show_only:
+    - report_title
+    - one_paragraph_thesis
+    - report_date
+    - data_cutoff
+    - main_market_timestamps
+    - coverage
+  remove_version_marketing_copy: true
+  remove_process_copy: true
+
+visual_style:
+  page_background: light_gray
+  content_background: white
+  primary_text: near_black
+  secondary_text: muted_gray
+  primary_accent: navy
+  market_color_convention: cn_red_up_green_down
+  warning_accent: amber
+  borders: very_light
+  shadows: minimal_or_none
+  corner_radius: restrained
+  animations: none
+  typography: compact_but_readable
+  whitespace: use_to_separate_information_layers
+  avoid:
+    - large_decorative_rounded_cards
+    - heavy_shadows
+    - gradient_overuse
+    - oversized_badges
+    - dense_repeated_metadata
+    - decorative_icons_without_information_value
+
+information_density:
+  principle: 先结论后证据，默认页面不同时展开全部细节
+  first_screen:
+    - one_paragraph_thesis
+    - three_new_changes
+    - high_priority
+    - needs_validation
+    - temporarily_ignore
+  details_collapsible: true
+  card_summary_lines_max: 4
+  long_evidence_default_collapsed: true
+  repeated_background_once_only: true
+  noncritical_missing_rows_omitted: true
+  critical_missing_display_from_shared_contract: true
+
+cards_and_tables:
+  use_plain_language_headings: true
+  avoid_repeating_section_taxonomy_inside_each_card: true
+  avoid_explaining_obvious_ui_elements: true
+  no_decorative_status_badge_without_information_value: true
+  prohibit_card_number_badges: true
+  market_map_client_columns:
+    - asset
+    - latest_value
+    - daily_change
+    - market_timestamp
+    - explanation
+  preserve_hidden_metadata:
+    - quality_status
+    - source_id
+    - source_url
+    - fetched_at
+  status_words_allowed_only_for_real_change:
+    - 新增
+    - 强化
+    - 弱化
+    - 证伪
+    - 延续
+  table_rules:
+    compact: true
+    explanation_column_required: true
+    horizontal_scroll_on_mobile: true
+    freeze_header_when_useful: true
+    avoid_more_than_seven_visible_columns: true
+
+news_display:
+  visible_count: 5
+  format:
+    - headline
+    - fact
+    - affected_assets
+    - transmission
+    - priced_in_degree
+    - next_validation
+  merge_duplicate_events: true
+  no_raw_headline_stacking: true
+  overseas_requires_domestic_transmission: true
+
+quality_checks:
+  - Hero区域不得出现内部分类徽章
+  - 每张卡片不得重复显示所属模块名称
+  - 客户页面不得出现真实数据版或类似自我证明式文案
+  - 页面标题、下载文件名和归档文件名必须一致
+  - 页面标题与文件名必须使用国内交易晨报，不得再使用纯国内交易晨报
+  - 客户可见文字只说明事实、结论和必要限制，不说明生成流程
+  - 内部质量代码只保留在来源与口径或可展开详情中
+  - 非关键缺失项直接省略，关键缺失项使用共享契约文本

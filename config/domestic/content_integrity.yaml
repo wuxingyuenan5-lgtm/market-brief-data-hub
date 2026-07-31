@@ -1,0 +1,184 @@
+schema_version: 2
+policy_id: domestic_content_integrity_v1
+status: active
+purpose: 严禁AI幻觉、虚假陈述、未经核验的精确数字、错误合约和伪造因果归因
+
+hard_principles:
+  - 不知道就不写，无法核验就删除或按共享契约显示缺失
+  - 不得将推断、印象、模型常识或历史记忆写成当天事实
+  - 不得为了版面完整补齐数字、事件、共识、公司指引、资金流、仓位或产业数据
+  - 不得把新闻标题、搜索摘要或二手转述中的数字直接当作已核验原始数据
+  - 不得使用未来信息解释历史日期的晨报
+  - 不得捏造市场时间戳、抓取时间、来源链、质量状态或跨源验证结果
+  - 格式预览、测试版和正式版适用完全相同的事实核验门槛
+  - 报告可以缩短，可以只有结构和缺失说明，但不能完整而失真
+
+claim_classes:
+  numeric_market_data:
+    required_evidence:
+      - source_id
+      - source_url
+      - exact_instrument
+      - market_timestamp
+      - fetched_at
+      - unit
+      - currency
+      - value_basis
+    minimum_quality: official_verified_or_cross_source_consistent
+  cn_futures_market_data:
+    required_evidence:
+      - exchange
+      - exact_contract
+      - trading_day
+      - session
+      - market_timestamp
+      - price_type
+      - unit
+      - source_lineage
+    prohibited:
+      - 省略合约月份
+      - 固定月份冒充动态主力
+      - 现货价格冒充期货
+      - 不同月份合约混接
+  macro_actual:
+    required_evidence:
+      - official_release_or_statistical_agency
+      - release_time
+      - statistical_period
+      - unit_and_adjustment_basis
+    minimum_quality: official_verified
+  macro_consensus:
+    required_evidence:
+      - named_consensus_provider_or_named_news_source
+      - publication_time
+      - exact_measure_definition
+    on_missing: omit_consensus_cell_or_write未取得可核验一致预期
+  company_financial_metric:
+    preferred_sources:
+      - company_announcement
+      - cninfo
+      - exchange_filing
+    fallback_rule: 两个独立权威来源数值一致后方可使用
+  industry_classification:
+    required_evidence:
+      - taxonomy_sw2021
+      - effective_date
+      - stock_code
+      - industry_code
+    prohibited:
+      - 将概念或主题写成申万行业
+      - 使用报告日之后的行业归属
+  specialist_industry_data:
+    allowed_quality: single_source_pending
+    disclosure_required: true
+    required_evidence:
+      - statistical_date
+      - region_or_grade
+      - unit
+      - source
+  policy_or_regulatory_event:
+    required_evidence:
+      - official_document_or_regulator_release
+      - stage_of_process
+      - exact_date
+    prohibited:
+      - 将征求意见或提案写成已生效
+      - 将媒体讨论写成正式政策
+      - 将单一评论写成监管共识
+  causal_statement:
+    rule: 来源明确归因时才可写确定性因果，否则使用限定表达
+    prohibited:
+      - 仅凭同日涨跌推断唯一原因
+      - 将相关性写成因果
+  research_inference:
+    required_display: 明确标注为判断、推断或待验证假设
+    required_support: 至少两条已核验事实或一条官方事实加一条市场证据
+
+retrieval_protocol:
+  before_marking_missing:
+    - 检查代码、资产类型和市场映射
+    - 检查交易日、夜盘归属与时区
+    - 调用首选源
+    - 调用至少两个独立备源或一个官方备源
+    - 检查历史日期接口或官方归档
+    - 检查是否误用现货、期货、ETF、指数、错误合约或错误申万归属
+  minimum_attempts:
+    critical_market_map_field: 3
+    headline_macro_or_company_metric: 3
+    futures_price_position_or_warrant: 3
+    noncritical_supporting_metric: 2
+  stop_conditions:
+    - 来源冲突且无法解释口径差异
+    - 只有搜索摘要没有正文或原始数据
+    - 时间戳不匹配
+    - 单位、品级、税口径或合约无法确认
+    - 数据疑似陈旧
+
+preview_rules:
+  use_real_data_only: true
+  synthetic_example_values_prohibited: true
+  sample_timestamp_prohibited: true
+  sample_source_lineage_prohibited: true
+  copied_unverified_numbers_prohibited: true
+  if_layout_demonstration_only:
+    - 删除所有未完成核验的事实性数字
+    - 明确标注仅展示版式
+    - 使用共享缺失文本或省略非关键项目
+    - 不得生成交易结论、定价程度或证伪条件，除非其依据已核验
+
+missing_data_policy:
+  critical_required_field: 使用共享数据契约的缺失文本并保留资产名称和应有时点
+  noncritical_field: 直接省略，不为完整性展示空卡片
+  historical_value_in_latest_column: prohibited
+  approximate_value_without_source: prohibited
+  range_without_source: prohibited
+  proxy_without_explicit_label: prohibited
+
+consistency_checks:
+  - 标题日期、数据时点和事件日期不得冲突
+  - 同一资产在市场概览、图表、正文和跟踪表中的数字必须一致
+  - 同一公司财务数据在正文和研究卡片中必须一致
+  - 涨跌方向必须与数值变化一致
+  - 百分比、基点、绝对值和币种不得混用
+  - 指数点位不得由ETF价格替代
+  - 期货不得省略合约月份
+  - 现货、期货、仓单、社会库存和交易所库存不得混标
+  - 申万一级、二级行业和主题标签不得混排
+  - 报告显示的数据截止时间必须来自实际运行上下文，不得手工编造
+  - 声称跨源一致前必须保留两个独立来源及各自取值
+
+anti_hallucination_gate:
+  before_render:
+    - 建立事实清单
+    - 为每个数字绑定来源与时点
+    - 为每个事实绑定原始页面、官方文件或实际接口返回
+    - 将推断与事实分栏检查
+    - 删除所有无来源精确数字
+    - 删除所有仅来自搜索摘要而未打开核验的数字
+    - 删除所有无法证明的唯一因果表述
+    - 检查未来信息泄漏
+    - 检查重复内容中的数字一致性
+    - 检查期货合约、申万归属和单位
+    - 检查是否虚构抓取时间、质量状态或验证步骤
+  fail_action:
+    - 阻止正式完整HTML生成
+    - 阻止带事实数字的格式预览生成
+    - 输出可核验的缩减版，而不是完整但虚假的版本
+  client_visible_audit_log: false
+
+language_rules:
+  avoid_false_certainty:
+    - 确认
+    - 必然
+    - 证明
+    - 导致
+  allowed_when_supported:
+    - 官方数据显示
+    - 公司公告显示
+    - 两个独立来源一致显示
+  cautious_inference_phrases:
+    - 可能与……有关
+    - 市场反应与……一致
+    - 目前证据更支持……
+    - 尚不能排除……
+    - 仍需由……验证

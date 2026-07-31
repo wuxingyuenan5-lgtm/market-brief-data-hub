@@ -1,0 +1,110 @@
+schema_version: 1
+module_id: domestic_reader_experience
+status: enabled
+baseline_compatibility: domestic_v1_2026_07_31
+
+principles:
+  - 默认完整视图保持2026-07-31版固定模块顺序
+  - 阅读模式只改变显示范围，不增加新的决策体系
+  - 不改变主模块顺序
+  - 交互必须在单文件离线HTML中可用
+  - 打印和导出PDF时自动恢复完整内容
+  - 控件和提示语保持简短，不暴露内部研究分类或生成过程
+  - 同步跨资产晨报通用展示原则，但不得加载或继承config/cross_asset下的专属配置
+
+reading_modes:
+  enabled: true
+  default_mode: full
+  controls_location: topbar
+  modes:
+    full:
+      label: 全部
+      behavior: 展示全部固定模块
+    overview:
+      label: 概览
+      show_sections:
+        - hero
+        - data_cutoff
+        - decision_90_seconds
+        - overnight_macro_and_policy
+        - domestic_market_map
+        - current_pricing_three_themes
+        - five_quick_updates
+        - catalysts_and_seven_day_calendar
+      keep_research_summary: true
+      keep_sources_links: true
+    research:
+      label: 研究
+      show_sections:
+        - hero
+        - overnight_macro_and_policy
+        - domestic_market_map
+        - charts
+        - structural_research_two_to_four
+        - flow_positioning_industry
+        - dual_ledger
+        - prior_view_review
+        - sources_and_methodology
+  implementation:
+    javascript_inline_only: true
+    persist_during_session: true
+    external_dependency: false
+    print_forces_full_mode: true
+
+change_highlighting:
+  enabled: true
+  compare_to: previous_completed_report
+  statuses:
+    new:
+      label: 新增
+      emphasis: high
+    strengthened:
+      label: 强化
+      emphasis: medium
+    weakened:
+      label: 弱化
+      emphasis: medium
+    falsified:
+      label: 证伪
+      emphasis: high
+    unchanged:
+      label: 延续
+      emphasis: low
+  rules:
+    - 只有相较上一份完整晨报发生实质变化时标记
+    - 不把措辞调整误判为研究变化
+    - 延续内容默认降低视觉权重但不删除必要背景
+    - 高亮不得只依赖颜色
+    - 状态标签只在确有跨日变化时显示，不作为装饰
+
+traceability:
+  enabled: true
+  key_claim_anchor_links: true
+  source_links_open_new_tab_when_online: true
+  internal_links:
+    - sources_and_methodology
+    - related_ledger_id
+    - prior_view_review
+  key_claim_metadata:
+    - source
+    - market_or_release_timestamp
+    - methodology
+    - related_ledger_id
+  display_policy:
+    default: compact
+    expand_on_click: true
+    audit_diagnostics_client_visible: false
+    do_not_show_internal_quality_codes: true
+    preserve_quality_codes_in_source_section: true
+
+client_copy:
+  config_path: config/domestic/client_presentation.yaml
+  no_internal_taxonomy_badges: true
+  no_self_certifying_copy: true
+
+mobile:
+  sticky_mode_switch: false
+  minimum_touch_target_px: 40
+  tables_horizontal_scroll: true
+  preserve_heading_hierarchy: true
+  cards_stack_below_px: 820
