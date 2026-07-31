@@ -1,0 +1,156 @@
+schema_version: 1
+
+validation_pipeline:
+  - normalize_symbol
+  - resolve_market
+  - validate_payload_schema
+  - validate_instrument_identity
+  - validate_market_calendar
+  - validate_timestamp_freshness
+  - validate_price_and_volume
+  - detect_stale_or_frozen_quote
+  - cross_check_independent_source
+  - assign_quality_status
+  - preserve_lineage
+
+hard_fail_rules:
+  - normalized_symbol_is_empty
+  - instrument_name_mismatch
+  - explicit_market_conflicts_with_symbol
+  - impossible_ohlc
+  - negative_volume
+  - missing_market_timestamp_for_intraday
+  - future_market_timestamp
+  - stale_cache_used_as_latest
+  - old_bse_symbol_returns_zombie_quote
+  - endpoint_error_hidden_as_empty_array
+
+symbol_rules:
+  cn:
+    require_explicit_disambiguation:
+      - '000001'
+      - '000016'
+      - '000300'
+    bse_old_prefixes: ['43', '83', '87']
+    bse_current_prefix: '920'
+    reject_old_bse_as_current_without_mapping: true
+    etf_prefixes_sh: ['5']
+    index_whitelist_required_for_000_series: true
+  hk:
+    canonical_width: 5
+    left_pad_zero: true
+  us:
+    uppercase: true
+    preserve_dot_and_dash_mapping: true
+
+freshness_rules:
+  intraday:
+    require_same_session: true
+    allow_previous_close_outside_session: true
+  daily_close:
+    require_latest_completed_trading_day: true
+  weekly_monthly:
+    require_statistical_date: true
+  holidays:
+    use_market_calendar: true
+    do_not_flag_previous_close_as_stale_on_holiday: true
+
+stale_detection:
+  signals:
+    - quote_timestamp_not_advancing
+    - volume_zero_without_suspension
+    - bid_ask_identical_for_extended_period
+    - price_diff_exceeds_cross_source_tolerance
+    - quote_date_older_than_latest_trading_day
+    - instrument_name_or_exchange_mismatch
+  action:
+    quality_status: suspected_stale
+    exclude_from_latest_value: true
+    attempt_fallback: true
+
+cross_source_rules:
+  independence_required: true
+  same_underlying_api_not_independent: true
+  tolerance_source: data_contract.yaml
+  if_consistent: cross_source_consistent
+  if_conflict:
+    preserve_values: true
+    average_values: false
+    apply_priority: true
+    disclose_methodology_difference: true
+
+source_priority:
+  - official_regulator_exchange
+  - primary_company_filing
+  - licensed_or_primary_vendor
+  - established_market_portal
+  - authoritative_media
+  - research_institution
+  - specialist_commentary
+
+macro_rules:
+  require_statistical_period: true
+  require_release_time: true
+  prefer_official_actual: true
+  consensus_source_must_be_named: true
+  preserve_previous_revision: true
+  do_not_mix_annualized_and_year_over_year: true
+  do_not_mix_seasonally_adjusted_and_unadjusted: true
+
+market_data_rules:
+  do_not_mix:
+    - spot_and_futures
+    - futures_contract_months
+    - official_close_and_intraday
+    - adjusted_and_unadjusted_prices
+    - onshore_and_offshore_fx
+    - index_and_etf_proxy
+    - rolling_24h_and_trading_day_return
+  proxies:
+    allowed_only_if_labeled: true
+    prohibited_in_latest_value_column: true
+
+unit_rules:
+  explicit_currency_required: true
+  explicit_price_unit_required: true
+  yield_change_in_basis_points: true
+  commodity_grade_and_location_required_when_material: true
+  fund_flow_scale_must_be_preserved: true
+
+missing_data_rules:
+  display_text: 未取得同一时点可核验数据
+  do_not_substitute_estimate: true
+  do_not_repeat_old_value_as_new: true
+  old_value_may_be_shown_in_research_note: true
+  old_value_requires_exact_date: true
+  empty_result_requires_query_validation: true
+
+lineage_rules:
+  required:
+    - source_id
+    - source_url
+    - raw_symbol
+    - normalized_symbol
+    - market_timestamp
+    - fetched_at
+    - unit
+    - methodology
+    - quality_status
+  derived_metrics:
+    preserve_input_sources: true
+    preserve_formula: true
+    preserve_period: true
+
+report_gate:
+  official_or_cross_source_required_for:
+    - headline_macro_actual
+    - market_map_latest_value
+    - chart_input
+    - fund_flow_headline
+    - policy_stage
+  single_source_allowed_with_disclosure_for:
+    - specialist_industry_data
+    - crypto_derivatives
+    - analyst_consensus
+  suspected_stale_action: exclude
+  unavailable_action: display_missing_text
