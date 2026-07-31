@@ -1,0 +1,90 @@
+schema_version: 1
+module_id: cross_asset_research_accumulation_trial
+status: trial
+start_date: '2026-08-01'
+review_after_reports: 1
+reversible: true
+removal_policy: 用户判断呈现效果不佳时，可删除本文件并从report.yaml移除引用，不影响公共数据层与格式基线
+
+principles:
+  - 不改变90秒决策区和三条当下定价的原有写法
+  - 只展示真正新增、强化、弱化或证伪的研究信息
+  - 不为填满模块而重复旧结论
+  - 研究积累服务于持续验证，不直接包装成交易建议
+  - 每日新增展示应简洁，完整状态保存在研究账本中
+
+modules:
+  consensus_hypothesis_library:
+    enabled: true
+    display_title: 市场共识与关键假设
+    maximum_visible_items: 3
+    required_fields:
+      - hypothesis_id
+      - topic
+      - current_market_consensus
+      - our_observation
+      - conditions_required
+      - earliest_falsification_indicator
+      - change_status
+    change_statuses: [new, strengthened, weakened, falsified, unchanged]
+    hide_unchanged_by_default: true
+
+  valuation_fundamental_bridge:
+    enabled: true
+    display_title: 估值—基本面桥梁
+    maximum_visible_items: 2
+    preferred_topics: [ai_technology, us_equities, gold_miners, copper_equities, lithium_equities]
+    required_fields:
+      - topic
+      - current_valuation_context
+      - earnings_or_cashflow_expectation
+      - implied_assumption
+      - new_fundamental_evidence
+      - valuation_framework_impact
+    rules:
+      - 无可靠估值或盈利数据时不生成
+      - 不用历史分位替代当前可核验估值
+      - 明确区分资产价格、公司估值和商品基本面
+
+  cross_asset_transmission_matrix:
+    enabled: true
+    display_title: 跨资产传导与背离
+    maximum_visible_shocks: 2
+    tracked_assets: [rates, dollar, gold, copper, bitcoin, us_technology, cn_hk_equities]
+    required_fields:
+      - shock_variable
+      - conventional_transmission
+      - observed_transmission
+      - divergence
+      - interpretation
+      - next_validation
+    rules:
+      - 只展示当日存在明显传导或背离的冲击
+      - 标准传导是分析基准，不是机械预测
+      - 背离必须给出数据证据和可验证解释
+
+  research_maturity_stage:
+    enabled: true
+    display_title: 研究主题成熟度
+    stages:
+      - hypothesis_formed
+      - initial_evidence
+      - multi_source_validated
+      - market_pricing_started
+      - crowded
+      - falsification_phase
+      - closed
+    required_fields:
+      - ledger_id
+      - topic
+      - previous_stage
+      - current_stage
+      - transition_evidence
+      - next_node
+    display_only_stage_changes: true
+
+storage:
+  ledger_path: config/cross_asset/research_ledger.yaml
+  preserve_history: true
+  stable_ids_required: true
+  daily_report_shows_increment_only: true
