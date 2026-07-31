@@ -1,4 +1,4 @@
-schema_version: 1
+schema_version: 2
 config_id: domestic_preferences_v1
 report_id: domestic_cn_v1
 timezone: Asia/Shanghai
@@ -24,6 +24,30 @@ format_baseline:
     - research_content
     - citations
     - quality_disclosures
+    - reader_mode_content_visibility
+    - client_visible_copy_simplification
+
+presentation_alignment:
+  synchronized_principles:
+    - concise_client_copy
+    - plain_language_section_names
+    - progressive_disclosure
+    - three_reader_modes
+    - real_cross_day_change_highlighting
+    - compact_traceability
+    - anti_hallucination_gate
+    - white_gray_minimal_visual_style
+  domestic_runtime_independence: true
+  do_not_load_cross_asset_config_at_runtime: true
+  domestic_policy_files:
+    reader_experience: config/domestic/user_experience.yaml
+    client_presentation: config/domestic/client_presentation.yaml
+    content_integrity: config/domestic/content_integrity.yaml
+  domestic_specific_differences:
+    market_color_convention: cn_red_up_green_down
+    industry_taxonomy: SW2021
+    futures_exact_contract_required: true
+    overseas_only_if_domestic_transmission: true
 
 module_weights:
   a_shares_and_hk_mapping: 45
@@ -40,6 +64,12 @@ chat_summary:
     - top_news_with_asset_mapping
     - trading_conclusion
     - catalysts_and_risks
+  first_screen_logic:
+    - one_paragraph_thesis
+    - three_new_changes
+    - high_priority
+    - needs_validation
+    - temporarily_ignore
   market_snapshot_required:
     - SHCOMP
     - CSI300
@@ -112,6 +142,9 @@ visual_semantics:
   long_term_fundamental: fundamental
   inference: infer
   hypothesis: hypo
+  client_visible_internal_codes: false
+  decorative_badges: false
+  change_labels_only_when_material: true
 
 chart_priority:
   - a_share_index_and_sw_industry_relative_strength
