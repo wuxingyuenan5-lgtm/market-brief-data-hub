@@ -1,0 +1,243 @@
+schema_version: 1
+policy_id: cross_asset_section_design_v1
+status: active
+purpose: 优化当下市场定价、资金仓位与产业数据、双账本三个模块，同时保持2026-07-31版总体结构与顺序
+
+principles:
+  - 不输出仓位建议、交易指令或机械评分
+  - 重点解释价格、板块轮动、资金仓位和产业数据之间是否相互确认
+  - 每个结论必须有可追溯的数据时点和来源
+  - 只展示有增量的信息，不因结构固定而制造内容
+  - 板块轮动用于描述市场定价，不等同于交易推荐
+
+current_pricing_three_themes:
+  title: 当下市场定价
+  required_count: 3
+  preserve_three_card_layout: true
+  each_theme_fields:
+    - theme_id
+    - headline
+    - new_fact_or_catalyst
+    - cross_asset_price_expression
+    - sector_rotation
+    - flow_or_positioning_confirmation
+    - industry_or_fundamental_confirmation
+    - pricing_stage
+    - divergence_or_unresolved_point
+    - next_validation_node
+  pricing_stage_values:
+    - early
+    - broadening
+    - mature
+    - crowded
+    - reversing
+    - unclear
+  sector_rotation_contract:
+    required: true
+    describe_not_recommend: true
+    fields:
+      - leading_regions_or_markets
+      - leading_sectors
+      - lagging_sectors
+      - one_day_relative_performance
+      - five_day_relative_performance_when_available
+      - breadth_or_participation
+      - turnover_or_flow_share_when_available
+      - rotation_character
+    rotation_character_values:
+      - defensive_to_cyclical
+      - cyclical_to_defensive
+      - large_cap_to_small_cap
+      - small_cap_to_large_cap
+      - growth_to_value
+      - value_to_growth
+      - hardware_to_software
+      - software_to_hardware
+      - commodity_upstream_to_downstream
+      - regional_rotation
+      - concentration_increasing
+      - breadth_improving
+      - mixed_or_unclear
+    benchmark_rules:
+      us_sectors: SPX
+      us_technology: NDX_or_SOX
+      cn_sectors: CSI300_or_broad_A_share_index
+      hk_sectors: HSI_or_HSTECH
+      commodities: relevant_front_month_or_spot_benchmark
+    display:
+      add_rotation_strip_below_three_cards: true
+      maximum_rotation_items: 8
+      show_change_label: true
+      use_relative_performance_not_only_absolute_return: true
+
+flow_positioning_industry:
+  title: 资金、仓位与产业数据
+  objective: 将市场资金、衍生品仓位和产业基本面分层展示，避免混为一张杂项表
+  layers:
+    market_flow:
+      title: 市场资金
+      fields:
+        - asset_or_market
+        - price_change
+        - etf_or_fund_flow
+        - turnover_or_volume
+        - breadth
+        - direction_vs_previous_period
+        - timestamp
+    positioning:
+      title: 仓位与拥挤度
+      fields:
+        - asset_or_market
+        - positioning_metric
+        - current_level
+        - recent_change
+        - historical_context_or_percentile_when_reliable
+        - crowding_direction
+        - source_and_date
+      possible_metrics:
+        - cftc_net_position
+        - options_skew
+        - put_call
+        - dealer_gamma_when_reliable
+        - futures_open_interest
+        - funding_rate
+        - futures_basis
+        - margin_financing
+        - southbound_or_northbound_flow_when_available
+    industry_data:
+      title: 产业验证
+      fields:
+        - theme_or_asset
+        - operating_metric
+        - latest_value
+        - comparison_period
+        - direction
+        - implication_for_current_pricing
+        - source_and_statistical_date
+  synthesis_table:
+    enabled: true
+    columns:
+      - theme_or_asset
+      - price_signal
+      - flow_signal
+      - positioning_signal
+      - industry_signal
+      - evidence_alignment
+      - key_gap
+    evidence_alignment_values:
+      - confirming
+      - partially_confirming
+      - divergent
+      - insufficient_data
+    rule: evidence_alignment只描述证据关系，不转化为买卖建议
+  asset_minimum_packs:
+    precious_metals:
+      - price
+      - dxy
+      - real_yield
+      - etf_flow_when_available
+      - cftc_positioning
+      - physical_premium_when_available
+    copper:
+      - price
+      - exchange_inventory
+      - spot_premium
+      - regional_spread
+      - cftc_or_exchange_positioning
+      - tc_rc_or_supply_indicator_when_available
+    lithium:
+      - futures_price
+      - spot_price
+      - basis
+      - warehouse_receipts
+      - open_interest
+      - production_or_battery_schedule_when_available
+    crypto:
+      - spot_price
+      - etf_flow_when_available
+      - funding
+      - open_interest
+      - basis
+      - exchange_or_stablecoin_metric_when_reliable
+    equities_and_ai:
+      - index_or_sector_return
+      - breadth
+      - turnover
+      - etf_or_fund_flow
+      - options_or_short_positioning_when_reliable
+      - earnings_capex_or_order_metric
+  display_rules:
+    do_not_force_all_assets_daily: true
+    show_only_material_updates: true
+    separate_statistical_dates: true
+    missing_data_explicit: true
+    maximum_primary_rows: 10
+
+ dual_ledger:
+  title: 双账本
+  preserve_two_table_layout: true
+  trading_pricing_ledger:
+    display_name: 市场定价账本
+    purpose: 记录市场正在交易的逻辑及其证据变化，不提供仓位或交易指令
+    fields:
+      - stable_id
+      - theme
+      - current_state
+      - linked_pricing_theme_id
+      - price_and_rotation_confirmation
+      - flow_and_positioning_confirmation
+      - what_changed_today
+      - next_validation_node
+      - falsification_condition
+      - last_updated
+    states:
+      - forming
+      - strengthening
+      - unchanged
+      - weakening
+      - crowded
+      - reversing
+      - falsified
+      - closed
+  fundamental_research_ledger:
+    display_name: 基本面研究账本
+    purpose: 记录长期核心假设、估值桥梁和研究成熟度
+    fields:
+      - stable_id
+      - topic
+      - maturity_stage
+      - core_assumption
+      - new_evidence
+      - valuation_fundamental_bridge
+      - contrary_evidence
+      - relation_to_market_pricing
+      - next_research_node
+      - last_updated
+    maturity_stages:
+      - hypothesis
+      - initial_evidence
+      - multi_source_validation
+      - market_pricing_started
+      - mature
+      - crowded_or_consensus
+      - falsification_watch
+      - closed
+  linkage_rules:
+    - 每条当下定价主线必须链接至少一个市场定价账本ID
+    - 每条系统研究更新应链接一个基本面研究账本ID
+    - 同一主题跨日沿用稳定ID，不因标题变化新建重复条目
+    - 当日报告只高亮状态变化和新增证据，历史保留在research_ledger.yaml
+    - 已关闭或证伪条目不删除，转入历史区
+  display_rules:
+    show_change_badges: true
+    collapse_unchanged_rows_when_possible: true
+    preserve_full_rows_for_print: true
+    no_confidence_score: true
+
+quality_checks:
+  - 三条定价主线均包含板块轮动或明确写无清晰轮动
+  - 板块轮动使用相对基准，不只比较绝对涨跌
+  - 资金、仓位、产业数据的统计日期分别标注
+  - 不把单源或时点错配数据包装成一致证据
+  - 双账本稳定ID与当日内容可相互跳转
+  - 不因缺少数据而填入估算值或模板句
