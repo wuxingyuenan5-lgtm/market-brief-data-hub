@@ -1,0 +1,187 @@
+schema_version: 1
+baseline_id: cross_asset_v4_2026_07_31
+baseline_name: 跨资产交易晨报2026-07-31格式
+status: locked_default
+source_artifact: 跨资产交易晨报_2026-07-31.html
+change_policy: explicit_user_approval_required
+
+purpose:
+  - 固定跨资产交易晨报V4的默认HTML结构与视觉层级
+  - 后续默认只更新数据、观点、图表和来源，不随意重构版式
+  - 优化以增量方式进行，未经确认不得删除模块或调整主顺序
+
+page:
+  language: zh-CN
+  max_width_px: 1400
+  background: light_gray
+  content_style: chinese_institutional_research
+  responsive: true
+  print_friendly: true
+  self_contained: true
+  external_dependencies: false
+
+navigation:
+  sticky: true
+  items:
+    - id: decision
+      label: 90秒决策
+    - id: macro
+      label: 隔夜宏观
+    - id: map
+      label: 市场地图
+    - id: pricing
+      label: 当下定价
+    - id: research
+      label: 系统研究
+    - id: data
+      label: 资金仓位
+    - id: ledger
+      label: 双账本
+    - id: calendar
+      label: 事件日历
+  controls:
+    - expand_collapse_all
+    - print_or_pdf
+
+visual_tokens:
+  primary: navy
+  pricing_accent: blue
+  research_accent: violet
+  positive: green
+  negative: red
+  warning: amber
+  cards:
+    border: subtle
+    radius: restrained
+    shadow: light
+  tables:
+    responsive_horizontal_scroll: true
+    hover_highlight: true
+  typography:
+    body: Microsoft YaHei, PingFang SC, Arial, sans-serif
+    headline_weight: strong
+    information_density: high
+
+section_order:
+  - hero
+  - decision_90_seconds
+  - overnight_macro
+  - validated_charts
+  - market_map
+  - current_pricing_three_themes
+  - structural_research_two_to_four
+  - five_quick_updates
+  - flow_positioning_industry
+  - dual_ledger
+  - prior_view_review
+  - catalysts_and_seven_day_calendar
+  - sources_and_methodology
+  - disclaimer
+
+section_contracts:
+  hero:
+    required:
+      - pricing_tag
+      - structural_research_tag
+      - real_data_tag
+      - report_title
+      - one_paragraph_thesis
+      - report_date
+      - data_cutoff
+      - main_market_timestamps
+      - coverage
+  decision_90_seconds:
+    layout: three_cards
+    required:
+      - one_sentence_mainline
+      - three_new_changes
+      - priority_validation_and_risk
+  overnight_macro:
+    required:
+      - actual_consensus_previous_table
+      - market_reaction
+      - medium_term_implication
+      - transmission_path
+      - falsification_condition
+  validated_charts:
+    layout: two_column_when_possible
+    maximum: 4
+    validated_data_only: true
+    require_research_meaning: true
+  market_map:
+    layout: responsive_table
+    columns:
+      - asset
+      - latest_value
+      - change
+      - market_timestamp
+      - status
+      - explanation
+  current_pricing_three_themes:
+    layout: three_cards
+    required_count: 3
+    card_accent: pricing_blue
+    details_collapsible: true
+  structural_research_two_to_four:
+    layout: two_column_cards
+    minimum_count: 2
+    maximum_count: 4
+    card_accent: research_violet
+    details_collapsible: true
+  five_quick_updates:
+    required_count: 5
+    label_each_as:
+      - current_pricing
+      - structural_accumulation
+  flow_positioning_industry:
+    layout: four_metric_cards_when_possible
+    missing_data_must_be_explicit: true
+  dual_ledger:
+    layout: two_tables
+    required:
+      - trading_logic_ledger
+      - fundamental_research_ledger
+  prior_view_review:
+    layout: two_cards
+    required:
+      - short_term_trading_review
+      - medium_long_term_research_review
+  catalysts_and_seven_day_calendar:
+    layout: timeline
+    distinguish:
+      - short_term_price_catalyst
+      - structural_research_node
+  sources_and_methodology:
+    clickable_sources: true
+    include_data_methodology: true
+
+mobile_behavior:
+  hide_full_navigation_below_px: 740
+  stack_cards: true
+  preserve_table_horizontal_scroll: true
+  preserve_controls: true
+
+allowed_without_user_approval:
+  - 更新当日数据、来源、时间戳和质量状态
+  - 更新研究内容和结论
+  - 在既定上限内调整图表数量
+  - 在2至4条范围内调整系统性研究数量
+  - 调整卡片内文字长度以适配内容
+  - 修复浏览器兼容性、打印和移动端问题
+
+requires_user_approval:
+  - 改变主模块顺序
+  - 删除固定模块
+  - 改变导航项目
+  - 改变双账本结构
+  - 改成深色或完全不同的视觉主题
+  - 将聊天摘要替代完整HTML
+  - 改变市场地图核心列
+  - 取消当下定价链与系统研究链的视觉分区
+
+quality_rules:
+  - 格式固定不代表填充占位内容
+  - 没有有效数据的图表直接不生成
+  - 缺失数据保留明确缺失表达
+  - 不使用历史值冒充最新值
+  - 不因模块固定而强行制造无增量观点
