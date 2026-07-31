@@ -1,9 +1,19 @@
-schema_version: 3
+schema_version: 4
 report_id: cross_asset_v4
-display_name: 每日跨资产交易晨报 V4
+display_name: 跨资产交易晨报
+edition: V4
 timezone: Asia/Shanghai
 scheduled_time: '08:00'
 filename_pattern: 跨资产交易晨报_{date}.html
+
+artifact_naming:
+  enforced: true
+  config_path: config/cross_asset/artifact_naming.yaml
+  display_title_pattern: 跨资产交易晨报｜{date}
+  filename_pattern: 跨资产交易晨报_{date}.html
+  attachment_name_pattern: 跨资产交易晨报_{date}.html
+  prohibit_generic_names: [preview, report, output, index, artifact]
+  require_real_file_before_delivery: true
 
 format_baseline:
   id: cross_asset_v4_2026_07_31
@@ -21,7 +31,9 @@ load_order:
   - config/shared/routing.yaml
   - config/shared/quality_rules.yaml
   - config/shared/instruments.yaml
+  - config/cross_asset/artifact_naming.yaml
   - config/cross_asset/format_baseline.yaml
+  - config/cross_asset/section_design.yaml
   - config/cross_asset/research_accumulation.yaml
   - config/cross_asset/research_ledger.yaml
   - config/cross_asset/user_experience.yaml
@@ -85,6 +97,47 @@ decision_layer:
     - current_pricing_three_themes
     - catalysts_and_risks
   rule: 保持2026-07-31基线原有表达，不增加仓位建议、交易指令、阈值触发或最优表达工具栏目
+
+section_design:
+  enabled: true
+  config_path: config/cross_asset/section_design.yaml
+  approved_on: '2026-07-31'
+  approved_scope:
+    - current_pricing_three_themes
+    - flow_positioning_industry
+    - dual_ledger
+  preserve_section_order: true
+  current_pricing:
+    required_count: 3
+    require_sector_rotation: true
+    add_rotation_strip: true
+    rotation_must_use_relative_benchmark: true
+    required_fields:
+      - headline
+      - new_fact_or_catalyst
+      - cross_asset_price_expression
+      - sector_rotation
+      - flow_or_positioning_confirmation
+      - industry_or_fundamental_confirmation
+      - pricing_stage
+      - divergence_or_unresolved_point
+      - next_validation_node
+  flow_positioning_industry:
+    separate_layers:
+      - market_flow
+      - positioning
+      - industry_data
+    include_evidence_alignment_table: true
+    evidence_alignment_is_not_trade_advice: true
+    show_only_material_updates: true
+  dual_ledger:
+    preserve_two_table_layout: true
+    trading_table_name: 市场定价账本
+    research_table_name: 基本面研究账本
+    require_stable_ids: true
+    require_cross_links: true
+    highlight_changes_only: true
+    preserve_history_in_research_ledger: true
 
 crypto_policy:
   daily_policy_section: false
@@ -158,18 +211,23 @@ chat_summary:
 
 research_requirements:
   current_pricing_theme_fields:
+    - theme_id
     - new_fact
     - actual_consensus_previous_or_prior_assumption
+    - cross_asset_price_expression
+    - sector_rotation
+    - flow_or_positioning_confirmation
+    - industry_or_fundamental_confirmation
     - already_priced
     - not_yet_reflected
-    - transmission_path
     - horizon
-    - pricing_status
+    - pricing_stage
     - validation_variables
     - counter_evidence
     - falsification_condition
   structural_update_fields:
     - research_topic
+    - stable_ledger_id
     - new_information
     - stage
     - changed_fundamental_variable
@@ -194,16 +252,20 @@ html:
   print_friendly: true
   baseline_spec: config/cross_asset/format_baseline.yaml
   preserve_2026_07_31_structure: true
+  title_must_follow_artifact_naming: true
 
 format_change_control:
   default: incremental_only
+  approved_exceptions:
+    - approved_on: '2026-07-31'
+      scope: 优化当下市场定价、资金仓位与产业数据及双账本内部结构，并增加板块轮动；不改变模块顺序和整体主题
   user_approval_required_for:
     - section_reorder
     - fixed_section_removal
     - navigation_change
     - market_map_column_change
     - visual_theme_replacement
-    - dual_ledger_structure_change
+    - future_dual_ledger_structure_change_outside_approved_scope
     - pricing_vs_research_partition_change
 
 internal_quality_operations:
@@ -219,3 +281,5 @@ quality_gate:
   official_or_cross_source_for_headlines: true
   all_key_numbers_require_timestamp: true
   format_lock_does_not_force_empty_content: true
+  filename_must_match_canonical_pattern: true
+  no_generic_preview_filename: true
