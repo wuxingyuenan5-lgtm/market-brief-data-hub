@@ -1,0 +1,121 @@
+schema_version: 1
+config_id: domestic_preferences_v1
+report_id: domestic_cn_v1
+timezone: Asia/Shanghai
+
+format_baseline:
+  baseline_id: domestic_v1_2026_07_31
+  reference_filename: 纯国内交易晨报_2026-07-31.html
+  status: locked_default
+  lock:
+    - fixed_navigation
+    - module_order
+    - visual_semantics
+    - responsive_layout
+    - print_styles
+    - source_toggle
+    - print_pdf_action
+  change_policy: explicit_user_approval_required
+  daily_change_scope:
+    - report_date
+    - data_cutoff
+    - data_values
+    - charts
+    - research_content
+    - citations
+    - quality_disclosures
+
+module_weights:
+  a_shares_and_hk_mapping: 45
+  domestic_commodities: 35
+  finance_news_and_company_events: 10
+  china_macro_policy_fx_rates: 10
+
+chat_summary:
+  style: compact_message
+  timestamp_required: true
+  sections:
+    - market_snapshot
+    - a_share_morning_features
+    - top_news_with_asset_mapping
+    - trading_conclusion
+    - catalysts_and_risks
+  market_snapshot_required:
+    - SHCOMP
+    - CSI300
+    - CSI500
+    - CSI1000
+    - CHINEXT
+    - STAR50
+    - HSI
+    - HSTECH
+    - SHFE_GOLD
+    - SHFE_COPPER
+    - GFEX_LITHIUM
+    - CN10Y
+    - DR007
+    - USDCNY
+    - USDCNH
+  a_share_morning_features:
+    required:
+      - limit_up_count
+      - limit_down_count
+      - market_breadth
+      - turnover
+      - sw_level1_leaders
+      - sw_level1_laggards
+      - active_themes
+    theme_label_must_be_separate_from_industry: true
+  quick_news_count: 5
+  news_requires_asset_mapping: true
+
+industry_standard:
+  taxonomy: SW2021
+  display_name: 申万2021行业分类
+  primary_level: level1
+  drilldown_level: level2
+  level3_default: false
+  use_as_only_industry_taxonomy: true
+  themes_are_not_industries: true
+  concepts_are_not_industries: true
+  classification_must_be_effective_on_report_date: true
+
+content_priorities:
+  a_share:
+    - market_breadth_and_turnover
+    - sw_industry_relative_strength
+    - incremental_fund_flow
+    - earnings_and_orders
+    - policy_pricing
+    - crowding_and_liquidity
+  commodities:
+    - futures_price_and_contract
+    - volume_open_interest
+    - term_structure
+    - basis
+    - exchange_warrants_and_inventory
+    - spot_premium_discount
+    - operating_rate_margin_and_schedule
+  news:
+    - policy_increment
+    - company_announcement
+    - industry_price_or_order_change
+    - capital_market_event
+    - direct_overseas_transmission
+
+visual_semantics:
+  decision: decision
+  risk: risk
+  priority: priority
+  fact: fact
+  short_term_pricing: pricing
+  long_term_fundamental: fundamental
+  inference: infer
+  hypothesis: hypo
+
+chart_priority:
+  - a_share_index_and_sw_industry_relative_strength
+  - turnover_breadth_and_fund_flow
+  - copper_or_lithium_price_inventory_basis
+  - gold_renminbi_and_domestic_rates
+chart_limit: 4
