@@ -1,0 +1,143 @@
+schema_version: 1
+report_id: cross_asset_v4
+display_name: 每日跨资产交易晨报 V4
+timezone: Asia/Shanghai
+scheduled_time: '08:00'
+filename_pattern: 跨资产交易晨报_{date}.html
+
+load_order:
+  - vendor/upstreams.lock.yaml
+  - config/shared/data_contract.yaml
+  - config/shared/sources.yaml
+  - config/shared/routing.yaml
+  - config/shared/quality_rules.yaml
+  - config/shared/instruments.yaml
+  - config/cross_asset/report.yaml
+
+coverage:
+  macro: [US, CN, GLOBAL]
+  assets:
+    - precious_metals
+    - copper
+    - lithium
+    - crypto
+    - cn_equities
+    - hk_equities
+    - us_equities
+    - ai_technology
+
+market_map:
+  required:
+    - SPX
+    - NDX
+    - SOX
+    - CSI300
+    - HSTECH
+    - BTCUSDT
+    - ETHUSDT
+    - GOLD_SPOT
+    - SILVER_SPOT
+    - LME_COPPER
+    - GFEX_LITHIUM
+    - DXY
+    - US2Y
+    - US10Y
+    - US10Y_REAL
+    - BRENT
+    - VIX
+  columns:
+    - asset
+    - latest_value
+    - daily_change
+    - market_timestamp
+    - quality_status
+    - explanation
+
+macro_module:
+  fixed: true
+  fields: [actual, consensus, previous, revision, market_reaction, transmission_path]
+  topics:
+    - growth
+    - inflation
+    - employment
+    - central_bank
+    - yield_curve
+    - dollar
+
+crypto_policy:
+  daily_policy_section: false
+  include_only_if_material: true
+  material_topics:
+    - legislation
+    - regulatory_implementation
+    - judicial_decision
+    - banking_custody
+    - stablecoin
+    - rwa
+    - licensing
+    - market_structure
+
+report_sections:
+  - data_cutoff
+  - decision_90_seconds
+  - overnight_macro
+  - market_map
+  - current_pricing_three_themes
+  - structural_research_two_to_four
+  - five_quick_updates
+  - flow_positioning_industry
+  - dual_ledger
+  - prior_view_review
+  - catalysts_and_seven_day_calendar
+  - charts
+  - sources_and_methodology
+
+chat_summary:
+  include_only:
+    - decision_90_seconds
+    - current_pricing_three_themes
+    - top_two_structural_updates
+    - catalysts_and_risks
+
+research_requirements:
+  current_pricing_theme_fields:
+    - new_fact
+    - actual_consensus_previous_or_prior_assumption
+    - already_priced
+    - not_yet_reflected
+    - transmission_path
+    - horizon
+    - pricing_status
+    - validation_variables
+    - counter_evidence
+    - falsification_condition
+  structural_update_fields:
+    - research_topic
+    - new_information
+    - stage
+    - changed_fundamental_variable
+    - valuation_framework_impact
+    - relation_to_prior_conclusion
+    - next_tracking_node
+
+chart_policy:
+  maximum: 4
+  validated_data_only: true
+  placeholder_forbidden: true
+  require_methodology_note: true
+
+html:
+  self_contained: true
+  external_cdn: false
+  external_fonts: false
+  remote_images: false
+  fixed_navigation: true
+  responsive: true
+  print_friendly: true
+
+quality_gate:
+  no_template_numbers: true
+  no_estimates_as_actual: true
+  unavailable_text_from_contract: true
+  official_or_cross_source_for_headlines: true
+  all_key_numbers_require_timestamp: true
