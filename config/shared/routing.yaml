@@ -1,0 +1,171 @@
+schema_version: 1
+routing_policy:
+  prefer_upstream_toolkits: true
+  use_locked_upstream_versions: true
+  fallback_requires_independent_domain: true
+  fallback_requires_independent_failure_surface: true
+  max_fallback_levels: 3
+  no_silent_fallback_to_old_cache: true
+
+routes:
+  cn_equity_quote:
+    implementation: a_stock_data
+    primary: [mootdx, tencent_finance]
+    fallback: [baidu_finance, eastmoney, sina_finance]
+    validations: [symbol_mapping, instrument_name, trading_date, nonzero_volume_or_suspended_flag, stale_quote]
+
+  cn_index_quote:
+    implementation: a_stock_data
+    primary: [tencent_finance, mootdx]
+    fallback: [eastmoney, sina_finance]
+    validations: [explicit_index_mapping, market_prefix, trading_date, stale_quote]
+
+  cn_etf_quote:
+    implementation: a_stock_data
+    primary: [tencent_finance, mootdx]
+    fallback: [eastmoney, sina_finance]
+    validations: [explicit_etf_mapping, exchange_prefix, trading_date, nav_field_not_confused_with_price]
+
+  cn_kline:
+    implementation: a_stock_data
+    primary: [mootdx, tencent_finance]
+    fallback: [baidu_finance, sina_finance]
+    validations: [ohlc_consistency, volume_nonnegative, interval, timezone, last_bar_date]
+
+  cn_market_breadth:
+    implementation: a_stock_data
+    primary: [eastmoney]
+    fallback: [tencent_finance, sse, szse]
+    validations: [universe_definition, trading_date, total_count_consistency]
+
+  cn_sector_performance:
+    implementation: a_stock_data
+    primary: [eastmoney]
+    fallback: [ths]
+    validations: [sector_type, ranking_field, trading_date]
+
+  cn_sector_fund_flow:
+    implementation: a_stock_data
+    primary: [eastmoney]
+    fallback: []
+    validations: [period, fund_flow_bucket_sum, trading_date]
+    single_source_policy: disclose
+
+  cn_margin_financing:
+    implementation: a_stock_data
+    primary: [eastmoney]
+    fallback: [sse, szse]
+    validations: [statistical_date, balance_identity, currency_unit]
+
+  cn_announcements:
+    implementation: a_stock_data
+    primary: [cninfo]
+    fallback: [sse, szse, eastmoney]
+    validations: [org_id_mapping, announcement_date, attachment_url]
+
+  cn_research_reports:
+    implementation: a_stock_data
+    primary: [eastmoney, ths]
+    fallback: []
+    validations: [normalized_ticker, report_date_window, empty_result_not_no_coverage]
+    single_source_policy: disclose
+
+  cn_limit_up_pool:
+    implementation: a_stock_data
+    primary: [eastmoney, ths]
+    fallback: []
+    validations: [trading_date, board_type, duplicate_symbol]
+
+  us_equity_quote:
+    implementation: global_stock_data
+    primary: [tencent_finance, sina_finance]
+    fallback: [eastmoney, yahoo_finance]
+    validations: [ticker_mapping, exchange, currency, session, timestamp, stale_quote]
+
+  hk_equity_quote:
+    implementation: global_stock_data
+    primary: [tencent_finance, sina_finance]
+    fallback: [eastmoney, yahoo_finance]
+    validations: [five_digit_symbol, currency_hkd, session, timestamp, stale_quote]
+
+  global_kline:
+    implementation: global_stock_data
+    primary: [sina_finance, yahoo_finance]
+    fallback: [tencent_finance, eastmoney]
+    validations: [ohlc_consistency, corporate_action_label, timezone, last_bar_date]
+
+  us_fundamentals:
+    implementation: global_stock_data
+    primary: [sec_edgar]
+    fallback: [yahoo_finance, eastmoney]
+    validations: [filing_period, fiscal_year, currency, instant_vs_duration_tag, restatement]
+
+  us_filings:
+    implementation: global_stock_data
+    primary: [sec_edgar]
+    fallback: []
+    validations: [declared_user_agent, filing_date, accession_number, form_type]
+
+  us_yield_curve:
+    implementation: global_stock_data
+    primary: [us_treasury]
+    fallback: [reuters]
+    validations: [observation_date, tenor_order, percent_unit, holiday_handling]
+
+  cftc_positioning:
+    implementation: global_stock_data
+    primary: [cftc]
+    fallback: []
+    validations: [report_date, contract_mapping, futures_only_vs_combined]
+
+  us_earnings_calendar:
+    implementation: global_stock_data
+    primary: [nasdaq_calendar]
+    fallback: [reuters, yahoo_finance]
+    validations: [event_date, before_after_market, ticker_mapping]
+
+  crypto_spot_quote:
+    primary: [binance_public]
+    fallback: [reuters]
+    validations: [symbol, rolling_24h_window, exchange_timestamp, bid_ask_sanity]
+    single_source_policy: disclose
+
+  crypto_derivatives:
+    primary: [binance_public]
+    fallback: []
+    validations: [contract_type, funding_interval, open_interest_unit, timestamp]
+    single_source_policy: disclose
+
+  gold_price_global:
+    primary: [reuters]
+    fallback: [sina_finance, eastmoney]
+    validations: [spot_vs_futures, contract_month, currency, settlement_vs_intraday, timestamp]
+
+  metals_cn:
+    primary: [smm]
+    fallback: [eastmoney, sina_finance]
+    validations: [spot_vs_futures, grade, location, tax_inclusion, unit, statistical_date]
+
+  ferrous_cn:
+    primary: [mysteel]
+    fallback: [eastmoney]
+    validations: [contract, region, inventory_definition, unit, statistical_date]
+
+  macro_release:
+    primary: [official_release]
+    fallback: [reuters, ap]
+    validations: [release_time, statistical_period, actual_consensus_previous, revisions]
+
+fallback_behavior:
+  on_network_error: try_next_source
+  on_rate_limit: retry_with_backoff_then_next_source
+  on_empty_result: validate_query_and_symbol_then_next_source
+  on_http_200_invalid_payload: mark_invalid_then_next_source
+  on_source_conflict: preserve_both_and_apply_source_priority
+  on_all_failed: mark_unavailable
+
+cache_policy:
+  cache_key_fields: [dataset, normalized_symbol, period, market_timestamp]
+  required_metadata: [generated_at, source_id, trading_date, schema_version]
+  stale_cache_action: reject_for_latest_column
+  stale_cache_may_support_research_history: true
