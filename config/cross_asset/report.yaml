@@ -1,9 +1,18 @@
-schema_version: 1
+schema_version: 2
 report_id: cross_asset_v4
 display_name: 每日跨资产交易晨报 V4
 timezone: Asia/Shanghai
 scheduled_time: '08:00'
 filename_pattern: 跨资产交易晨报_{date}.html
+
+format_baseline:
+  id: cross_asset_v4_2026_07_31
+  name: 跨资产交易晨报2026-07-31格式
+  spec_path: config/cross_asset/format_baseline.yaml
+  source_artifact: 跨资产交易晨报_2026-07-31.html
+  locked_default: true
+  change_policy: explicit_user_approval_required
+  default_behavior: 保持版式、导航、模块顺序与视觉语义，只更新真实数据、研究内容、图表和来源
 
 load_order:
   - vendor/upstreams.lock.yaml
@@ -12,6 +21,7 @@ load_order:
   - config/shared/routing.yaml
   - config/shared/quality_rules.yaml
   - config/shared/instruments.yaml
+  - config/cross_asset/format_baseline.yaml
   - config/cross_asset/report.yaml
 
 coverage:
@@ -78,9 +88,10 @@ crypto_policy:
     - market_structure
 
 report_sections:
-  - data_cutoff
+  - hero
   - decision_90_seconds
   - overnight_macro
+  - validated_charts
   - market_map
   - current_pricing_three_themes
   - structural_research_two_to_four
@@ -89,8 +100,8 @@ report_sections:
   - dual_ledger
   - prior_view_review
   - catalysts_and_seven_day_calendar
-  - charts
   - sources_and_methodology
+  - disclaimer
 
 chat_summary:
   include_only:
@@ -125,6 +136,7 @@ chart_policy:
   validated_data_only: true
   placeholder_forbidden: true
   require_methodology_note: true
+  baseline_layout: two_column_when_possible
 
 html:
   self_contained: true
@@ -134,6 +146,19 @@ html:
   fixed_navigation: true
   responsive: true
   print_friendly: true
+  baseline_spec: config/cross_asset/format_baseline.yaml
+  preserve_2026_07_31_structure: true
+
+format_change_control:
+  default: incremental_only
+  user_approval_required_for:
+    - section_reorder
+    - fixed_section_removal
+    - navigation_change
+    - market_map_column_change
+    - visual_theme_replacement
+    - dual_ledger_structure_change
+    - pricing_vs_research_partition_change
 
 quality_gate:
   no_template_numbers: true
@@ -141,3 +166,4 @@ quality_gate:
   unavailable_text_from_contract: true
   official_or_cross_source_for_headlines: true
   all_key_numbers_require_timestamp: true
+  format_lock_does_not_force_empty_content: true
