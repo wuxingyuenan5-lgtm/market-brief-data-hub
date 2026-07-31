@@ -1,0 +1,41 @@
+schema_version: 1
+policy_id: cross_asset_artifact_naming_v1
+status: enforced
+
+canonical:
+  report_name: 跨资产交易晨报
+  display_title_pattern: 跨资产交易晨报｜{date}
+  html_title_pattern: 跨资产交易晨报｜{date}
+  filename_pattern: 跨资产交易晨报_{date}.html
+  chat_attachment_name_pattern: 跨资产交易晨报_{date}.html
+  archive_filename_pattern: 跨资产交易晨报_{date}.html
+  archive_path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
+  date_format: YYYY-MM-DD
+
+hard_rules:
+  - 生成文件在文件系统中的真实文件名必须等于 filename_pattern
+  - 聊天附件或下载链接必须直接指向该真实文件，不得只提供预览页或临时资源名
+  - HTML的title标签与页面H1必须使用对应日期的固定标题
+  - 聊天交付文件名、HTML标题和GitHub归档文件名必须日期一致
+  - 禁止把preview、report、output、index、artifact或随机ID作为正式交付文件名
+  - 禁止生成正式HTML后再通过无文件名的预览包装层交付
+  - 仓库归档必须与聊天附件逐字节一致
+
+runtime_output:
+  preferred_local_path_pattern: /mnt/data/跨资产交易晨报_{date}.html
+  require_path_exists_before_linking: true
+  require_direct_download_link: true
+  verify_before_delivery:
+    - basename_matches_pattern
+    - html_title_matches_date
+    - h1_matches_report_name_and_date
+    - archive_basename_matches_attachment
+    - file_is_self_contained
+
+failure_behavior:
+  wrong_or_generic_filename:
+    action: rename_before_delivery
+    disclose_to_user: false
+  cannot_preserve_filename:
+    action: deliver_content_and_explicitly_state_filename_preservation_failed
+    never_claim_success: true
