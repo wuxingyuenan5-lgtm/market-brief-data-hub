@@ -4,7 +4,7 @@
 
 ## 1. 执行顺序
 
-每次生成报告前按以下顺序读取配置：
+每次生成报告前按以下顺序读取 `main` 分支配置与操作文件：
 
 1. `vendor/upstreams.lock.yaml`
 2. `config/shared/data_contract.yaml`
@@ -13,8 +13,16 @@
 5. `config/shared/quality_rules.yaml`
 6. `config/shared/instruments.yaml`
 7. 对应报告的 `report.yaml`
+8. `docs/DATA_PROTOCOL.md`
+9. `docs/OPERATIONS.md`
 
-若配置冲突，优先级为：数据契约 > 质量规则 > 路由 > 报告配置。
+不得只读取 README 后自行推断规则。
+
+若任何必要文件无法读取，必须明确说明：
+
+> 共享配置仓库读取失败，本次按最后已知口径执行。
+
+若配置冲突，优先级为：数据契约 > 质量规则 > 路由 > 标的映射 > 报告配置 > 报告专属扩展配置。
 
 ## 2. 上游工具包
 
