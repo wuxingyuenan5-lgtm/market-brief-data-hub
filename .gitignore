@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.cache/
+__pycache__/
+*.pyc
+.venv/
+venv/
+reports/**/*.html
+reports/**/*.json
+reports/**/*.csv
+.DS_Store
+.idea/
+.vscode/
