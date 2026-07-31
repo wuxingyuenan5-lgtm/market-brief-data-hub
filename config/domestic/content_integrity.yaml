@@ -1,4 +1,4 @@
-schema_version: 1
+schema_version: 2
 policy_id: domestic_content_integrity_v1
 status: active
 purpose: 严禁AI幻觉、虚假陈述、未经核验的精确数字、错误合约和伪造因果归因
@@ -9,7 +9,9 @@ hard_principles:
   - 不得为了版面完整补齐数字、事件、共识、公司指引、资金流、仓位或产业数据
   - 不得把新闻标题、搜索摘要或二手转述中的数字直接当作已核验原始数据
   - 不得使用未来信息解释历史日期的晨报
-  - 报告可以缩短，但不能完整而失真
+  - 不得捏造市场时间戳、抓取时间、来源链、质量状态或跨源验证结果
+  - 格式预览、测试版和正式版适用完全相同的事实核验门槛
+  - 报告可以缩短，可以只有结构和缺失说明，但不能完整而失真
 
 claim_classes:
   numeric_market_data:
@@ -112,6 +114,18 @@ retrieval_protocol:
     - 单位、品级、税口径或合约无法确认
     - 数据疑似陈旧
 
+preview_rules:
+  use_real_data_only: true
+  synthetic_example_values_prohibited: true
+  sample_timestamp_prohibited: true
+  sample_source_lineage_prohibited: true
+  copied_unverified_numbers_prohibited: true
+  if_layout_demonstration_only:
+    - 删除所有未完成核验的事实性数字
+    - 明确标注仅展示版式
+    - 使用共享缺失文本或省略非关键项目
+    - 不得生成交易结论、定价程度或证伪条件，除非其依据已核验
+
 missing_data_policy:
   critical_required_field: 使用共享数据契约的缺失文本并保留资产名称和应有时点
   noncritical_field: 直接省略，不为完整性展示空卡片
@@ -130,19 +144,25 @@ consistency_checks:
   - 期货不得省略合约月份
   - 现货、期货、仓单、社会库存和交易所库存不得混标
   - 申万一级、二级行业和主题标签不得混排
+  - 报告显示的数据截止时间必须来自实际运行上下文，不得手工编造
+  - 声称跨源一致前必须保留两个独立来源及各自取值
 
 anti_hallucination_gate:
   before_render:
     - 建立事实清单
     - 为每个数字绑定来源与时点
+    - 为每个事实绑定原始页面、官方文件或实际接口返回
     - 将推断与事实分栏检查
     - 删除所有无来源精确数字
+    - 删除所有仅来自搜索摘要而未打开核验的数字
     - 删除所有无法证明的唯一因果表述
     - 检查未来信息泄漏
     - 检查重复内容中的数字一致性
     - 检查期货合约、申万归属和单位
+    - 检查是否虚构抓取时间、质量状态或验证步骤
   fail_action:
     - 阻止正式完整HTML生成
+    - 阻止带事实数字的格式预览生成
     - 输出可核验的缩减版，而不是完整但虚假的版本
   client_visible_audit_log: false
 
