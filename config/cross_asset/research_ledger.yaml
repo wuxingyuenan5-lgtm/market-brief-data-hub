@@ -1,11 +1,74 @@
 schema_version: 1
 ledger_id: cross_asset_research_ledger
-updated_at: null
+updated_at: '2026-08-01T07:55:00+08:00'
 
-hypotheses: []
-valuation_bridges: []
-transmission_cases: []
-research_topics: []
+hypotheses:
+  - stable_id: M-001
+    theme: AI公司分层
+    status: strengthened
+    evidence_date: '2026-07-31'
+    evidence:
+      - Amazon上涨15.3%，Apple下跌7.4%，Nasdaq上涨1.0%
+      - 市场表现继续区分收入兑现、供应约束与增长指引
+    next_validation:
+      - AMD与Palantir财报
+      - 科技板块参与广度
+  - stable_id: M-002
+    theme: 通胀约束回归
+    status: new
+    evidence_date: '2026-07-31'
+    evidence:
+      - 美国二季度就业成本指数环比上涨0.9%，同比上涨3.4%
+      - Brent原油结算价87.93美元，美国10年期国债收益率约4.71%
+    next_validation:
+      - 2026-08-04 JOLTS
+      - 2026-08-06 生产率与单位劳动力成本
+      - 2026-08-07 非农
+  - stable_id: M-003
+    theme: 风险偏好扩散
+    status: weakened
+    evidence_date: '2026-07-31'
+    evidence:
+      - S&P 500和Nasdaq上涨，但Russell 2000下跌0.5%
+      - BTC仅温和上涨，ETH接近平盘
+    next_validation:
+      - 市场宽度
+      - 信用利差
+      - ETF资金流
+
+valuation_bridges:
+  - stable_id: R-AI-001
+    topic: 云收入与资本效率
+    status: strengthened
+    maturity_stage: initial_evidence
+    core_assumption: 云收入增长需要由增量利润率、资本开支和自由现金流共同验证
+    new_evidence: Amazon财报后股价大涨，市场奖励AWS增长改善
+    next_research_node:
+      - 自由现金流恢复路径
+      - 资本开支回报率
+
+transmission_cases:
+  - stable_id: R-MACRO-002
+    topic: 能源冲击与利率
+    status: new
+    maturity_stage: hypothesis_formed
+    core_assumption: 能源价格持续高位可能延长高利率环境并压制实际收入
+    new_evidence:
+      - Brent接近88美元
+      - 美国10年期国债收益率约4.71%
+    next_research_node:
+      - 通胀预期
+      - 实际收入与消费
+
+research_topics:
+  - stable_id: R-AI-001
+    topic: 云收入与资本效率
+    maturity_stage: initial_evidence
+    last_updated: '2026-08-01'
+  - stable_id: R-MACRO-002
+    topic: 能源冲击与利率
+    maturity_stage: hypothesis_formed
+    last_updated: '2026-08-01'
 
 status_rules:
   allowed_change_statuses: [new, strengthened, weakened, falsified, unchanged]
