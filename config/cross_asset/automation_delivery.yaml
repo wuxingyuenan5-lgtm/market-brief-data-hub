@@ -1,0 +1,84 @@
+schema_version: 1
+policy_id: cross_asset_automation_delivery_v1
+status: active
+purpose: 约束计划任务只交付可用的正式成品，不向用户暴露中间过程、内部标识或失败的半成品
+
+execution_mode:
+  github_access: read_only
+  github_write_during_scheduled_run: false
+  reason: 计划任务环境无法稳定把本地生成附件传递给GitHub写入接口；写入失败不得污染客户交付
+  archive_policy: deferred_until_reliable_file_transfer_exists
+
+final_only_delivery:
+  enabled: true
+  prohibit_intermediate_user_messages: true
+  prohibit_progress_updates: true
+  prohibit_tool_status_messages: true
+  prohibit_analysis_status_copy: true
+  final_response_only_after_artifact_validation: true
+
+artifact_gate:
+  required: true
+  canonical_filename: 跨资产交易晨报_{date}.html
+  required_local_path: /mnt/data/跨资产交易晨报_{date}.html
+  minimum_file_size_bytes: 12000
+  require_html_doctype: true
+  require_title_pattern: 跨资产交易晨报｜{date}
+  require_h1_pattern: 跨资产交易晨报｜{date}
+  required_sections:
+    - 90秒摘要
+    - 隔夜宏观
+    - 市场概览
+    - 市场主线
+    - 研究更新
+    - 资金、仓位与产业数据
+    - 跟踪表
+    - 今日关注与未来7天事件
+    - 来源与口径
+  prohibited_visible_strings:
+    - 分析已暂停
+    - 仓库备份失败
+    - 研究账本已同步
+    - 提交为
+    - commit
+    - SHA
+    - preview
+    - 主线01
+    - 主线02
+    - 主线03
+    - 当下定价
+    - 系统性积累
+    - 真实数据版
+
+failure_behavior:
+  if_html_generation_fails:
+    send_partial_report: false
+    send_market_summary: false
+    final_message: 今日晨报未通过成品校验，未发送半成品。
+  if_data_coverage_insufficient:
+    generate_verified_reduced_html: true
+    do_not_pad_with_unverified_data: true
+  if_github_read_fails:
+    send_partial_report: false
+    final_message: 今日晨报因配置读取失败未生成，未发送半成品。
+
+final_message_contract:
+  maximum_paragraphs: 2
+  include:
+    - concise_90_second_summary
+    - direct_html_attachment
+  exclude:
+    - internal_ledger_ids
+    - commit_hashes
+    - repository_paths
+    - repository_write_status
+    - tool_or_analysis_status
+    - methodology_debugging
+  attachment_required: true
+  no_attachment_means_no_report: true
+
+customer_quality:
+  report_is_primary_deliverable: true
+  chat_summary_is_secondary: true
+  chat_summary_must_not_replace_html: true
+  client_facing_language_only: true
