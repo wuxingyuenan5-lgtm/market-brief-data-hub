@@ -1,15 +1,16 @@
-schema_version: 2
+schema_version: 3
 pipeline_id: domestic_morning_brief_v3
 status: active
-updated_at: '2026-08-02T22:26:00+08:00'
+updated_at: '2026-08-02T22:45:00+08:00'
 
-purpose: 国内交易晨报运行清单；先完成官方交易日与发布条件判定，再执行数据核验、成品生成和交付验证
+purpose: 国内交易晨报运行清单；以聊天正文为第一交付物，以回读验证后的GitHub归档为稳定入口，附件仅为可选补充
 
 bootstrap_read_order:
   - config/domestic/runtime_manifest.yaml
   - config/shared/report_calendar.yaml
 
-required_config_reads_after_bootstrap:
+required_config_reads:
+  - config/shared/report_calendar.yaml
   - vendor/upstreams.lock.yaml
   - config/shared/data_contract.yaml
   - config/shared/sources.yaml
@@ -30,32 +31,54 @@ required_config_reads_after_bootstrap:
   - docs/OPERATIONS.md
 
 read_rules:
-  bootstrap_files_must_be_read_first: true
+  runtime_manifest_must_be_first: true
+  report_calendar_must_be_second: true
   preserve_exact_order: true
   never_claim_unread_file_was_read: true
-  missing_or_conflicting_required_config_action: block_delivery
+  chat_memory_cannot_replace_repository_configuration: true
+  missing_or_conflicting_required_config_action: fixed_failure_message
+
+required_pipeline_steps:
+  - read_runtime_manifest_from_github
+  - read_report_calendar_and_all_required_configs
+  - resolve_official_market_calendars_and_temporary_notices
+  - decide_publication_mode
+  - if_silent_skip_end_without_message_html_or_archive
+  - collect_and_normalize_domestic_market_data
+  - build_fact_ledger_for_every_exact_number
+  - validate_sources_timestamps_units_currency_and_methodology
+  - generate_standalone_chat_body_at_least_900_chinese_characters
+  - render_complete_self_contained_html
+  - validate_title_h1_sections_terms_file_size_and_fact_consistency
+  - write_full_utf8_html_string_to_github_archive
+  - fetch_github_archive_and_verify_content_integrity
+  - deliver_chat_body_verified_github_link_and_optional_attachment
+
+hard_gates:
+  all_required_configs_read: true
+  official_calendar_resolution_required: true
+  temporary_notice_check_required: true
+  publication_decision_required: true
+  key_number_source_binding_required: true
+  chat_body_independent_usability_required: true
+  chat_body_min_chinese_characters: 900
+  html_generation_required_for_full_success: true
+  github_archive_readback_required_for_verified_link: true
+  prohibit_unverified_github_link: true
+  prohibit_summary_only_success: true
+  prohibit_attachment_only_success: true
+  prohibit_broken_attachment_as_failure_of_text_delivery: true
+  prohibit_unverified_claim_of_pipeline_execution: true
+  prohibit_proxy_for_closed_market: true
+  prohibit_internal_process_output: true
 
 calendar_resolution:
-  primary_market_group: domestic_primary
   policy_file: config/shared/report_calendar.yaml
+  primary_market_group: domestic_primary
   official_calendar_required: true
   temporary_official_notice_required: true
-  government_workday_calendar_not_sufficient: true
-  lookback_for_special_notices_hours: 72
-  recognize:
-    - scheduled_holiday
-    - special_closure
-    - open_half_day
-    - early_close
-    - delayed_open
-    - technical_halt
-  required_outputs:
-    - yesterday_state_by_market
-    - today_state_by_market
-    - latest_valid_session_by_market
-    - publish_decision
-    - weekly_module_due
-    - weekly_module_already_delivered_this_week
+  temporary_notice_lookback_hours: 72
+  government_workday_or_weekday_inference_prohibited: true
 
 publication_modes:
   allowed:
@@ -67,14 +90,11 @@ publication_modes:
     - silent_skip
   silent_skip:
     condition: yesterday_and_today_all_domestic_primary_markets_closed
-    actions:
-      generate_html: false
-      archive: false
-      send_message: false
-      send_failure_message: false
+    generate_html: false
+    write_archive: false
+    send_message: false
   saturday_friday_summary:
     condition: saturday_and_friday_had_any_valid_domestic_primary_session
-    data_basis: friday_latest_valid_session_by_market
   sunday:
     default: silent_skip
     exception: official_special_or_regular_trading_day_for_any_domestic_primary_market
@@ -86,54 +106,82 @@ publication_modes:
 weekly_module:
   due: monday_or_deferred_first_publishable_open_day
   once_per_iso_week: true
-  delivery_guard_sources:
-    - existing_historical_archives
-    - prior_successful_task_output_when_available
   required_sections:
     - 本周交易日与假期安排
     - 本周重要宏观、政策、财报、产业和商品事件
     - 本周主要风险与验证节点
   monday_data_basis: previous_valid_session_plus_weekend_information
-  deferral_rule: 周一全部相关市场休市时，递延至本周第一个满足发布条件的开市日
-  domestic_scope_only: true
+  deferral_rule: 周一全部相关市场休市时递延至本周第一个满足发布条件的开市日
+  duplicate_check_sources:
+    - verified_github_archives
+    - prior_successful_task_output_when_available
 
-required_pipeline_steps:
-  - read_bootstrap_files_first
-  - read_and_parse_remaining_required_configs
-  - resolve_official_market_calendars_and_temporary_notices
-  - decide_publication_mode
-  - if_silent_skip_end_without_message_artifact_or_archive
-  - collect_and_normalize_market_data
-  - perform_source_timestamp_and_contract_validation
-  - apply_weekly_module_if_due_once_per_week
-  - render_self_contained_html
-  - validate_html_artifact
-  - deliver_finished_product_only
-
-hard_gates:
-  config_read_success_required: true
-  official_calendar_resolution_required: true
-  temporary_notice_check_required: true
-  publication_decision_required: true
-  silent_skip_must_produce_no_message_artifact_or_archive: true
-  prohibit_summary_only_success: true
-  prohibit_broken_attachment_only_success: true
-  prohibit_unverified_claim_of_pipeline_execution: true
-  prohibit_proxy_for_closed_market: true
+chat_delivery:
+  primary_deliverable: standalone_verified_body
+  minimum_chinese_characters: 900
+  required_sections:
+    - 90秒摘要
+    - 已核验市场概览
+    - 三条市场主线
+    - 两条重要研究更新
+    - 今日关注与主要风险
+  include_weekly_sections_when_due: true
+  attachment_dependency: false
 
 artifact_identity:
   html_meta_name: market-brief-pipeline
   html_meta_content: domestic_morning_brief_v3
+  display_name: 国内交易晨报
+  page_title_pattern: 国内交易晨报｜{date}
+  h1_pattern: 国内交易晨报｜{date}
   filename_pattern: 国内交易晨报_{date}.html
-  output_path_pattern: /mnt/data/国内交易晨报_{date}.html
-  github_archive_enabled: false
+  local_output_path_pattern: /mnt/data/国内交易晨报_{date}.html
+  github_archive_path_pattern: reports/domestic/{year}/{month}/国内交易晨报_{date}.html
+  encoding: utf-8
+
+archive_protocol:
+  enabled: true
+  allowed_scope: reports/domestic/
+  input_must_be_complete_html_string: true
+  temporary_attachment_reference_as_input_prohibited: true
+  create_when_missing: create_file
+  update_when_existing:
+    - fetch_file_for_current_sha
+    - update_file_with_complete_html_string
+  post_write_validation:
+    - fetch_file
+    - verify_file_exists
+    - verify_title_h1_and_pipeline_meta
+    - verify_required_sections
+    - verify_content_not_truncated
+  expose_link_only_after_readback_success: true
+  expose_commit_hash: false
+  expose_internal_path: false
 
 failure_messages:
-  artifact_validation_failed: 今日国内交易晨报未通过成品校验，未发送半成品。
-  config_or_tool_failure_after_publish_decision: 今日国内交易晨报未通过成品校验，未发送半成品。
+  config_or_tool_unavailable: 今日国内交易晨报未执行完整配置流程，未生成正式版本。
+  data_truthfulness_failed: 今日国内交易晨报未通过数据真实性校验，未生成正式版本。
+  html_generation_failed_after_verified_data: 完整HTML未生成，本次仅发送已核验正文。
+
+fallback_delivery:
+  github_write_failed:
+    send_full_verified_chat_body: true
+    show_error_detail: false
+    provide_unverified_link: false
+  attachment_failed:
+    send_full_verified_chat_body: true
+    send_verified_github_link_when_available: true
+    show_attachment_error: false
+  html_failed_after_data_verified:
+    send_full_verified_chat_body: true
+    append_exact_message_from_failure_messages: html_generation_failed_after_verified_data
+  required_config_or_truthfulness_failed:
+    send_partial_body: false
+    use_fixed_failure_message: true
 
 non_goals:
   - modify_cross_asset_configuration
-  - write_back_research_ledger
-  - archive_html_to_github
-  - send_message_on_calendar_skip
+  - modify_cross_asset_reports
+  - use_chat_memory_instead_of_github_configuration
+  - treat_attachment_as_primary_delivery
+  - expose_commit_hash_or_internal_tool_status
