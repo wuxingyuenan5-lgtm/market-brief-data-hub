@@ -1,18 +1,21 @@
-schema_version: 1
-pipeline_id: domestic_morning_brief_v2
+schema_version: 2
+pipeline_id: domestic_morning_brief_v3
 status: active
-updated_at: '2026-08-02T22:05:00+08:00'
+updated_at: '2026-08-02T22:26:00+08:00'
 
-purpose: 国内交易晨报运行清单；统一执行交易日判断、节假日与特殊休市识别、数据核验、成品生成和交付验证
+purpose: 国内交易晨报运行清单；先完成官方交易日与发布条件判定，再执行数据核验、成品生成和交付验证
 
-required_config_reads:
+bootstrap_read_order:
+  - config/domestic/runtime_manifest.yaml
+  - config/shared/report_calendar.yaml
+
+required_config_reads_after_bootstrap:
   - vendor/upstreams.lock.yaml
   - config/shared/data_contract.yaml
   - config/shared/sources.yaml
   - config/shared/routing.yaml
   - config/shared/quality_rules.yaml
   - config/shared/instruments.yaml
-  - config/shared/report_calendar.yaml
   - config/domestic/preferences.yaml
   - config/domestic/user_experience.yaml
   - config/domestic/client_presentation.yaml
@@ -26,44 +29,111 @@ required_config_reads:
   - docs/DATA_PROTOCOL.md
   - docs/OPERATIONS.md
 
+read_rules:
+  bootstrap_files_must_be_read_first: true
+  preserve_exact_order: true
+  never_claim_unread_file_was_read: true
+  missing_or_conflicting_required_config_action: block_delivery
+
+calendar_resolution:
+  primary_market_group: domestic_primary
+  policy_file: config/shared/report_calendar.yaml
+  official_calendar_required: true
+  temporary_official_notice_required: true
+  government_workday_calendar_not_sufficient: true
+  lookback_for_special_notices_hours: 72
+  recognize:
+    - scheduled_holiday
+    - special_closure
+    - open_half_day
+    - early_close
+    - delayed_open
+    - technical_halt
+  required_outputs:
+    - yesterday_state_by_market
+    - today_state_by_market
+    - latest_valid_session_by_market
+    - publish_decision
+    - weekly_module_due
+    - weekly_module_already_delivered_this_week
+
+publication_modes:
+  allowed:
+    - regular_daily
+    - saturday_friday_summary
+    - monday_weekly_open
+    - deferred_weekly_first_open_day
+    - partial_market_open
+    - silent_skip
+  silent_skip:
+    condition: yesterday_and_today_all_domestic_primary_markets_closed
+    actions:
+      generate_html: false
+      archive: false
+      send_message: false
+      send_failure_message: false
+  saturday_friday_summary:
+    condition: saturday_and_friday_had_any_valid_domestic_primary_session
+    data_basis: friday_latest_valid_session_by_market
+  sunday:
+    default: silent_skip
+    exception: official_special_or_regular_trading_day_for_any_domestic_primary_market
+  partial_market_open:
+    allowed: true
+    require_market_specific_timestamp: true
+    prohibit_proxy_for_closed_market: true
+
+weekly_module:
+  due: monday_or_deferred_first_publishable_open_day
+  once_per_iso_week: true
+  delivery_guard_sources:
+    - existing_historical_archives
+    - prior_successful_task_output_when_available
+  required_sections:
+    - 本周交易日与假期安排
+    - 本周重要宏观、政策、财报、产业和商品事件
+    - 本周主要风险与验证节点
+  monday_data_basis: previous_valid_session_plus_weekend_information
+  deferral_rule: 周一全部相关市场休市时，递延至本周第一个满足发布条件的开市日
+  domestic_scope_only: true
+
 required_pipeline_steps:
-  - read_and_parse_all_required_configs
-  - resolve_official_market_calendars_and_special_closures
-  - use_domestic_primary_market_group
-  - decide_publish_or_skip_from_shared_calendar_policy
-  - if_skipped_end_without_user_message_or_artifact
+  - read_bootstrap_files_first
+  - read_and_parse_remaining_required_configs
+  - resolve_official_market_calendars_and_temporary_notices
+  - decide_publication_mode
+  - if_silent_skip_end_without_message_artifact_or_archive
   - collect_and_normalize_market_data
-  - perform_source_and_timestamp_validation
-  - add_weekly_outlook_on_monday_or_deferred_first_open_day
-  - build_usable_inline_report
+  - perform_source_timestamp_and_contract_validation
+  - apply_weekly_module_if_due_once_per_week
   - render_self_contained_html
   - validate_html_artifact
-  - deliver_usable_report
+  - deliver_finished_product_only
 
 hard_gates:
   config_read_success_required: true
   official_calendar_resolution_required: true
-  special_closure_check_required: true
+  temporary_notice_check_required: true
   publication_decision_required: true
-  skip_must_produce_no_artifact: true
+  silent_skip_must_produce_no_message_artifact_or_archive: true
   prohibit_summary_only_success: true
   prohibit_broken_attachment_only_success: true
   prohibit_unverified_claim_of_pipeline_execution: true
-
-weekly_module:
-  due: monday_or_deferred_first_open_day
-  required:
-    - 本周交易日与假期安排
-    - 本周展望
-  domestic_scope_only: true
-  once_per_week: true
+  prohibit_proxy_for_closed_market: true
 
 artifact_identity:
   html_meta_name: market-brief-pipeline
-  html_meta_content: domestic_morning_brief_v2
+  html_meta_content: domestic_morning_brief_v3
   filename_pattern: 国内交易晨报_{date}.html
-  archive_pattern: reports/domestic/{year}/{month}/国内交易晨报_{date}.html
+  output_path_pattern: /mnt/data/国内交易晨报_{date}.html
+  github_archive_enabled: false
 
 failure_messages:
-  config_or_tool_unavailable: 今日国内交易晨报未执行完整配置流程，未生成正式版本。
   artifact_validation_failed: 今日国内交易晨报未通过成品校验，未发送半成品。
+  config_or_tool_failure_after_publish_decision: 今日国内交易晨报未通过成品校验，未发送半成品。
+
+non_goals:
+  - modify_cross_asset_configuration
+  - write_back_research_ledger
+  - archive_html_to_github
+  - send_message_on_calendar_skip
