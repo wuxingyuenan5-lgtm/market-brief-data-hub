@@ -1,9 +1,9 @@
-schema_version: 1
-config_id: domestic_automation_delivery_v1
+schema_version: 2
+config_id: domestic_automation_delivery_v2
 report_id: domestic_cn_v1
 status: active
 mode: finished_product_delivery
-purpose: 管理《国内交易晨报》每日自动任务的最终交付、成品校验、失败行为和GitHub只读边界，不改变报告版式、研究范围或公共数据口径
+purpose: 管理《国内交易晨报》自动任务的日历判定、最终交付、成品校验、静默跳过和GitHub只读边界，不改变版式、研究范围或数据口径
 
 timezone: Asia/Shanghai
 schedule:
@@ -11,7 +11,11 @@ schedule:
   local_time: '08:00'
   enabled: true
 
-required_load_order:
+bootstrap_load_order:
+  - config/domestic/runtime_manifest.yaml
+  - config/shared/report_calendar.yaml
+
+required_load_order_after_bootstrap:
   - vendor/upstreams.lock.yaml
   - config/shared/data_contract.yaml
   - config/shared/sources.yaml
@@ -31,11 +35,58 @@ required_load_order:
   - docs/DATA_PROTOCOL.md
   - docs/OPERATIONS.md
 
-load_failure_policy:
+load_and_calendar_gate:
+  bootstrap_files_must_be_read_first: true
+  preserve_exact_order: true
   never_claim_unread_file_was_read: true
   required_file_missing_or_conflict_action: block_delivery
+  official_calendar_resolution_before_data_collection: true
+  official_temporary_notice_check_required: true
+  government_workday_or_weekday_inference_prohibited: true
+  primary_market_group: domestic_primary
+
+publication_behavior:
+  policy_file: config/shared/report_calendar.yaml
+  yesterday_and_today_all_primary_closed:
+    action: silent_skip
+    generate_html: false
+    archive: false
+    send_message: false
+    send_failure_message: false
+  saturday:
+    publish_if_friday_had_valid_primary_session: true
+    mode: friday_summary
+  sunday:
+    default: silent_skip
+    publish_only_on_official_special_or_regular_trading_day: true
+  monday:
+    publish_if_any_primary_market_open: true
+    use_previous_valid_session_and_weekend_information: true
+    include_weekly_module: true
+  monday_all_primary_closed:
+    action: silent_skip_and_defer_weekly_module
+  deferred_weekly_module:
+    deliver_on_first_publishable_open_day: true
+    once_per_iso_week: true
+  partial_market_open:
+    publish_allowed: true
+    require_real_timestamp_per_market: true
+    prohibit_proxy_for_closed_market: true
+
+weekly_module:
+  required_when_due:
+    - 本周交易日与假期安排
+    - 本周重要宏观、政策、财报、产业和商品事件
+    - 本周主要风险与验证节点
+  once_per_iso_week: true
+  duplicate_check_sources:
+    - existing_historical_archives
+    - prior_successful_task_output_when_available
+
+load_failure_policy:
   send_partial_product: false
-  client_failure_message: 今日国内交易晨报未通过成品校验，未发送半成品。
+  client_failure_message_when_publication_was_due: 今日国内交易晨报未通过成品校验，未发送半成品。
+  calendar_silent_skip_is_not_failure: true
 
 github_runtime_permissions:
   mode: read_only
@@ -63,19 +114,13 @@ report_identity:
   filename_pattern: 国内交易晨报_{date}.html
   output_path_pattern: /mnt/data/国内交易晨报_{date}.html
   attachment_display_name_pattern: 国内交易晨报_{date}.html
-  prohibited_filename_tokens:
-    - preview
-    - report
-    - output
-    - index
-    - artifact
-    - random_id
-    - temporary_name
+  prohibited_filename_tokens: [preview, report, output, index, artifact, random_id, temporary_name]
   require_exact_file_existence_before_delivery: true
 
 runtime_output_policy:
   allow_intermediate_user_messages: false
   only_one_final_response_after_validation: true
+  silent_skip_sends_no_final_response: true
   prohibited_intermediate_content:
     - 分析已暂停
     - 正在分析
@@ -96,28 +141,27 @@ runtime_output_policy:
 final_response:
   success:
     max_parts: 2
-    part_1:
-      type: concise_summary
-      required_content:
-        - 90秒摘要
-        - 三条市场主线
-        - 两条最重要研究更新
-        - 今日关注和主要风险
-      prohibit_full_report_copy: true
-    part_2:
-      type: single_html_attachment
-      filename_pattern: 国内交易晨报_{date}.html
-      prohibit_trailing_content: true
-  failure:
+    part_1_required:
+      - 90秒摘要
+      - 三条市场主线
+      - 两条最重要研究更新
+      - 今日关注和主要风险
+    part_2: single_html_attachment
+    attachment_filename_pattern: 国内交易晨报_{date}.html
+    prohibit_trailing_content: true
+  publication_due_but_failed:
     send_market_summary: false
     send_text_report: false
     send_attachment: false
     exact_message: 今日国内交易晨报未通过成品校验，未发送半成品。
+  calendar_silent_skip:
+    send_anything: false
 
 finished_product_validation:
   enabled: true
   all_checks_required: true
   checks:
+    - publication_mode_allows_delivery
     - html_file_exists_at_exact_output_path
     - filename_exactly_matches_pattern
     - html_title_exactly_matches_page_title_pattern
@@ -126,19 +170,19 @@ finished_product_validation:
     - html_opens_offline
     - css_is_inline
     - required_javascript_is_inline
-    - no_cdn_dependency
-    - no_remote_font_dependency
-    - no_remote_image_dependency
-    - no_external_script_dependency
+    - no_cdn_remote_font_remote_image_or_external_script
     - fixed_navigation_exists
     - expand_and_collapse_supported
     - print_shows_full_content
     - all_required_sections_exist
+    - weekly_sections_exist_when_due
     - prohibited_client_terms_absent
     - internal_process_information_absent
     - every_key_number_passes_content_integrity_gate
+    - closed_markets_have_no_proxy_values
+    - each_market_value_has_real_market_timestamp
     - attachment_is_actually_downloadable
-  fail_action: send_fixed_failure_message_only
+  fail_action_when_publication_due: send_fixed_failure_message_only
 
 required_html_sections:
   - 数据截止时间
@@ -174,19 +218,6 @@ client_visible_policy:
     - commit hash
     - 仓库路径
     - GitHub写入状态
-  allowed_section_names:
-    - 90秒摘要
-    - 隔夜宏观与政策
-    - 市场概览
-    - 市场主线
-    - 研究更新
-    - 重点信息
-    - 资金、仓位与产业数据
-    - 跟踪表
-    - 前期观点复盘
-    - 今日关注与未来7天事件
-    - 数据图表
-    - 来源与口径
   internal_quality_codes_visible_in_primary_tables: false
   internal_quality_codes_allowed_in_data_records_and_methodology: true
 
@@ -205,15 +236,7 @@ scope:
     - 房地产
     - 消费
   overseas_requires_explicit_china_asset_transmission: true
-  overseas_transmission_template:
-    - overseas_factor
-    - usd_or_renminbi
-    - foreign_risk_appetite
-    - a_share_hk_or_domestic_commodity
-  prohibited_fixed_sections:
-    - 美股综述
-    - 加密货币
-    - 与中国资产无直接关系的海外政治新闻
+  prohibited_fixed_sections: [美股综述, 加密货币, 与中国资产无直接关系的海外政治新闻]
 
 market_map:
   priority_assets:
@@ -233,19 +256,10 @@ market_map:
     - DR007
     - USDCNY
     - USDCNH
-  client_visible_columns:
-    - 资产
-    - 最新值
-    - 日变化
-    - 市场时点
-    - 简要解释
-  hidden_metadata:
-    - source_id
-    - source_url
-    - fetched_at
-    - quality_status
+  client_visible_columns: [资产, 最新值, 日变化, 市场时点, 简要解释]
   noncritical_missing_action: omit
   critical_missing_display: 数据暂缺
+  market_closed_rule: 不使用ETF、期货或其他代理值替代正式收盘
 
 content_truthfulness_gate:
   enabled: true
@@ -256,25 +270,15 @@ content_truthfulness_gate:
     - 所有精确数字必须绑定来源、URL、标的、市场或发布时间、抓取时间、单位、币种和统计口径
     - 宏观Actual优先使用官方来源
     - Consensus必须有具名来源，否则不填
-    - 公司财务数字优先使用公司公告、交易所披露或监管文件
     - 政策必须区分提出、征求意见、审议、通过、发布、生效和执行
     - 推断必须明确写成判断或待验证假设
     - 同一数字在正文、表格、图表和跟踪表中必须一致
     - 时点冲突、单位不清、代码错误、合约错误、疑似陈旧或来源冲突无法解释时停止使用
     - 宁可生成缩减版，不得生成完整但虚假的版本
-  exact_number_required_metadata:
-    - source_id
-    - source_url
-    - exact_instrument
-    - market_or_release_timestamp
-    - fetched_at
-    - unit
-    - currency
-    - methodology
 
 missing_data_attempts_before_unavailable:
   - check_symbol_and_exchange
-  - check_trading_day_and_timezone
+  - check_trading_day_timezone_and_official_calendar
   - call_primary_source
   - call_two_independent_fallbacks_or_one_official_fallback
   - check_historical_endpoint_and_official_archive
@@ -299,10 +303,7 @@ html_technical_requirements:
   print_friendly: true
   css_inline: true
   javascript_inline_when_required: true
-  cdn_dependency: false
-  remote_font_dependency: false
-  remote_image_dependency: false
-  external_script_dependency: false
+  external_dependencies: false
   fixed_navigation: true
   details_expand_collapse: true
   print_forces_full_content: true
