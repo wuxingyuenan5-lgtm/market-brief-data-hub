@@ -1,0 +1,56 @@
+schema_version: 1
+pipeline_id: cross_asset_morning_brief_v3
+status: active
+updated_at: '2026-08-02T11:00:00+08:00'
+
+purpose: 定时任务运行清单；用于确认任务确实执行了仓库读取、数据核验、HTML生成和归档验证，而不是退化为普通资讯摘要
+
+required_config_reads:
+  - vendor/upstreams.lock.yaml
+  - config/shared/data_contract.yaml
+  - config/shared/sources.yaml
+  - config/shared/routing.yaml
+  - config/shared/quality_rules.yaml
+  - config/shared/instruments.yaml
+  - config/cross_asset/artifact_naming.yaml
+  - config/cross_asset/client_presentation.yaml
+  - config/cross_asset/content_integrity.yaml
+  - config/cross_asset/automation_delivery.yaml
+  - config/cross_asset/format_baseline.yaml
+  - config/cross_asset/section_design.yaml
+  - config/cross_asset/research_accumulation.yaml
+  - config/cross_asset/research_ledger.yaml
+  - config/cross_asset/user_experience.yaml
+  - config/cross_asset/report.yaml
+  - docs/DATA_PROTOCOL.md
+
+required_pipeline_steps:
+  - read_and_parse_all_required_configs
+  - collect_and_normalize_market_data
+  - perform_source_and_timestamp_validation
+  - build_inline_report
+  - render_self_contained_html
+  - validate_html_artifact
+  - write_html_to_github_as_utf8_text
+  - fetch_archived_html_and_verify
+  - deliver_inline_report_and_verified_link
+
+hard_gates:
+  config_read_success_required: true
+  minimum_verified_market_assets: 6
+  inline_report_minimum_chinese_characters: 900
+  html_minimum_file_size_bytes: 12000
+  github_archive_verification_required_for_link: true
+  prohibit_summary_only_success: true
+  prohibit_broken_attachment_only_success: true
+  prohibit_unverified_claim_of_pipeline_execution: true
+
+artifact_identity:
+  html_meta_name: market-brief-pipeline
+  html_meta_content: cross_asset_morning_brief_v3
+  filename_pattern: 跨资产交易晨报_{date}.html
+  archive_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
+
+failure_messages:
+  config_or_tool_unavailable: 今日晨报未执行完整配置流程，未生成正式版本。
+  artifact_validation_failed: 今日晨报未通过成品校验，未发送半成品。
