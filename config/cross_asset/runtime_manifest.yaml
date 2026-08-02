@@ -1,9 +1,9 @@
-schema_version: 1
-pipeline_id: cross_asset_morning_brief_v3
+schema_version: 2
+pipeline_id: cross_asset_morning_brief_v4
 status: active
-updated_at: '2026-08-02T11:00:00+08:00'
+updated_at: '2026-08-02T22:05:00+08:00'
 
-purpose: 定时任务运行清单；用于确认任务确实执行了仓库读取、数据核验、HTML生成和归档验证，而不是退化为普通资讯摘要
+purpose: 定时任务运行清单；确认任务执行交易日判断、仓库读取、数据核验、HTML生成和归档验证，而不是退化为普通资讯摘要
 
 required_config_reads:
   - vendor/upstreams.lock.yaml
@@ -12,6 +12,7 @@ required_config_reads:
   - config/shared/routing.yaml
   - config/shared/quality_rules.yaml
   - config/shared/instruments.yaml
+  - config/shared/report_calendar.yaml
   - config/cross_asset/artifact_naming.yaml
   - config/cross_asset/client_presentation.yaml
   - config/cross_asset/content_integrity.yaml
@@ -26,8 +27,12 @@ required_config_reads:
 
 required_pipeline_steps:
   - read_and_parse_all_required_configs
+  - resolve_official_market_calendars_and_special_closures
+  - decide_publish_or_skip_from_shared_calendar_policy
+  - if_skipped_end_without_user_message_or_artifact
   - collect_and_normalize_market_data
   - perform_source_and_timestamp_validation
+  - add_weekly_outlook_on_monday_or_deferred_first_open_day
   - build_inline_report
   - render_self_contained_html
   - validate_html_artifact
@@ -37,6 +42,10 @@ required_pipeline_steps:
 
 hard_gates:
   config_read_success_required: true
+  official_calendar_resolution_required: true
+  special_closure_check_required: true
+  publication_decision_required: true
+  skip_must_produce_no_artifact: true
   minimum_verified_market_assets: 6
   inline_report_minimum_chinese_characters: 900
   html_minimum_file_size_bytes: 12000
@@ -45,9 +54,16 @@ hard_gates:
   prohibit_broken_attachment_only_success: true
   prohibit_unverified_claim_of_pipeline_execution: true
 
+weekly_module:
+  due: monday_or_deferred_first_open_day
+  required:
+    - 本周交易日与假期安排
+    - 本周展望
+  once_per_week: true
+
 artifact_identity:
   html_meta_name: market-brief-pipeline
-  html_meta_content: cross_asset_morning_brief_v3
+  html_meta_content: cross_asset_morning_brief_v4
   filename_pattern: 跨资产交易晨报_{date}.html
   archive_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
 
