@@ -1,0 +1,69 @@
+schema_version: 1
+pipeline_id: domestic_morning_brief_v2
+status: active
+updated_at: '2026-08-02T22:05:00+08:00'
+
+purpose: 国内交易晨报运行清单；统一执行交易日判断、节假日与特殊休市识别、数据核验、成品生成和交付验证
+
+required_config_reads:
+  - vendor/upstreams.lock.yaml
+  - config/shared/data_contract.yaml
+  - config/shared/sources.yaml
+  - config/shared/routing.yaml
+  - config/shared/quality_rules.yaml
+  - config/shared/instruments.yaml
+  - config/shared/report_calendar.yaml
+  - config/domestic/preferences.yaml
+  - config/domestic/user_experience.yaml
+  - config/domestic/client_presentation.yaml
+  - config/domestic/content_integrity.yaml
+  - config/domestic/automation_delivery.yaml
+  - config/domestic/watchlist.yaml
+  - config/domestic/research_ledger.yaml
+  - config/domestic/event_watchlist.yaml
+  - config/domestic/source_overrides.yaml
+  - config/domestic/report.yaml
+  - docs/DATA_PROTOCOL.md
+  - docs/OPERATIONS.md
+
+required_pipeline_steps:
+  - read_and_parse_all_required_configs
+  - resolve_official_market_calendars_and_special_closures
+  - use_domestic_primary_market_group
+  - decide_publish_or_skip_from_shared_calendar_policy
+  - if_skipped_end_without_user_message_or_artifact
+  - collect_and_normalize_market_data
+  - perform_source_and_timestamp_validation
+  - add_weekly_outlook_on_monday_or_deferred_first_open_day
+  - build_usable_inline_report
+  - render_self_contained_html
+  - validate_html_artifact
+  - deliver_usable_report
+
+hard_gates:
+  config_read_success_required: true
+  official_calendar_resolution_required: true
+  special_closure_check_required: true
+  publication_decision_required: true
+  skip_must_produce_no_artifact: true
+  prohibit_summary_only_success: true
+  prohibit_broken_attachment_only_success: true
+  prohibit_unverified_claim_of_pipeline_execution: true
+
+weekly_module:
+  due: monday_or_deferred_first_open_day
+  required:
+    - 本周交易日与假期安排
+    - 本周展望
+  domestic_scope_only: true
+  once_per_week: true
+
+artifact_identity:
+  html_meta_name: market-brief-pipeline
+  html_meta_content: domestic_morning_brief_v2
+  filename_pattern: 国内交易晨报_{date}.html
+  archive_pattern: reports/domestic/{year}/{month}/国内交易晨报_{date}.html
+
+failure_messages:
+  config_or_tool_unavailable: 今日国内交易晨报未执行完整配置流程，未生成正式版本。
+  artifact_validation_failed: 今日国内交易晨报未通过成品校验，未发送半成品。
