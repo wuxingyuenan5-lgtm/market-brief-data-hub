@@ -1,38 +1,65 @@
-schema_version: 1
-policy_id: cross_asset_automation_delivery_v1
+schema_version: 2
+policy_id: cross_asset_automation_delivery_v2
 status: active
-purpose: 约束计划任务只交付可用的正式成品，不向用户暴露中间过程、内部标识或失败的半成品
+purpose: 计划任务必须交付可直接阅读的正文，并提供可长期访问的正式HTML；聊天附件仅为附加项，不得成为唯一交付渠道
 
 execution_mode:
-  github_access: read_only
-  github_write_during_scheduled_run: false
-  reason: 计划任务环境无法稳定把本地生成附件传递给GitHub写入接口；写入失败不得污染客户交付
-  archive_policy: deferred_until_reliable_file_transfer_exists
+  github_access: read_write_for_completed_html
+  github_config_read: true
+  github_archive_write: true
+  archive_write_method: raw_utf8_html_content
+  prohibit_local_file_reference_as_github_input: true
+  archive_path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
+  verify_archive_after_write: true
+  verification_method: fetch_file
+  update_existing_file_only_after_fetching_current_sha: true
+  research_ledger_write_during_scheduled_run: false
+  reason: HTML正文可直接作为UTF-8文本写入GitHub；不得把临时附件引用当作GitHub文件参数
 
-final_only_delivery:
-  enabled: true
-  prohibit_intermediate_user_messages: true
-  prohibit_progress_updates: true
-  prohibit_tool_status_messages: true
-  prohibit_analysis_status_copy: true
-  final_response_only_after_artifact_validation: true
+user_delivery_priority:
+  - usable_inline_report
+  - verified_stable_github_link
+  - optional_chat_attachment
 
-artifact_gate:
+inline_report:
+  required: true
+  must_remain_useful_without_attachment: true
+  minimum_chinese_characters: 900
+  maximum_chinese_characters: 2200
+  required_sections:
+    - 90秒摘要
+    - 市场概览
+    - 三条市场主线
+    - 两条研究更新
+    - 今日关注与风险
+  market_overview_minimum_verified_assets: 6
+  market_overview_preferred_assets: 10
+  include_source_citations: true
+  prohibit_internal_process_copy: true
+  prohibit_repository_status_copy: true
+  prohibit_ledger_ids: true
+  prohibit_commit_hashes: true
+
+html_artifact:
   required: true
   canonical_filename: 跨资产交易晨报_{date}.html
-  required_local_path: /mnt/data/跨资产交易晨报_{date}.html
+  title_pattern: 跨资产交易晨报｜{date}
+  h1_pattern: 跨资产交易晨报｜{date}
   minimum_file_size_bytes: 12000
-  require_html_doctype: true
-  require_title_pattern: 跨资产交易晨报｜{date}
-  require_h1_pattern: 跨资产交易晨报｜{date}
+  self_contained: true
+  local_path_optional: /mnt/data/跨资产交易晨报_{date}.html
   required_sections:
     - 90秒摘要
     - 隔夜宏观
+    - 数据图表
     - 市场概览
     - 市场主线
     - 研究更新
+    - 研究跟踪
+    - 重点信息
     - 资金、仓位与产业数据
     - 跟踪表
+    - 前期观点复盘
     - 今日关注与未来7天事件
     - 来源与口径
   prohibited_visible_strings:
@@ -50,35 +77,65 @@ artifact_gate:
     - 系统性积累
     - 真实数据版
 
+stable_link:
+  required_after_verified_github_write: true
+  preferred_url_pattern: https://github.com/wuxingyuenan5-lgtm/market-brief-data-hub/blob/main/reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
+  link_label_pattern: 下载《跨资产交易晨报_{date}.html》
+  do_not_present_unverified_link: true
+
+chat_attachment:
+  optional: true
+  may_be_included_only_if_file_exists: true
+  attachment_failure_must_not_invalidate_inline_report: true
+  attachment_failure_must_not_be_shown_to_user: true
+  never_show_broken_attachment_as_primary_delivery: true
+
 failure_behavior:
-  if_html_generation_fails:
-    send_partial_report: false
-    send_market_summary: false
-    final_message: 今日晨报未通过成品校验，未发送半成品。
+  if_github_write_fails:
+    still_send_usable_inline_report: true
+    do_not_claim_archive_success: true
+    do_not_show_repository_error_details: true
+    omit_stable_link: true
+  if_chat_attachment_fails:
+    still_send_inline_report_and_verified_github_link: true
+    do_not_show_attachment_error: true
+  if_html_generation_fails_but_inline_data_is_verified:
+    send_inline_report: true
+    omit_file_link: true
+    final_note: 完整HTML未生成，本次仅发送已核验正文。
   if_data_coverage_insufficient:
-    generate_verified_reduced_html: true
+    generate_verified_reduced_report: true
+    minimum_inline_sections:
+      - 90秒摘要
+      - 已核验市场概览
+      - 市场主线
+      - 今日关注与风险
     do_not_pad_with_unverified_data: true
-  if_github_read_fails:
-    send_partial_report: false
-    final_message: 今日晨报因配置读取失败未生成，未发送半成品。
+  if_github_config_read_fails:
+    use_last_known_public_rules: false
+    final_message: 今日晨报因配置读取失败未生成。
 
 final_message_contract:
-  maximum_paragraphs: 2
+  send_once_after_research_and_rendering_complete: true
   include:
-    - concise_90_second_summary
-    - direct_html_attachment
+    - usable_inline_report
+    - verified_stable_github_link_when_available
+    - optional_working_attachment_when_available
   exclude:
-    - internal_ledger_ids
+    - tool_status
+    - analysis_status
+    - repository_write_details
+    - repository_paths_as_plain_text
     - commit_hashes
-    - repository_paths
-    - repository_write_status
-    - tool_or_analysis_status
+    - internal_ledger_ids
     - methodology_debugging
-  attachment_required: true
-  no_attachment_means_no_report: true
+  do_not_reduce_to_one_paragraph_summary: true
+  do_not_make_attachment_the_only_content: true
 
 customer_quality:
-  report_is_primary_deliverable: true
-  chat_summary_is_secondary: true
-  chat_summary_must_not_replace_html: true
   client_facing_language_only: true
+  exact_numbers_require_source_timestamp_unit_and_basis: true
+  inference_must_be_labeled_as_judgment: true
+  unresolved_source_conflicts_must_be_excluded: true
+  noncritical_missing_items_should_be_omitted: true
+  never_claim_success_without_verification: true
