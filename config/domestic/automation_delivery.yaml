@@ -1,58 +1,40 @@
-schema_version: 2
-config_id: domestic_automation_delivery_v2
+schema_version: 3
+config_id: domestic_automation_delivery_v3
 report_id: domestic_cn_v1
 status: active
-mode: finished_product_delivery
-purpose: 管理《国内交易晨报》自动任务的日历判定、最终交付、成品校验、静默跳过和GitHub只读边界，不改变版式、研究范围或数据口径
+mode: chat_first_verified_archive
+purpose: 管理《国内交易晨报》自动任务的聊天正文、HTML、GitHub归档、回读验证、附件和失败回退；不改变版式、研究范围或公共数据口径
 
 timezone: Asia/Shanghai
 schedule:
   frequency: daily
   local_time: '08:00'
   enabled: true
+  timing_mode: condition_watch
 
 bootstrap_load_order:
   - config/domestic/runtime_manifest.yaml
   - config/shared/report_calendar.yaml
 
-required_load_order_after_bootstrap:
-  - vendor/upstreams.lock.yaml
-  - config/shared/data_contract.yaml
-  - config/shared/sources.yaml
-  - config/shared/routing.yaml
-  - config/shared/quality_rules.yaml
-  - config/shared/instruments.yaml
-  - config/domestic/preferences.yaml
-  - config/domestic/user_experience.yaml
-  - config/domestic/client_presentation.yaml
-  - config/domestic/content_integrity.yaml
-  - config/domestic/automation_delivery.yaml
-  - config/domestic/watchlist.yaml
-  - config/domestic/research_ledger.yaml
-  - config/domestic/event_watchlist.yaml
-  - config/domestic/source_overrides.yaml
-  - config/domestic/report.yaml
-  - docs/DATA_PROTOCOL.md
-  - docs/OPERATIONS.md
-
-load_and_calendar_gate:
-  bootstrap_files_must_be_read_first: true
-  preserve_exact_order: true
-  never_claim_unread_file_was_read: true
-  required_file_missing_or_conflict_action: block_delivery
-  official_calendar_resolution_before_data_collection: true
-  official_temporary_notice_check_required: true
-  government_workday_or_weekday_inference_prohibited: true
-  primary_market_group: domestic_primary
+manifest_execution:
+  execute_sections:
+    - required_config_reads
+    - required_pipeline_steps
+    - hard_gates
+    - weekly_module
+    - artifact_identity
+    - failure_messages
+  chat_memory_substitution_prohibited: true
 
 publication_behavior:
   policy_file: config/shared/report_calendar.yaml
+  primary_market_group: domestic_primary
+  official_calendar_and_temporary_notice_required: true
   yesterday_and_today_all_primary_closed:
     action: silent_skip
     generate_html: false
-    archive: false
+    write_archive: false
     send_message: false
-    send_failure_message: false
   saturday:
     publish_if_friday_had_valid_primary_session: true
     mode: friday_summary
@@ -65,124 +47,107 @@ publication_behavior:
     include_weekly_module: true
   monday_all_primary_closed:
     action: silent_skip_and_defer_weekly_module
-  deferred_weekly_module:
-    deliver_on_first_publishable_open_day: true
-    once_per_iso_week: true
   partial_market_open:
     publish_allowed: true
     require_real_timestamp_per_market: true
     prohibit_proxy_for_closed_market: true
 
-weekly_module:
-  required_when_due:
+primary_delivery:
+  type: standalone_chat_body
+  minimum_chinese_characters: 900
+  must_be_usable_without_attachment: true
+  required_sections:
+    - 90秒摘要
+    - 已核验市场概览
+    - 三条市场主线
+    - 两条重要研究更新
+    - 今日关注与主要风险
+  weekly_sections_when_due:
     - 本周交易日与假期安排
     - 本周重要宏观、政策、财报、产业和商品事件
     - 本周主要风险与验证节点
-  once_per_iso_week: true
-  duplicate_check_sources:
-    - existing_historical_archives
-    - prior_successful_task_output_when_available
+  prohibit_two_or_three_paragraph_summary_as_complete_delivery: true
 
-load_failure_policy:
-  send_partial_product: false
-  client_failure_message_when_publication_was_due: 今日国内交易晨报未通过成品校验，未发送半成品。
-  calendar_silent_skip_is_not_failure: true
+market_overview:
+  priority_assets:
+    - SHCOMP
+    - CSI300
+    - CSI500
+    - CSI1000
+    - CHINEXT
+    - STAR50
+    - HSI
+    - HSCEI
+    - HSTECH
+    - CN10Y
+    - DR007
+    - USDCNY
+    - USDCNH
+    - SHFE_GOLD
+    - SHFE_COPPER
+    - GFEX_LITHIUM
+  show_only_verified_values: true
+  noncritical_missing_action: omit
+  prohibited_substitutions:
+    - old_value
+    - estimate
+    - vague_range
+    - etf_for_index
+    - futures_for_closed_cash_market
+    - different_trading_day_as_same_snapshot
+    - different_futures_contract_month
+    - stale_cache
 
-github_runtime_permissions:
-  mode: read_only
-  allowed:
-    - read_shared_configuration
-    - read_domestic_configuration
-    - read_research_ledger
-    - read_existing_historical_archives
-  prohibited:
-    - write_github
-    - update_research_ledger
-    - create_commit
-    - submit_pull_request
-    - archive_html
-    - upload_html_to_repository
-    - expose_commit_hash
-    - expose_repository_path
-    - report_repository_write_failure
-  archive_status: disabled_until_separately_reenabled
+fact_ledger:
+  required_for_every_exact_number: true
+  required_fields:
+    - source_id
+    - source_url
+    - exact_instrument
+    - market_or_release_timestamp
+    - fetched_at
+    - unit
+    - currency
+    - methodology
+  cross_source_consistent_requires_two_retained_source_values: true
+  same_number_must_match_across_body_html_chart_and_tracking_table: true
 
-report_identity:
+html_artifact:
+  required_for_full_success: true
   display_name: 国内交易晨报
   page_title_pattern: 国内交易晨报｜{date}
   h1_pattern: 国内交易晨报｜{date}
   filename_pattern: 国内交易晨报_{date}.html
-  output_path_pattern: /mnt/data/国内交易晨报_{date}.html
-  attachment_display_name_pattern: 国内交易晨报_{date}.html
-  prohibited_filename_tokens: [preview, report, output, index, artifact, random_id, temporary_name]
-  require_exact_file_existence_before_delivery: true
+  local_output_path_pattern: /mnt/data/国内交易晨报_{date}.html
+  pipeline_meta_from_runtime_manifest: true
+  self_contained: true
+  offline_openable: true
+  responsive: true
+  print_friendly: true
+  css_inline: true
+  javascript_inline_when_required: true
+  external_dependencies: false
+  fixed_navigation: true
+  details_expand_collapse: true
+  print_forces_full_content: true
+  max_real_data_charts: 4
+  empty_example_or_placeholder_charts: false
 
-runtime_output_policy:
-  allow_intermediate_user_messages: false
-  only_one_final_response_after_validation: true
-  silent_skip_sends_no_final_response: true
-  prohibited_intermediate_content:
-    - 分析已暂停
-    - 正在分析
-    - 正在读取仓库
-    - 正在调用数据源
-    - 正在同步研究账本
-    - 正在生成HTML
-    - 工具调用状态
-    - 数据抓取过程
-    - 失败重试过程
-    - 仓库路径
-    - 研究账本ID
-    - commit hash
-    - 调试信息
-    - 内部质量状态
-    - GitHub写入失败
-
-final_response:
-  success:
-    max_parts: 2
-    part_1_required:
-      - 90秒摘要
-      - 三条市场主线
-      - 两条最重要研究更新
-      - 今日关注和主要风险
-    part_2: single_html_attachment
-    attachment_filename_pattern: 国内交易晨报_{date}.html
-    prohibit_trailing_content: true
-  publication_due_but_failed:
-    send_market_summary: false
-    send_text_report: false
-    send_attachment: false
-    exact_message: 今日国内交易晨报未通过成品校验，未发送半成品。
-  calendar_silent_skip:
-    send_anything: false
-
-finished_product_validation:
-  enabled: true
-  all_checks_required: true
+html_validation:
+  all_checks_required_for_full_success: true
   checks:
-    - publication_mode_allows_delivery
-    - html_file_exists_at_exact_output_path
-    - filename_exactly_matches_pattern
-    - html_title_exactly_matches_page_title_pattern
-    - html_h1_exactly_matches_h1_pattern
-    - file_is_not_empty_shell_or_plain_text_wrapper
-    - html_opens_offline
-    - css_is_inline
-    - required_javascript_is_inline
-    - no_cdn_remote_font_remote_image_or_external_script
-    - fixed_navigation_exists
-    - expand_and_collapse_supported
-    - print_shows_full_content
-    - all_required_sections_exist
+    - exact_local_file_exists
+    - filename_matches
+    - title_matches
+    - h1_matches
+    - runtime_manifest_pipeline_meta_matches
+    - file_size_is_not_empty_shell
+    - all_required_report_sections_exist
     - weekly_sections_exist_when_due
     - prohibited_client_terms_absent
     - internal_process_information_absent
-    - every_key_number_passes_content_integrity_gate
-    - closed_markets_have_no_proxy_values
-    - each_market_value_has_real_market_timestamp
-    - attachment_is_actually_downloadable
-  fail_action_when_publication_due: send_fixed_failure_message_only
+    - fact_consistency_passes
+    - offline_openable
 
 required_html_sections:
   - 数据截止时间
@@ -198,6 +163,79 @@ required_html_sections:
   - 今日关注与未来7天事件
   - 数据图表
   - 来源与口径
+
+github_archive:
+  enabled: true
+  repository: wuxingyuenan5-lgtm/market-brief-data-hub
+  allowed_write_scope:
+    - reports/domestic/
+  prohibited_write_scope:
+    - config/cross_asset/
+    - reports/cross_asset/
+  path_pattern: reports/domestic/{year}/{month}/国内交易晨报_{date}.html
+  input_type: complete_utf8_html_string
+  temporary_attachment_reference_as_input_prohibited: true
+  write_protocol:
+    file_missing:
+      action: create_file
+    file_exists:
+      - fetch_file_for_current_sha
+      - update_file_with_complete_html_string
+  readback_protocol:
+    required: true
+    action: fetch_file
+    verify:
+      - file_exists
+      - content_not_truncated
+      - title_matches
+      - h1_matches
+      - pipeline_meta_matches_runtime_manifest
+      - required_sections_exist
+  link_policy:
+    provide_only_after_readback_success: true
+    unverified_link_prohibited: true
+  client_output:
+    expose_commit_hash: false
+    expose_repository_error_detail: false
+    expose_internal_path: false
+
+attachment_delivery:
+  priority: optional
+  local_path_pattern: /mnt/data/国内交易晨报_{date}.html
+  display_name_pattern: 国内交易晨报_{date}.html
+  attachment_failure_does_not_block_chat_body: true
+  attachment_failure_does_not_block_verified_github_link: true
+  show_failure_detail: false
+
+final_delivery:
+  success_order:
+    - standalone_chat_body
+    - verified_github_link
+    - optional_html_attachment
+  no_internal_process_output: true
+  no_commit_hash: true
+  no_unverified_link: true
+
+failure_fallback:
+  github_write_or_readback_failed:
+    send_full_verified_chat_body: true
+    omit_github_link: true
+    show_error_detail: false
+  attachment_failed:
+    send_full_verified_chat_body: true
+    send_verified_github_link_when_available: true
+    show_error_detail: false
+  html_failed_after_data_verified:
+    send_full_verified_chat_body: true
+    append_exact_text: 完整HTML未生成，本次仅发送已核验正文。
+  required_config_not_read:
+    send_partial_body: false
+    fixed_message_from_runtime_manifest: config_or_tool_unavailable
+  data_truthfulness_failed:
+    send_partial_body: false
+    fixed_message_from_runtime_manifest: data_truthfulness_failed
+  silent_skip:
+    send_anything: false
 
 client_visible_policy:
   prohibited_terms:
@@ -221,99 +259,15 @@ client_visible_policy:
   internal_quality_codes_visible_in_primary_tables: false
   internal_quality_codes_allowed_in_data_records_and_methodology: true
 
-scope:
-  include:
-    - 中国宏观
-    - 货币政策与财政政策
-    - 人民币
-    - 国内利率与流动性
-    - A股
-    - 港股
-    - 国内商品
-    - 中国AI与科技
-    - 高端制造
-    - 新能源
-    - 房地产
-    - 消费
-  overseas_requires_explicit_china_asset_transmission: true
-  prohibited_fixed_sections: [美股综述, 加密货币, 与中国资产无直接关系的海外政治新闻]
-
-market_map:
-  priority_assets:
-    - SHCOMP
-    - CSI300
-    - CSI500
-    - CSI1000
-    - CHINEXT
-    - STAR50
-    - HSI
-    - HSCEI
-    - HSTECH
-    - SHFE_GOLD
-    - SHFE_COPPER
-    - GFEX_LITHIUM
-    - CN10Y
-    - DR007
-    - USDCNY
-    - USDCNH
-  client_visible_columns: [资产, 最新值, 日变化, 市场时点, 简要解释]
-  noncritical_missing_action: omit
-  critical_missing_display: 数据暂缺
-  market_closed_rule: 不使用ETF、期货或其他代理值替代正式收盘
-
-content_truthfulness_gate:
-  enabled: true
-  hard_rules:
-    - 不知道就不写
-    - 无法核验就删除或标注数据暂缺
-    - 不得把模型记忆、常识、历史印象或搜索摘要写成当天事实
-    - 所有精确数字必须绑定来源、URL、标的、市场或发布时间、抓取时间、单位、币种和统计口径
-    - 宏观Actual优先使用官方来源
-    - Consensus必须有具名来源，否则不填
-    - 政策必须区分提出、征求意见、审议、通过、发布、生效和执行
-    - 推断必须明确写成判断或待验证假设
-    - 同一数字在正文、表格、图表和跟踪表中必须一致
-    - 时点冲突、单位不清、代码错误、合约错误、疑似陈旧或来源冲突无法解释时停止使用
-    - 宁可生成缩减版，不得生成完整但虚假的版本
-
-missing_data_attempts_before_unavailable:
-  - check_symbol_and_exchange
-  - check_trading_day_timezone_and_official_calendar
-  - call_primary_source
-  - call_two_independent_fallbacks_or_one_official_fallback
-  - check_historical_endpoint_and_official_archive
-  - check_stock_index_etf_mapping
-  - check_spot_futures_and_contract_month_mapping
-  - check_onshore_offshore_renminbi_mapping
-  - check_seasonal_adjustment_yoy_mom_and_annualized_basis
-  prohibited_substitutions:
-    - old_value
-    - estimate
-    - vague_range
-    - etf_for_index
-    - secondary_vague_news_number
-    - different_trading_day
-    - different_futures_contract_month
-    - stale_cache
-
-html_technical_requirements:
-  self_contained: true
-  offline_openable: true
-  responsive: true
-  print_friendly: true
-  css_inline: true
-  javascript_inline_when_required: true
-  external_dependencies: false
-  fixed_navigation: true
-  details_expand_collapse: true
-  print_forces_full_content: true
-  max_real_data_charts: 4
-  empty_example_or_placeholder_charts: false
+runtime_output_policy:
+  allow_intermediate_user_messages: false
+  silent_skip_sends_no_message: true
+  prohibit_tool_status_debug_and_internal_errors: true
 
 non_goals:
   - change_existing_layout
   - change_research_scope
   - change_shared_data_contract
-  - write_back_to_github_during_automation
-  - update_research_ledger_during_automation
-  - archive_html_during_automation
+  - write_to_cross_asset_paths
+  - treat_attachment_as_primary_delivery
+  - provide_unverified_github_links
