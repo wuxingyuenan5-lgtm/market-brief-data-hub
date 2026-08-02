@@ -1,25 +1,61 @@
-schema_version: 1
-policy_id: shared_market_calendar_and_publication_v1
+schema_version: 2
+policy_id: shared_market_calendar_and_publication_v2
 status: active
-updated_at: '2026-08-02T22:05:00+08:00'
-purpose: 两份晨报共用的交易日、节假日、特殊休市与周度展望发布规则；禁止仅按星期或政府调休日历判断市场是否开市
+updated_at: '2026-08-02T22:26:00+08:00'
+purpose: 两份晨报共用的交易日、节假日、特殊休市和发布判定规则；必须依据交易所官方日历及临时公告，不得仅按星期、法定节假日或政府调休表判断
 
 timezone: Asia/Shanghai
 
 calendar_authority:
   source_priority:
-    - official_exchange_special_notice
+    - official_exchange_temporary_notice
     - official_exchange_trading_calendar
-    - official_market_operator_calendar
+    - official_market_operator_notice
     - official_regulator_or_clearing_notice
-    - authoritative_news_confirmation
-  rules:
-    - 必须使用交易所或市场运营方日历，不得把政府调休工作日自动视为证券或期货交易日
-    - 临时休市、延迟开市、提前收市、半日市和技术性停市必须以官方临时公告覆盖年度日历
-    - 不同市场分别判定，不得因一个市场开市而把其他市场的旧数据写成当日数据
-    - 交易日期、当地时区、北京时间和报告日期必须分别保存
+    - authoritative_news_confirmation_only_as_cross_check
+  temporary_notice_overrides_annual_calendar: true
+  government_workday_calendar_is_not_market_calendar: true
+  weekday_only_inference_prohibited: true
+  official_evidence_required_for_open_or_closed_claim: true
+  special_notice_lookback_hours: 72
+  required_event_types:
+    - statutory_or_exchange_holiday
+    - special_closure
+    - open_half_day
+    - early_close
+    - delayed_open
+    - technical_halt
+    - resumed_trading
+
+market_calendar_sources:
+  SSE: [sse_official_calendar, sse_temporary_notices]
+  SZSE: [szse_official_calendar, szse_temporary_notices]
+  BSE: [bse_official_calendar, bse_temporary_notices]
+  HKEX: [hkex_official_calendar, hkex_market_arrangements]
+  SHFE: [shfe_official_calendar, shfe_notices]
+  INE: [ine_official_calendar, ine_notices]
+  DCE: [dce_official_calendar, dce_notices]
+  CZCE: [czce_official_calendar, czce_notices]
+  GFEX: [gfex_official_calendar, gfex_notices]
+  CFFEX: [cffex_official_calendar, cffex_notices]
+  NYSE: [nyse_official_calendar, nyse_notices]
+  NASDAQ: [nasdaq_official_calendar, nasdaq_notices]
+  CME: [cme_official_calendar, cme_special_notices]
+  ICE_US: [ice_official_calendar, ice_notices]
+  LME: [lme_official_calendar, lme_notices]
 
 market_groups:
+  domestic_primary:
+    - SSE
+    - SZSE
+    - BSE
+    - HKEX
+    - SHFE
+    - INE
+    - DCE
+    - CZCE
+    - GFEX
+    - CFFEX
   cross_asset_primary:
     - NYSE
     - NASDAQ
@@ -35,20 +71,11 @@ market_groups:
     - DCE
     - CZCE
     - GFEX
-  domestic_primary:
-    - SSE
-    - SZSE
-    - BSE
-    - HKEX
-    - SHFE
-    - INE
-    - DCE
-    - CZCE
-    - GFEX
+    - CFFEX
   continuous_markets:
     - CRYPTO_SPOT
     - CRYPTO_DERIVATIVES
-  continuous_market_rule: 加密等连续市场不得单独触发普通周日晨报；仅在传统主市场触发晨报后作为补充数据纳入
+  continuous_market_rule: 连续市场不得单独触发周日或传统市场全休时的晨报
 
 session_states:
   allowed:
@@ -59,123 +86,129 @@ session_states:
     - scheduled_holiday
     - special_closure
     - technical_halt
+    - resumed_after_halt
     - unknown_pending_verification
   open_states:
     - open_full_day
     - open_half_day
     - delayed_open
     - early_close
+    - resumed_after_halt
   closed_states:
     - scheduled_holiday
     - special_closure
     - technical_halt
-  unknown_action: 不得假定开市；先核验官方公告
+  unknown_action: 不得假定开市；继续核验官方日历与临时公告
 
 run_resolution:
+  must_run_before_market_data_collection: true
   required_fields:
     - report_date_beijing
-    - previous_calendar_date
-    - today_session_state_by_market
-    - previous_day_session_state_by_market
+    - weekday_beijing
+    - yesterday_state_by_market
+    - today_state_by_market
     - latest_valid_session_date_by_market
-    - first_open_day_of_week_by_report
-    - weekly_outlook_due
-    - holiday_module_due
+    - latest_valid_session_timestamp_by_market
+    - official_calendar_source_by_market
+    - temporary_notice_checked_at
+    - publication_mode
+    - publication_reason
+    - weekly_module_due
+    - weekly_module_already_delivered_this_iso_week
   steps:
-    - 读取本周和下周一的官方交易日历
-    - 检查过去72小时是否有临时休市、半日市、延迟开市或提前收市公告
-    - 分市场确定昨日是否开市、今日是否开市以及最近有效交易日
-    - 根据对应晨报的primary市场组计算是否发布
-    - 若发布，所有市场数据使用各自最近有效交易时点并明确标注
+    - 读取本周、下周一及最近有效交易日的官方交易日历
+    - 检查过去72小时官方临时公告
+    - 分市场识别法定节假日、特殊休市、半日市、提前收市、延迟开市和技术性停市
+    - 分别确定昨日、今日及最近有效交易时段
+    - 使用对应晨报primary市场组判断发布模式
+    - 发布时逐资产保留真实市场时点
 
 publication_decision:
-  general_rule: 昨日没有任何对应primary市场开市且今日也没有任何对应primary市场开市时，不发布晨报
+  domestic_general_rule: 昨日与今日所有domestic_primary市场均休市时静默跳过
+  cross_asset_general_rule: 昨日与今日所有cross_asset_primary市场均休市时静默跳过
   publish_when:
-    - 昨日至少一个对应primary市场有有效交易时段
-    - 今日至少一个对应primary市场按官方日历开市，即使昨日休市
-    - 今日存在官方确认的特殊交易时段或补充交易时段
+    - 昨日至少一个对应primary市场存在有效交易时段
+    - 今日至少一个对应primary市场按官方安排开市
+    - 今日存在官方确认的特殊或补充交易时段
   skip_when:
-    - 昨日所有对应primary市场均休市且今日所有对应primary市场均休市
-    - 市场状态无法核验且没有官方开市依据
-  skip_delivery_behavior: 不发送空晨报、不发送“今日无晨报”提示、不生成HTML、不创建归档
+    - 昨日与今日所有对应primary市场均处于closed_states
+    - 所有相关市场状态均无法核验且没有官方开市依据
+  silent_skip_behavior:
+    generate_report: false
+    generate_html: false
+    create_archive: false
+    send_message: false
+    send_failure_notice: false
 
 weekday_rules:
   saturday:
-    publish_if: 周五至少一个对应primary市场正常开市或半日市
+    publish_if: 周五至少一个对应primary市场存在有效交易时段
+    publication_mode: saturday_friday_summary
     content:
-      - 总结周五各市场最近有效交易数据
-      - 纳入周五收盘后至周六报告截止时间的重要信息
-      - 对半日市明确标注成交量和流动性不可与完整交易日直接比较
+      - 使用周五各市场最近有效交易数据
+      - 纳入周五收盘后至周六截止时间的重要信息
+      - 半日市或提前收市必须标注流动性和成交不可与完整交易日直接比较
   sunday:
-    default: skip
-    exception: 仅当周日被官方认定为对应primary市场的正式或特殊交易日时发布
-    prohibited_trigger: 不得仅因加密市场持续交易而发布普通周日晨报
-  monday_or_first_open_day:
+    default: silent_skip
+    exception: 仅当交易所官方安排至少一个对应primary市场为正式或特殊交易日时发布
+    continuous_market_cannot_trigger: true
+  monday:
     publish_if: 当日至少一个对应primary市场开市
-    content:
-      - 使用上一个有效交易日数据，通常为周五
-      - 纳入周末及假期期间的重要政策、宏观、公司和产业信息
-      - 增加本周假期与特殊交易安排
-      - 增加当周展望
-    deferral: 若周一所有对应primary市场休市，将周一附加模块递延到该周第一个满足发布条件的开市日，仅发布一次
+    data_basis: 上一个有效交易日数据加周末信息
+    weekly_module_due: true
+    if_all_primary_closed: 静默跳过并将周度模块递延
+  deferred_first_open_day:
+    condition: 周一全部相关primary市场休市且本周尚未展示周度模块
+    action: 在本周第一个满足发布条件的开市日展示周度模块
+    once_per_week: true
   tuesday_to_friday:
-    rule: 按general_rule执行；若昨日休市但今日开市，发布开市前晨报并使用最近有效交易日与休市期间新增信息
+    rule: 按general_rule执行
+    reopen_after_holiday: 使用各市场最近有效交易日并整合休市期间新增信息
 
-holiday_and_special_closure:
-  holiday_module_fields:
-    - market
-    - holiday_or_event_name
-    - local_date
-    - beijing_date
-    - session_state
-    - close_or_open_time_local
-    - close_or_open_time_beijing
-    - settlement_or_liquidity_impact
-    - official_source
-  rules:
-    - 同一节假日在不同交易所可能安排不同，必须逐市场列示
-    - 半日市、提前收市和延迟开市计为开市，但必须显著标注
-    - 临时休市优先于年度日历
-    - 若只休市部分市场，晨报仍可发布，但不得横向比较不同交易日的涨跌幅
-    - 复市首日必须说明休市期间累计信息和缺口风险
-
-weekly_outlook:
-  due: 每周一；若周一不满足发布条件，则递延至当周第一个满足发布条件的开市日
-  once_per_week: true
-  visible_section_name: 本周展望
-  required_subsections:
+weekly_module:
+  visible_once_per_iso_week: true
+  due: 周一；若周一不满足发布条件则递延至本周第一个满足发布条件的开市日
+  required_sections:
     - 本周交易日与假期安排
-    - 重要宏观数据与央行事件
-    - 重点政策、监管与财政事件
-    - 重点公司财报与产业事件
-    - 商品、指数调整、到期与再平衡事项
-    - 主要风险与验证节点
-  event_rules:
-    - 仅列已确认或有明确官方日程的事件
-    - 暂定事件必须明确标注暂定
-    - 每项写明北京时间、影响市场和需要验证的变量
-    - 优先级按市场影响和研究价值排序，不为凑数填充
-    - 跨资产晨报覆盖全球与中国相关事件
+    - 本周重要宏观、政策、财报、产业和商品事件
+    - 本周主要风险与验证节点
+  event_requirements:
+    - 仅列官方确认或有明确日程的事件
+    - 暂定事件必须标注暂定
+    - 每项写明北京时间、影响市场和验证变量
     - 国内晨报只纳入中国事件及有明确中国资产传导的海外事件
-  preferred_count: 6-12
+  once_per_week_check_sources:
+    - existing_historical_archives
+    - prior_successful_task_output_when_available
+  prohibit_duplicate_weekly_module_same_iso_week: true
+
+partial_market_open:
+  publish_allowed: true
+  rules:
+    - 每个市场独立显示最近有效交易时点
+    - 休市市场不得用ETF、期货或其他代理值替代正式收盘
+    - 不得把不同交易日的涨跌幅伪装成同一时点横截面
+    - 休市期间新闻可纳入，但价格反应等待对应市场复市确认
+    - 半日市、提前收市和延迟开市必须显著标注
 
 multi_market_consistency:
   rules:
-    - 同一晨报允许不同资产使用不同最近有效交易日，但必须逐项显示市场时点
-    - 禁止将周五美股、周一亚洲盘和周末加密数据伪装成同一收盘时点
-    - 某市场休市时，不得使用ETF、期货或其他市场代理值替代该市场正式收盘
-    - 休市期间的新闻可以纳入，但价格反应必须等待对应市场恢复交易后再确认
+    - 同一晨报允许资产使用不同最近有效交易日，但必须逐项标明
+    - 在岸与离岸人民币、指数与ETF、现货与期货及不同合约月份不得互相替代
+    - 技术性停市期间不得沿用停市前旧报价作为新报价
+    - 复市首日说明休市期间累计信息和价格缺口风险
 
 report_specific_application:
-  cross_asset:
-    primary_group: cross_asset_primary
-    monday_scope: 全球交易所假期、主要宏观与央行、重点财报、商品和加密重要制度事件
   domestic:
     primary_group: domestic_primary
-    monday_scope: 中国内地与香港交易安排、中国宏观政策、A/H股与国内商品事件；海外事件仅在有明确中国资产传导时纳入
+    monday_scope: 中国内地与香港交易安排、中国宏观政策、A/H股和国内商品事件；海外事件仅在有明确中国资产传导时纳入
+  cross_asset:
+    primary_group: cross_asset_primary
+    monday_scope: 全球交易所安排、主要宏观与央行、重点财报和商品事件
 
 quality_gate:
-  - 发布前必须记录本次publish或skip的判定依据
-  - 客户页面不展示内部判定日志，只展示必要的休市和假期信息
-  - 未核验官方交易日历不得声称市场开市或休市
-  - skip日不得生成占位HTML或重复上一交易日晨报
+  - 发布前必须形成内部publish或silent_skip判定及官方依据
+  - 客户页面只展示必要交易安排，不展示内部判定日志
+  - 未核验官方交易日历和临时公告不得声称开市或休市
+  - silent_skip日不得生成占位HTML、复制旧报告或发送任何消息
+  - 部分市场开市时必须保留逐市场真实时点
