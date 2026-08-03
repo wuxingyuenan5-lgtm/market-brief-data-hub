@@ -1,53 +1,52 @@
-schema_version: 2
-policy_id: cross_asset_automation_delivery_v2
+schema_version: 3
+policy_id: cross_asset_automation_delivery_v3
 status: active
-purpose: 计划任务必须交付可直接阅读的正文，并提供可长期访问的正式HTML；聊天附件仅为附加项，不得成为唯一交付渠道
+purpose: 计划任务必须以批准版式的正式HTML附件作为主要交付物；聊天仅保留精简摘要；GitHub仅用于后台归档，不得作为客户下载入口
 
 execution_mode:
-  github_access: read_write_for_completed_html
   github_config_read: true
   github_archive_write: true
   archive_write_method: raw_utf8_html_content
-  prohibit_local_file_reference_as_github_input: true
   archive_path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
   verify_archive_after_write: true
-  verification_method: fetch_file
   update_existing_file_only_after_fetching_current_sha: true
   research_ledger_write_during_scheduled_run: false
-  reason: HTML正文可直接作为UTF-8文本写入GitHub；不得把临时附件引用当作GitHub文件参数
 
 user_delivery_priority:
-  - usable_inline_report
-  - verified_stable_github_link
-  - optional_chat_attachment
+  - direct_chat_html_attachment
+  - concise_chat_summary
+  - hidden_github_archive
 
-inline_report:
+chat_summary:
   required: true
-  must_remain_useful_without_attachment: true
-  minimum_chinese_characters: 900
-  maximum_chinese_characters: 2200
-  required_sections:
+  purpose: 仅供快速浏览，不替代正式HTML
+  minimum_chinese_characters: 250
+  maximum_chinese_characters: 700
+  allowed_sections:
     - 90秒摘要
-    - 市场概览
     - 三条市场主线
-    - 两条研究更新
-    - 今日关注与风险
-  market_overview_minimum_verified_assets: 6
-  market_overview_preferred_assets: 10
-  include_source_citations: true
+    - 两条最重要研究更新
+    - 今日关注与主要风险
+    - 周一或递延首个开市日的精简本周展望
+  prohibit_full_market_table: true
+  prohibit_long_form_report_in_chat: true
+  prohibit_copying_entire_html_content: true
+  include_source_citations_when_supported: true
   prohibit_internal_process_copy: true
   prohibit_repository_status_copy: true
-  prohibit_ledger_ids: true
-  prohibit_commit_hashes: true
+  prohibit_repository_links: true
 
 html_artifact:
   required: true
+  primary_deliverable: true
   canonical_filename: 跨资产交易晨报_{date}.html
+  required_local_path: /mnt/data/跨资产交易晨报_{date}.html
   title_pattern: 跨资产交易晨报｜{date}
   h1_pattern: 跨资产交易晨报｜{date}
   minimum_file_size_bytes: 12000
   self_contained: true
-  local_path_optional: /mnt/data/跨资产交易晨报_{date}.html
+  baseline_id: cross_asset_v4_2026_07_31
+  baseline_conformance_required: true
   required_sections:
     - 90秒摘要
     - 隔夜宏观
@@ -77,60 +76,68 @@ html_artifact:
     - 系统性积累
     - 真实数据版
 
-stable_link:
-  required_after_verified_github_write: true
-  preferred_url_pattern: https://github.com/wuxingyuenan5-lgtm/market-brief-data-hub/blob/main/reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
-  link_label_pattern: 下载《跨资产交易晨报_{date}.html》
-  do_not_present_unverified_link: true
-
 chat_attachment:
-  optional: true
-  may_be_included_only_if_file_exists: true
-  attachment_failure_must_not_invalidate_inline_report: true
-  attachment_failure_must_not_be_shown_to_user: true
-  never_show_broken_attachment_as_primary_delivery: true
+  required: true
+  attachment_name_pattern: 跨资产交易晨报_{date}.html
+  source_must_be_exact_local_file: true
+  local_file_must_exist_before_attachment: true
+  local_file_bytes_must_match_validated_html: true
+  direct_download_required: true
+  prohibit_external_url_substitute: true
+  prohibit_github_blob_link: true
+  prohibit_github_raw_link_as_customer_delivery: true
+  prohibit_preview_wrapper: true
+  prohibit_broken_attachment_success: true
+
+background_archive:
+  enabled: true
+  customer_visible: false
+  archive_must_match_attachment_byte_for_byte: true
+  do_not_show_github_link: true
+  do_not_show_repository_path: true
+  do_not_show_commit_hash: true
+  archive_failure_must_not_replace_attachment_with_link: true
 
 failure_behavior:
-  if_github_write_fails:
-    still_send_usable_inline_report: true
-    do_not_claim_archive_success: true
+  if_local_html_generation_fails:
+    send_formal_report: false
+    final_message: 今日晨报未生成可下载的正式HTML附件，未发送半成品。
+  if_attachment_validation_or_upload_fails:
+    retry_attachment_once: true
+    after_retry_send_formal_report: false
+    never_offer_github_link_as_fallback: true
+    final_message: 今日晨报HTML附件交付失败，未以GitHub链接替代。
+  if_github_archive_fails:
+    still_send_validated_chat_attachment: true
     do_not_show_repository_error_details: true
-    omit_stable_link: true
-  if_chat_attachment_fails:
-    still_send_inline_report_and_verified_github_link: true
-    do_not_show_attachment_error: true
-  if_html_generation_fails_but_inline_data_is_verified:
-    send_inline_report: true
-    omit_file_link: true
-    final_note: 完整HTML未生成，本次仅发送已核验正文。
+    do_not_show_github_link: true
   if_data_coverage_insufficient:
-    generate_verified_reduced_report: true
-    minimum_inline_sections:
-      - 90秒摘要
-      - 已核验市场概览
-      - 市场主线
-      - 今日关注与风险
+    generate_verified_reduced_html: true
+    preserve_baseline_structure: true
     do_not_pad_with_unverified_data: true
   if_github_config_read_fails:
-    use_last_known_public_rules: false
     final_message: 今日晨报因配置读取失败未生成。
 
 final_message_contract:
-  send_once_after_research_and_rendering_complete: true
+  send_once_after_research_rendering_and_attachment_validation_complete: true
+  order:
+    - concise_chat_summary
+    - direct_html_attachment
   include:
-    - usable_inline_report
-    - verified_stable_github_link_when_available
-    - optional_working_attachment_when_available
+    - concise_chat_summary
+    - direct_working_html_attachment
   exclude:
-    - tool_status
-    - analysis_status
+    - github_link
+    - repository_path
     - repository_write_details
-    - repository_paths_as_plain_text
     - commit_hashes
     - internal_ledger_ids
+    - tool_status
+    - analysis_status
     - methodology_debugging
-  do_not_reduce_to_one_paragraph_summary: true
-  do_not_make_attachment_the_only_content: true
+    - full_market_table_in_chat
+  attachment_is_mandatory_for_success: true
+  github_is_background_only: true
 
 customer_quality:
   client_facing_language_only: true
@@ -138,4 +145,4 @@ customer_quality:
   inference_must_be_labeled_as_judgment: true
   unresolved_source_conflicts_must_be_excluded: true
   noncritical_missing_items_should_be_omitted: true
-  never_claim_success_without_verification: true
+  never_claim_success_without_attachment_validation: true
