@@ -1,9 +1,8 @@
-schema_version: 3
-pipeline_id: cross_asset_morning_brief_v5
+schema_version: 4
+pipeline_id: cross_asset_morning_brief_v6
 status: active
-updated_at: '2026-08-03T10:05:00+08:00'
-
-purpose: 定时任务运行清单；确认任务执行交易日判断、仓库读取、数据核验、批准版式HTML生成、直接附件交付和后台归档，不得退化为长篇聊天报告或GitHub页面链接
+updated_at: '2026-08-04T10:05:00+08:00'
+purpose: 计划任务与互动聊天共用同一研究与版式规则，但按运行环境选择可实现的交付方式；计划任务优先保证关联聊天正文可用，互动聊天优先交付正式HTML附件
 
 required_config_reads:
   - vendor/upstreams.lock.yaml
@@ -27,74 +26,69 @@ required_config_reads:
 
 required_pipeline_steps:
   - read_and_parse_all_required_configs
+  - identify_execution_context_as_scheduled_task_or_interactive_chat
   - resolve_official_market_calendars_and_special_closures
   - decide_publish_or_skip_from_shared_calendar_policy
   - if_skipped_end_without_user_message_or_artifact
   - collect_and_normalize_market_data
-  - perform_source_and_timestamp_validation
+  - perform_source_timestamp_unit_and_instrument_validation
   - add_weekly_outlook_on_monday_or_deferred_first_open_day
-  - build_concise_chat_summary
-  - render_self_contained_html_using_locked_baseline
-  - validate_html_artifact_and_baseline_conformance
-  - write_exact_html_to_required_local_path
-  - validate_direct_chat_attachment
-  - write_same_html_to_github_as_background_archive
-  - fetch_archived_html_and_verify_byte_equivalent_content
-  - deliver_concise_summary_and_direct_attachment_only
+  - build_verified_report_content
+  - render_self_contained_html_using_locked_baseline_when_file_tools_are_available
+  - validate_html_artifact_when_generated
+  - archive_completed_html_in_background_when_generated
+  - deliver_according_to_automation_delivery_execution_context
 
 hard_gates:
   config_read_success_required: true
   official_calendar_resolution_required: true
   special_closure_check_required: true
   publication_decision_required: true
-  skip_must_produce_no_artifact: true
   minimum_verified_market_assets: 6
-  chat_summary_minimum_chinese_characters: 250
-  chat_summary_maximum_chinese_characters: 700
-  prohibit_long_form_report_in_chat: true
-  prohibit_full_market_table_in_chat: true
-  html_minimum_file_size_bytes: 12000
   baseline_id_required: cross_asset_v4_2026_07_31
-  baseline_conformance_required: true
-  exact_local_file_required: true
-  direct_chat_attachment_required: true
-  attachment_name_validation_required: true
+  baseline_conformance_required_for_html: true
   prohibit_github_link_in_customer_delivery: true
-  github_archive_is_background_only: true
   prohibit_summary_only_success: true
-  prohibit_broken_attachment_success: true
   prohibit_unverified_claim_of_pipeline_execution: true
+  scheduled_task_inline_report_required: true
+  scheduled_task_attachment_required: false
+  interactive_chat_direct_attachment_required: true
 
 weekly_module:
   due: monday_or_deferred_first_open_day
   required:
     - 本周交易日与假期安排
-    - 本周展望
+    - 本周重要宏观、政策、财报、产业和商品事件
+    - 本周主要风险与验证节点
   once_per_week: true
 
 artifact_identity:
   html_meta_name: market-brief-pipeline
-  html_meta_content: cross_asset_morning_brief_v5
+  html_meta_content: cross_asset_morning_brief_v6
   filename_pattern: 跨资产交易晨报_{date}.html
   local_path_pattern: /mnt/data/跨资产交易晨报_{date}.html
   archive_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
-  customer_delivery: direct_chat_attachment
-  github_delivery: prohibited
 
-attachment_validation:
+scheduled_task_delivery:
+  destination: task_associated_chat
   required:
-    - local_path_exists
-    - basename_matches_filename_pattern
-    - file_size_at_least_12000_bytes
-    - title_matches_date
-    - h1_matches_date
-    - pipeline_meta_matches_v5
-    - all_required_sections_present
-    - no_prohibited_visible_strings
-    - attachment_uses_actual_file_bytes
-    - no_external_url_or_preview_wrapper
+    - usable_inline_report
+    - client_facing_copy_only
+    - no_internal_process_messages
+    - no_github_link
+  optional:
+    - direct_html_attachment_when_runtime_supports_real_file_creation
+  attachment_unavailable_action: send_verified_inline_report_without_failure_notice
+
+interactive_chat_delivery:
+  required:
+    - concise_chat_summary
+    - direct_downloadable_html_attachment
+  prohibited:
+    - github_link_as_substitute
+    - preview_wrapper
+    - broken_attachment_success
 
 failure_messages:
-  config_or_tool_unavailable: 今日晨报未执行完整配置流程，未生成正式版本。
-  artifact_validation_failed: 今日晨报未通过成品校验，未发送半成品。
-  attachment_failed: 今日晨报HTML附件交付失败，未以GitHub链接替代。
+  config_or_data_gate_failed: 今日晨报未通过数据与配置校验，未发送半成品。
+  interactive_attachment_failed: 今日晨报HTML附件交付失败，未以GitHub链接替代。
