@@ -1,52 +1,48 @@
-schema_version: 3
-policy_id: cross_asset_automation_delivery_v3
+schema_version: 4
+policy_id: cross_asset_automation_delivery_v4
 status: active
-purpose: 计划任务必须以批准版式的正式HTML附件作为主要交付物；聊天仅保留精简摘要；GitHub仅用于后台归档，不得作为客户下载入口
+purpose: 区分计划任务与互动聊天的运行能力；计划任务不得因附件能力缺失而整份失败，互动聊天仍以可下载HTML附件为正式交付
 
-execution_mode:
-  github_config_read: true
-  github_archive_write: true
-  archive_write_method: raw_utf8_html_content
-  archive_path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
-  verify_archive_after_write: true
-  update_existing_file_only_after_fetching_current_sha: true
-  research_ledger_write_during_scheduled_run: false
+execution_contexts:
+  scheduled_task:
+    primary_delivery: associated_chat_inline_report
+    minimum_chinese_characters: 900
+    maximum_chinese_characters: 2200
+    required_sections:
+      - 90秒摘要
+      - 市场概览
+      - 三条市场主线
+      - 两条研究更新
+      - 今日关注与风险
+      - 周度模块到期时的本周交易安排与本周展望
+    attachment_policy: best_effort
+    attachment_failure_is_report_failure: false
+    github_customer_link_allowed: false
+    rules:
+      - 先保证关联聊天中的报告正文可独立阅读
+      - 若运行环境能够生成并附加真实HTML文件，则同时附加
+      - 若运行环境不能创建可下载附件，不得只发送失败提示，不得以GitHub链接替代
+      - 不输出完整市场表格时，市场概览至少覆盖6个已核验核心资产
 
-user_delivery_priority:
-  - direct_chat_html_attachment
-  - concise_chat_summary
-  - hidden_github_archive
+  interactive_chat:
+    primary_delivery: concise_summary_and_direct_html_attachment
+    summary_minimum_chinese_characters: 250
+    summary_maximum_chinese_characters: 700
+    direct_attachment_required: true
+    required_local_path: /mnt/data/跨资产交易晨报_{date}.html
+    github_customer_link_allowed: false
+    rules:
+      - 正式HTML附件必须可直接下载
+      - 附件名称必须为跨资产交易晨报_{date}.html
+      - 附件失败不得声称完成
 
-chat_summary:
-  required: true
-  purpose: 仅供快速浏览，不替代正式HTML
-  minimum_chinese_characters: 250
-  maximum_chinese_characters: 700
-  allowed_sections:
-    - 90秒摘要
-    - 三条市场主线
-    - 两条最重要研究更新
-    - 今日关注与主要风险
-    - 周一或递延首个开市日的精简本周展望
-  prohibit_full_market_table: true
-  prohibit_long_form_report_in_chat: true
-  prohibit_copying_entire_html_content: true
-  include_source_citations_when_supported: true
-  prohibit_internal_process_copy: true
-  prohibit_repository_status_copy: true
-  prohibit_repository_links: true
-
-html_artifact:
-  required: true
-  primary_deliverable: true
+common_html:
   canonical_filename: 跨资产交易晨报_{date}.html
-  required_local_path: /mnt/data/跨资产交易晨报_{date}.html
   title_pattern: 跨资产交易晨报｜{date}
   h1_pattern: 跨资产交易晨报｜{date}
   minimum_file_size_bytes: 12000
   self_contained: true
   baseline_id: cross_asset_v4_2026_07_31
-  baseline_conformance_required: true
   required_sections:
     - 90秒摘要
     - 隔夜宏观
@@ -76,68 +72,23 @@ html_artifact:
     - 系统性积累
     - 真实数据版
 
-chat_attachment:
-  required: true
-  attachment_name_pattern: 跨资产交易晨报_{date}.html
-  source_must_be_exact_local_file: true
-  local_file_must_exist_before_attachment: true
-  local_file_bytes_must_match_validated_html: true
-  direct_download_required: true
-  prohibit_external_url_substitute: true
-  prohibit_github_blob_link: true
-  prohibit_github_raw_link_as_customer_delivery: true
-  prohibit_preview_wrapper: true
-  prohibit_broken_attachment_success: true
-
 background_archive:
   enabled: true
   customer_visible: false
-  archive_must_match_attachment_byte_for_byte: true
+  archive_path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
+  write_method: raw_utf8_html_content
+  verify_after_write: true
   do_not_show_github_link: true
   do_not_show_repository_path: true
   do_not_show_commit_hash: true
-  archive_failure_must_not_replace_attachment_with_link: true
+  archive_failure_must_not_block_valid_customer_delivery: true
 
 failure_behavior:
-  if_local_html_generation_fails:
-    send_formal_report: false
-    final_message: 今日晨报未生成可下载的正式HTML附件，未发送半成品。
-  if_attachment_validation_or_upload_fails:
-    retry_attachment_once: true
-    after_retry_send_formal_report: false
-    never_offer_github_link_as_fallback: true
-    final_message: 今日晨报HTML附件交付失败，未以GitHub链接替代。
-  if_github_archive_fails:
-    still_send_validated_chat_attachment: true
-    do_not_show_repository_error_details: true
-    do_not_show_github_link: true
-  if_data_coverage_insufficient:
-    generate_verified_reduced_html: true
-    preserve_baseline_structure: true
-    do_not_pad_with_unverified_data: true
-  if_github_config_read_fails:
-    final_message: 今日晨报因配置读取失败未生成。
-
-final_message_contract:
-  send_once_after_research_rendering_and_attachment_validation_complete: true
-  order:
-    - concise_chat_summary
-    - direct_html_attachment
-  include:
-    - concise_chat_summary
-    - direct_working_html_attachment
-  exclude:
-    - github_link
-    - repository_path
-    - repository_write_details
-    - commit_hashes
-    - internal_ledger_ids
-    - tool_status
-    - analysis_status
-    - methodology_debugging
-    - full_market_table_in_chat
-  attachment_is_mandatory_for_success: true
-  github_is_background_only: true
+  scheduled_task:
+    config_or_data_gate_failed: 今日晨报未通过数据与配置校验，未发送半成品。
+    html_or_attachment_unavailable_but_inline_verified: 发送完整已核验正文，不发送GitHub链接，不把附件缺失写入客户正文
+  interactive_chat:
+    attachment_failed: 今日晨报HTML附件交付失败，未以GitHub链接替代。
 
 customer_quality:
   client_facing_language_only: true
@@ -145,4 +96,4 @@ customer_quality:
   inference_must_be_labeled_as_judgment: true
   unresolved_source_conflicts_must_be_excluded: true
   noncritical_missing_items_should_be_omitted: true
-  never_claim_success_without_attachment_validation: true
+  never_claim_success_without_actual_delivery: true
