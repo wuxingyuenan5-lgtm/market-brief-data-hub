@@ -6,173 +6,393 @@
 <meta name="market-brief-pipeline" content="cross_asset_morning_brief_v6">
 <title>跨资产交易晨报｜2026-08-08</title>
 <style>
-:root{--bg:#f4f6f8;--paper:#ffffff;--ink:#15202b;--muted:#65717e;--line:#dfe5ea;--navy:#17324d;--blue:#315d82;--soft:#eef3f7;--green:#157347;--red:#b42318;--amber:#9a6700;--shadow:0 10px 30px rgba(19,40,61,.08)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;line-height:1.64;-webkit-font-smoothing:antialiased}.page{max-width:1160px;margin:0 auto;padding:26px 22px 70px}.hero{background:linear-gradient(135deg,#122a41,#234d70);color:white;border-radius:18px;padding:30px 34px;box-shadow:var(--shadow)}.hero h1{margin:0 0 8px;font-size:34px;letter-spacing:.01em}.hero .sub{opacity:.86;font-size:14px}.hero-grid{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end}.modebar{display:flex;gap:8px;flex-wrap:wrap}.modebar button{border:1px solid rgba(255,255,255,.38);color:white;background:rgba(255,255,255,.08);border-radius:999px;padding:7px 13px;cursor:pointer}.modebar button.active{background:white;color:#17324d}.section{background:var(--paper);border:1px solid var(--line);border-radius:16px;margin-top:18px;padding:24px 26px;box-shadow:0 3px 14px rgba(19,40,61,.035)}h2{font-size:21px;margin:0 0 16px;color:var(--navy)}h3{font-size:17px;margin:0 0 8px;color:var(--navy)}p{margin:8px 0 0}.lede{font-size:17px}.summary-grid,.theme-grid,.research-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.summary-card,.theme-card,.research-card{border:1px solid var(--line);border-radius:13px;padding:17px;background:#fbfcfd}.summary-card strong{display:block;color:var(--navy);margin-bottom:5px}.kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.metric{background:var(--soft);border-radius:12px;padding:13px}.metric .v{font-size:22px;font-weight:750;color:var(--navy)}.metric .l{font-size:12px;color:var(--muted)}.up{color:var(--green)}.down{color:var(--red)}.neutral{color:var(--muted)}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);vertical-align:top}th{color:#496171;font-weight:650;background:#f8fafb}.nowrap{white-space:nowrap}.muted{color:var(--muted)}.note{font-size:13px;color:var(--muted)}.callout{border-left:4px solid var(--blue);padding:12px 15px;background:#f4f8fb;border-radius:0 10px 10px 0;margin:12px 0}.tag{display:inline-block;font-size:12px;padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--navy);margin-right:6px}.tag.green{background:#e9f6ef;color:#12613b}.tag.amber{background:#fff6dd;color:#7a5200}.chart-wrap{overflow-x:auto}.chart{min-width:620px;border:1px solid var(--line);border-radius:14px;padding:16px;background:#fbfcfd}.bar-row{display:grid;grid-template-columns:84px 1fr 72px;gap:10px;align-items:center;margin:13px 0}.bar-track{height:18px;background:#e9edf1;border-radius:6px;position:relative;overflow:hidden}.bar{height:100%;border-radius:6px;background:#52799a}.bar.neg{background:#9f5a5a;margin-left:50%}.bar.pos{margin-left:50%}.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:0 82px 0 92px}.source-list{padding-left:20px;margin:0}.source-list li{margin:8px 0}.source-list a{color:#315d82;word-break:break-all}.footer{font-size:12px;color:var(--muted);padding:20px 4px 0}.trade-only,.research-only{display:block}body.mode-trade .research-only{display:none}body.mode-research .trade-only{display:none}body.mode-full .trade-only,body.mode-full .research-only{display:block}@media(max-width:820px){.page{padding:14px 12px 46px}.hero{padding:22px}.hero h1{font-size:26px}.hero-grid{grid-template-columns:1fr}.summary-grid,.theme-grid,.research-grid,.metric-row{grid-template-columns:1fr}.section{padding:19px 17px;overflow-x:auto}table{min-width:720px}}@media print{body{background:white}.page{max-width:none;padding:0}.section,.hero{box-shadow:none;break-inside:avoid}.modebar{display:none}.trade-only,.research-only{display:block!important}a{color:inherit;text-decoration:none}}
+:root {
+  --bg:#f4f6f8; --paper:#ffffff; --ink:#16222d; --muted:#667481; --line:#dfe6ec;
+  --navy:#17324d; --blue:#315d82; --soft:#eef3f7; --green:#157347; --red:#b42318;
+  --amber:#916600; --shadow:0 10px 30px rgba(19,40,61,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;line-height:1.64;-webkit-font-smoothing:antialiased}
+.page{max-width:1160px;margin:0 auto;padding:24px 22px 64px}
+.hero{background:linear-gradient(135deg,#122a41,#234d70);color:#fff;border-radius:18px;padding:30px 34px;box-shadow:var(--shadow)}
+.hero-grid{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end}
+.hero h1{margin:2px 0 8px;font-size:34px;letter-spacing:.01em}
+.kicker{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#b9d2e6;font-weight:700}
+.sub{font-size:14px;opacity:.86}
+.modebar{display:flex;gap:8px;flex-wrap:wrap}
+.modebar button{border:1px solid rgba(255,255,255,.42);color:#fff;background:rgba(255,255,255,.08);border-radius:999px;padding:8px 14px;min-height:40px;cursor:pointer}
+.modebar button.active{background:#fff;color:var(--navy)}
+.nav{position:sticky;top:0;z-index:5;margin-top:12px;padding:10px 12px;background:rgba(244,246,248,.95);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;display:flex;gap:12px;overflow-x:auto;white-space:nowrap}
+.nav a{font-size:13px;color:var(--navy);text-decoration:none}
+.section{background:var(--paper);border:1px solid var(--line);border-radius:16px;margin-top:18px;padding:24px 26px;box-shadow:0 3px 14px rgba(19,40,61,.035)}
+h2{font-size:21px;margin:0 0 16px;color:var(--navy)} h3{font-size:17px;margin:0 0 8px;color:var(--navy)} h4{font-size:14px;margin:12px 0 4px;color:var(--navy)}
+p{margin:8px 0 0} .lede{font-size:17px} .note,.small{font-size:13px;color:var(--muted)} .muted{color:var(--muted)}
+.summary-grid,.theme-grid,.research-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.summary-card,.theme-card,.research-card{border:1px solid var(--line);border-radius:13px;padding:17px;background:#fbfcfd}
+.summary-card strong{display:block;color:var(--navy);margin-bottom:5px}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.metric{background:var(--soft);border-radius:12px;padding:13px} .metric .v{font-size:22px;font-weight:750;color:var(--navy)} .metric .l{font-size:12px;color:var(--muted)}
+.up{color:var(--green)} .down{color:var(--red)} .neutral{color:var(--muted)} .amber{color:var(--amber)}
+.callout{border-left:4px solid var(--blue);padding:12px 15px;background:#f4f8fb;border-radius:0 10px 10px 0;margin:12px 0}
+.tag{display:inline-block;font-size:12px;padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--navy);margin-right:6px}
+.tag.green{background:#e9f6ef;color:#12613b} .tag.amber{background:#fff6dd;color:#7a5200} .tag.red{background:#feeeee;color:#9a2118}
+table{width:100%;border-collapse:collapse;font-size:14px} th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);vertical-align:top} th{color:#496171;font-weight:650;background:#f8fafb}
+.nowrap{white-space:nowrap} .scroll{overflow-x:auto} .scroll table{min-width:760px}
+.chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.chart{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fbfcfd;min-height:260px}
+.bar-row{display:grid;grid-template-columns:88px 1fr 70px;gap:10px;align-items:center;margin:14px 0}
+.bar-track{height:18px;background:#e9edf1;border-radius:6px;position:relative;overflow:hidden}
+.bar{height:100%;border-radius:6px;background:#52799a} .bar.pos{margin-left:50%} .bar.neg{background:#9f5a5a;margin-left:calc(50% - var(--w));width:var(--w)!important}
+.curve-row{display:grid;grid-template-columns:60px 1fr 62px;gap:10px;align-items:center;margin:12px 0}
+.curve-track{height:15px;background:#e9edf1;border-radius:8px;overflow:hidden} .curve-fill{height:100%;background:#52799a;border-radius:8px}
+.list{margin:0;padding-left:20px} .list li{margin:8px 0}
+.source-list{padding-left:20px;margin:0} .source-list li{margin:8px 0} .source-list a{color:#315d82;word-break:break-all}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.evidence{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fbfcfd}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;background:#fbfcfd} summary{cursor:pointer;color:var(--navy);font-weight:650}
+.footer{font-size:12px;color:var(--muted);padding:20px 4px 0}
+.trade-only,.research-only{display:block}
+body.mode-trading .research-only{display:none} body.mode-research .trade-only{display:none}
+body.mode-full .trade-only,body.mode-full .research-only{display:block}
+@media(max-width:820px){
+ .page{padding:13px 11px 44px} .hero{padding:22px} .hero h1{font-size:26px} .hero-grid{grid-template-columns:1fr}
+ .summary-grid,.theme-grid,.research-grid,.metric-row,.chart-grid,.split{grid-template-columns:1fr}
+ .section{padding:19px 17px} .nav{border-radius:10px} .scroll{margin:0 -4px}
+}
+@media print{
+ body{background:#fff} .page{max-width:none;padding:0} .section,.hero{box-shadow:none;break-inside:avoid} .modebar,.nav{display:none}
+ .trade-only,.research-only{display:block!important} a{color:inherit;text-decoration:none}
+}
 </style>
 </head>
 <body class="mode-full">
 <div class="page">
-<header class="hero">
-  <div class="hero-grid"><div><div class="kicker" style="color:#b9d2e6">SATURDAY · FRIDAY RECAP</div><h1>跨资产交易晨报｜2026-08-08</h1><div class="sub">数据截止：2026-08-08 17:30（北京时间）｜周五有效交易日总结，并纳入周五收盘后的重要信息</div></div>
-  <div class="modebar" aria-label="阅读模式"><button class="active" onclick="setMode('full',this)">全文</button><button onclick="setMode('trade',this)">交易</button><button onclick="setMode('research',this)">研究</button></div></div>
+<header class="hero" id="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="kicker">SATURDAY · FRIDAY RECAP</div>
+      <h1>跨资产交易晨报｜2026-08-08</h1>
+      <div class="sub">数据截止：2026-08-08 17:54（北京时间）｜周五有效交易日总结，并纳入截止时点前的周五收盘后重要信息</div>
+    </div>
+    <div class="modebar" aria-label="阅读模式">
+      <button class="active" data-mode="full" onclick="setMode('full',this)">全部</button>
+      <button data-mode="trading" onclick="setMode('trading',this)">概览</button>
+      <button data-mode="research" onclick="setMode('research',this)">研究</button>
+    </div>
+  </div>
 </header>
+
+<nav class="nav" aria-label="页面导航">
+<a href="#summary">90秒摘要</a><a href="#macro">隔夜宏观</a><a href="#charts">数据图表</a><a href="#marketmap">市场概览</a>
+<a href="#themes">市场主线</a><a href="#research-update">研究更新</a><a href="#research-track">研究跟踪</a>
+<a href="#quick">重点信息</a><a href="#flow">资金、仓位与产业数据</a><a href="#ledger">跟踪表</a>
+<a href="#review">前期观点复盘</a><a href="#calendar">今日关注与未来7天事件</a><a href="#sources">来源与口径</a>
+</nav>
 
 <section class="section" id="summary">
 <h2>90秒摘要</h2>
 <div class="summary-grid">
-  <div class="summary-card"><strong>就业冲击显著弱于预期</strong>美国7月非农减少2.3万人，Reuters调查预期为增加8万人；5月与6月合计再下修10.3万人。失业率降至4.1%，但劳动参与率仅61.4%，因此“失业率下降”本身并不能抵消就业供给收缩信号。</div>
-  <div class="summary-card"><strong>权益把弱就业解释为利率压力缓和</strong>标普500周五收于7,757.64点、上涨0.62%并创收盘新高；纳斯达克综合指数上涨1.30%。美国国债官方曲线显示2年期4.19%、10年期4.65%，期限结构仍处在高利率区间。</div>
-  <div class="summary-card"><strong>风险偏好扩散，但成交量没有同步放大</strong>NYSE上涨/下跌家数比为2.49:1，Nasdaq为2.07:1；但美国交易所成交量为169.4亿股，低于20日均值175.6亿股。广度改善可信，增量成交确认仍不足。</div>
+  <div class="summary-card"><strong>就业数据显著弱于共识</strong>美国7月非农就业减少2.3万人，Reuters调查共识为增加8万人；5月和6月合计再下修10.3万人。失业率降至4.1%，但劳动参与率降至61.4%，因此就业报告的主信息仍是劳动力需求明显降温。</div>
+  <div class="summary-card"><strong>权益先交易“加息压力缓和”</strong>标普500收于7,757.64点、上涨0.62%并创收盘新高；Nasdaq Composite上涨1.30%。美国2年期和10年期官方收益率分别降至4.19%和4.65%，显示弱就业首先压低了政策利率路径和期限利率。</div>
+  <div class="summary-card"><strong>风险偏好扩散，但资金流仍有背离</strong>NYSE上涨/下跌家数为2.49:1，Nasdaq为2.07:1；但美股基金截至8月5日一周净流出15.8亿美元，成长基金净流出55亿美元。价格广度改善与资金流确认尚未完全同步。</div>
 </div>
-<div class="callout"><b>核心矛盾：</b>市场把“就业转弱”快速交易成更低的加息概率，但7月平均时薪仍同比增长3.2%。未来一周真正决定这一逻辑能否延续的，不是就业数据本身，而是8月12日CPI与8月13日PPI能否同时证明通胀约束继续减弱。</div>
+<div class="callout"><b>核心矛盾：</b>市场把就业走弱快速解释为加息概率下降，但平均时薪仍同比增长3.2%，Brent又在周五结算上涨1.3%至83.55美元/桶。8月12日CPI与8月13日PPI将检验“增长降温足以压过通胀约束”这一新定价能否延续。</div>
 </section>
 
 <section class="section trade-only" id="macro">
 <h2>隔夜宏观</h2>
-<p class="lede">7月美国就业报告把宏观焦点从“增长仍强、通胀偏高”推向“就业明显降温、通胀尚未完全解除”。BLS公布非农就业减少23,000人，过去12个月平均月增仅34,000人；失业率4.1%，劳动参与率61.4%，平均时薪37.62美元、同比增长3.2%。5月由+129,000修订为+63,000，6月由+57,000修订为+20,000，两个月合计下修103,000。</p>
+<p class="lede">美国7月就业报告将宏观矛盾从“增长偏强、利率维持高位”重新推向“就业降温、通胀约束仍在”。BLS公布非农就业减少23,000人，失业率4.1%，劳动参与率61.4%，平均时薪37.62美元、同比增长3.2%。5月由+129,000修订至+63,000，6月由+57,000修订至+20,000，两个月合计下修103,000。</p>
 <div class="metric-row">
   <div class="metric"><div class="v down">-23k</div><div class="l">7月非农就业环比</div></div>
   <div class="metric"><div class="v">4.1%</div><div class="l">7月失业率</div></div>
   <div class="metric"><div class="v">61.4%</div><div class="l">劳动参与率</div></div>
   <div class="metric"><div class="v">3.2%</div><div class="l">平均时薪同比</div></div>
 </div>
-<p>价格反应显示市场首先交易“政策收紧风险下降”：Reuters报道9月加息概率由前一交易日约55%降至约44%。但这并不等价于“宽松周期已经确立”。就业恶化、工资仍有粘性以及能源风险溢价尚未完全退出同时存在，意味着下一阶段更像是增长与通胀约束重新排序，而不是单一方向的政策交易。</p>
+<div class="scroll" style="margin-top:16px">
+<table>
+<thead><tr><th>指标</th><th>Actual</th><th>Consensus</th><th>Previous</th><th>Revision</th><th>发布时间</th><th>市场反应 / 传导</th></tr></thead>
+<tbody>
+<tr>
+<td>美国7月非农就业</td><td><b>-23k</b></td><td>+80k（Reuters调查）</td><td>+20k（6月最新修订）</td><td>6月由+57k下修至+20k；5月由+129k下修至+63k</td>
+<td>2026-08-07 08:30 ET</td><td>Fed 9月加息概率据Reuters引用CME FedWatch降至约44%；2Y与10Y收益率分别较前一日下降6bp和4bp。</td>
+</tr>
+<tr>
+<td>美国7月失业率</td><td><b>4.1%</b></td><td>4.2%（Reuters调查）</td><td>4.2%</td><td>—</td>
+<td>2026-08-07 08:30 ET</td><td>失业率下降伴随劳动参与率降至61.4%，不能单独解读为就业走强。</td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 
 <section class="section trade-only" id="charts">
 <h2>数据图表</h2>
-<div class="chart-wrap"><div class="chart">
-<h3>美国非农就业月度变化：修订后明显减速</h3>
-<div class="note">单位：千人；BLS 2026-08-07最新发布/修订值</div>
-<div class="bar-row"><span>2026年5月</span><div class="bar-track"><div class="bar pos" style="width:31.5%"></div></div><b>+63</b></div>
-<div class="bar-row"><span>2026年6月</span><div class="bar-track"><div class="bar pos" style="width:10%"></div></div><b>+20</b></div>
-<div class="bar-row"><span>2026年7月</span><div class="bar-track"><div class="bar neg" style="width:11.5%"></div></div><b>-23</b></div>
-<div class="axis"><span>-100</span><span>0</span><span>+100</span></div>
-<p class="note">图中5月、6月采用本次就业报告后的最新修订值；不与此前初值混用。</p>
-</div></div>
+<div class="chart-grid">
+  <div class="chart">
+    <h3>美国非农：连续修订后出现负增长</h3>
+    <div class="note">单位：千人；5月、6月均采用2026-08-07就业报告后的最新修订值。</div>
+    <div class="bar-row"><span>2026年5月</span><div class="bar-track"><div class="bar pos" style="width:31.5%"></div></div><b>+63</b></div>
+    <div class="bar-row"><span>2026年6月</span><div class="bar-track"><div class="bar pos" style="width:10%"></div></div><b>+20</b></div>
+    <div class="bar-row"><span>2026年7月</span><div class="bar-track"><div class="bar neg" style="--w:11.5%;width:11.5%"></div></div><b>-23</b></div>
+    <p class="note">方法：以0为中轴，条形仅用于比较方向和相对幅度；输入值来自BLS。</p>
+  </div>
+  <div class="chart">
+    <h3>美国国债收益率曲线仍偏高</h3>
+    <div class="note">2026-08-07 U.S. Treasury Constant Maturity，单位：%。</div>
+    <div class="curve-row"><span>2Y</span><div class="curve-track"><div class="curve-fill" style="width:80.5%"></div></div><b>4.19%</b></div>
+    <div class="curve-row"><span>5Y</span><div class="curve-track"><div class="curve-fill" style="width:83.7%"></div></div><b>4.35%</b></div>
+    <div class="curve-row"><span>10Y</span><div class="curve-track"><div class="curve-fill" style="width:89.4%"></div></div><b>4.65%</b></div>
+    <div class="curve-row"><span>30Y</span><div class="curve-track"><div class="curve-fill" style="width:99.8%"></div></div><b>5.19%</b></div>
+    <p class="note">方法：横条按5.20%统一缩放，仅表达同日曲线形状；不是历史标准化指标。</p>
+  </div>
+</div>
 </section>
 
 <section class="section trade-only" id="marketmap">
 <h2>市场概览</h2>
+<div class="scroll">
 <table>
-<thead><tr><th>资产/指标</th><th>最新核验值</th><th>日变化/状态</th><th>市场时间</th><th>口径</th></tr></thead>
+<thead><tr><th>资产/指标</th><th>最新核验值</th><th>日变化/状态</th><th>市场时点</th><th>核验口径</th></tr></thead>
 <tbody>
-<tr><td>S&amp;P 500</td><td><b>7,757.64</b></td><td class="up">+0.62%</td><td>2026-08-07 美股收盘</td><td>现金指数；Reuters与AP一致</td></tr>
-<tr><td>Nasdaq 100</td><td colspan="4" class="muted">未取得同一时点可核验数据</td></tr>
-<tr><td>PHLX Semiconductor</td><td colspan="4" class="muted">未取得同一时点可核验数据</td></tr>
-<tr><td>沪深300</td><td colspan="4" class="muted">未取得同一时点可核验数据；周五A股方向性上涨信息已核验，但未以不同源/不同口径数值补齐</td></tr>
-<tr><td>恒生科技</td><td colspan="4" class="muted">未取得同一时点可核验数据；周五港股方向性上涨信息已核验，但未以代理指数补齐</td></tr>
-<tr><td>BTCUSDT</td><td><b>64,923.19 USDT</b></td><td class="up">+0.93%</td><td>2026-08-08 08:00 北京时间</td><td>Binance Spot，2026-08-07 UTC日K收盘</td></tr>
-<tr><td>ETHUSDT</td><td><b>1,914.18 USDT</b></td><td class="up">+0.53%</td><td>2026-08-08 08:00 北京时间</td><td>Binance Spot，2026-08-07 UTC日K收盘</td></tr>
-<tr><td>现货黄金</td><td colspan="4" class="muted">不同可靠报道的抓取时点不一致，精确值不进入市场地图</td></tr>
-<tr><td>现货白银</td><td colspan="4" class="muted">未取得同一时点可核验数据</td></tr>
-<tr><td>LME铜</td><td colspan="4" class="muted">未取得同一时点可核验数据</td></tr>
-<tr><td>广期所碳酸锂</td><td colspan="4" class="muted">未取得同一合约、同一时点可核验数据</td></tr>
-<tr><td>美元指数</td><td colspan="4" class="muted">可靠报道存在不同盘中快照，精确值不进入市场地图</td></tr>
-<tr><td>美国2年期国债</td><td><b>4.19%</b></td><td class="neutral">官方日度曲线</td><td>2026-08-07 约15:30 ET</td><td>U.S. Treasury 2Y CMT，indicative bid-side</td></tr>
-<tr><td>美国10年期国债</td><td><b>4.65%</b></td><td class="neutral">官方日度曲线</td><td>2026-08-07 约15:30 ET</td><td>U.S. Treasury 10Y CMT，indicative bid-side</td></tr>
-<tr><td>美国10年期实际利率</td><td><b>2.40%</b></td><td class="neutral">官方日度曲线</td><td>2026-08-07</td><td>U.S. Treasury 10Y Real CMT</td></tr>
-<tr><td>Brent</td><td colspan="4" class="muted">不同报道口径/时点存在冲突，精确值不进入市场地图</td></tr>
-<tr><td>VIX</td><td colspan="4" class="muted">未取得同一时点可核验数据</td></tr>
-</tbody></table>
-<p class="note">补充市场温度：Dow Jones周五收于54,036.93（+0.28%）；Nasdaq Composite收于26,690.62（+1.30%）。二者由Reuters与AP交叉核验，但不用于替代上表规定的Nasdaq 100或其他标的。</p>
+<tr><td>S&amp;P 500</td><td><b>7,757.64</b></td><td class="up">+0.62%</td><td>2026-08-07 美股收盘</td><td>现金指数；Reuters与AP交叉一致</td></tr>
+<tr><td>Nasdaq 100</td><td colspan="4" class="muted">数据暂缺</td></tr>
+<tr><td>PHLX Semiconductor</td><td colspan="4" class="muted">数据暂缺</td></tr>
+<tr><td>沪深300</td><td colspan="4" class="muted">数据暂缺</td></tr>
+<tr><td>恒生科技</td><td colspan="4" class="muted">数据暂缺</td></tr>
+<tr><td>BTCUSDT</td><td><b>64,923.19 USDT</b></td><td class="up">+0.93%</td><td>2026-08-08 08:00 北京时间</td><td>Binance Spot；2026-08-07 UTC日K已完成</td></tr>
+<tr><td>ETHUSDT</td><td><b>1,914.18 USDT</b></td><td class="up">+0.53%</td><td>2026-08-08 08:00 北京时间</td><td>Binance Spot；2026-08-07 UTC日K已完成</td></tr>
+<tr><td>现货黄金</td><td colspan="4" class="muted">数据暂缺</td></tr>
+<tr><td>现货白银</td><td colspan="4" class="muted">数据暂缺</td></tr>
+<tr><td>LME铜</td><td colspan="4" class="muted">数据暂缺</td></tr>
+<tr><td>广期所碳酸锂</td><td colspan="4" class="muted">数据暂缺</td></tr>
+<tr><td>美元指数</td><td colspan="4" class="muted">数据暂缺</td></tr>
+<tr><td>美国2年期国债</td><td><b>4.19%</b></td><td class="down">-6bp</td><td>2026-08-07 约15:30 ET</td><td>U.S. Treasury 2Y CMT；官方日度曲线</td></tr>
+<tr><td>美国10年期国债</td><td><b>4.65%</b></td><td class="down">-4bp</td><td>2026-08-07 约15:30 ET</td><td>U.S. Treasury 10Y CMT；官方日度曲线</td></tr>
+<tr><td>美国10年期实际利率</td><td><b>2.40%</b></td><td class="down">-3bp</td><td>2026-08-07 约15:30 ET</td><td>U.S. Treasury 10Y Real CMT；官方日度曲线</td></tr>
+<tr><td>Brent</td><td><b>83.55 USD/bbl</b></td><td class="up">+1.30%</td><td>2026-08-07 结算</td><td>Brent期货；Reuters结算价，AP独立报道一致</td></tr>
+<tr><td>VIX</td><td colspan="4" class="muted">数据暂缺</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">市场概览只填入本次运行已通过标的、日期、单位与时点核验的数值。未通过同一口径核验的项目保留为“数据暂缺”，不以ETF、不同合约或旧值补齐。</p>
 </section>
 
 <section class="section trade-only" id="themes">
 <h2>市场主线</h2>
 <div class="theme-grid">
-<div class="theme-card"><h3>弱就业重新打开政策路径，但通胀验证被推到前台</h3><p>非农负增长本身不是唯一信号，更重要的是前两月累计下修10.3万人以及劳动参与率处在61.4%。市场随即降低9月加息概率，权益与国债同步受益。但工资同比3.2%意味着“增长降温”尚未自动转化为“通胀安全”。8月12日CPI若不能继续确认价格压力下降，周五形成的利率逻辑可能出现反复。</p><p class="note">下一验证：美国7月CPI、PPI；工资与服务通胀的组合。</p></div>
-<div class="theme-card"><h3>科技重新领涨，广度改善比指数创新高更有信息量</h3><p>S&amp;P 500创收盘新高、Nasdaq Composite上涨1.30%，同时NYSE和Nasdaq上涨家数显著占优，说明风险偏好并非只集中在少数权重股。限制因素是成交量仍低于20日均值，因此本次扩散更适合定义为“确认度上升”，而非已经完成从权重行情向全面行情的切换。</p><p class="note">下一验证：科技财报簇、半导体相对强弱，以及上涨广度能否在放量条件下保持。</p></div>
-<div class="theme-card"><h3>霍尔木兹出现外交缓和信号，但实物流量仍未修复</h3><p>美国官员周五称伊朗与阿曼在海峡谈判上取得进展并“预计很快达成协议”，美国解除对伊朗港口封锁将与协议落地及伊朗履约挂钩。与此同时，Reuters基于Kpler的数据称本周一至周四仅33艘船通过海峡，低于前一周同期50艘，远低于战前通常每周130—140艘的水平。外交标题与真实航运恢复仍有明显距离。</p><p class="note">下一验证：无阻碍商业航运是否实际恢复、保险条款与制裁支付障碍是否解除、船舶通过量是否持续回升。</p></div>
+  <article class="theme-card">
+    <span class="tag green">新增证据</span>
+    <h3>就业转弱正在重写利率路径，但“宽松交易”尚未闭环</h3>
+    <h4>新事实</h4><p>7月非农-23k，较Reuters共识+80k出现103k缺口；5月、6月又合计下修103k。FedWatch的9月加息概率降至约44%。</p>
+    <h4>跨资产表达</h4><p>2Y从4.25%降至4.19%，10Y从4.69%降至4.65%；标普500上涨0.62%并创收盘新高。</p>
+    <h4>板块轮动</h4><p>Nasdaq Composite上涨1.30%，明显快于标普500；Reuters报道科技和可选消费领涨，但本次未取得SOX与Nasdaq 100同一口径收盘值，因此不补写精确相对收益。</p>
+    <h4>资金/仓位验证</h4><p>利率价格已快速响应，但截至8月5日一周美国债券基金净流入65.2亿美元，显示防御性资金需求并未因权益走强消失。</p>
+    <h4>未解决背离</h4><p>平均时薪同比仍为3.2%，油价周五反弹；就业走弱能否转化为持续的通胀降温仍未得到数据确认。</p>
+    <h4>下一验证节点</h4><p>8月12日CPI、8月13日PPI，以及2Y收益率是否继续下移。</p>
+  </article>
+
+  <article class="theme-card">
+    <span class="tag amber">强化但未确认</span>
+    <h3>风险偏好扩散到更广市场，但成交与基金流量仍落后于价格</h3>
+    <h4>新事实</h4><p>NYSE上涨/下跌家数2.49:1，Nasdaq为2.07:1；Russell 2000当日上涨1.1%，支持上涨并非只由少数超大盘股驱动。</p>
+    <h4>跨资产表达</h4><p>S&amp;P 500日涨0.62%、周涨3.58%；Nasdaq Composite日涨1.30%、周涨5.19%。</p>
+    <h4>板块轮动</h4><p>资金流数据与价格表现相反：成长基金一周净流出55亿美元，而价值基金净流入19.9亿美元；科技基金净流入仅3.88亿美元，为六周低位。</p>
+    <h4>资金/仓位验证</h4><p>美股交易量169.4亿股，低于20日均值175.6亿股；美国股票基金一周总体净流出15.8亿美元。</p>
+    <h4>未解决背离</h4><p>“上涨广度改善”已得到价格确认，但“增量资金主动追涨”尚无确认，价格与基金流向仍处于分离状态。</p>
+    <h4>下一验证节点</h4><p>下周成交量、成长/科技基金流向与新高家数能否同步扩张。</p>
+  </article>
+
+  <article class="theme-card">
+    <span class="tag amber">持续观察</span>
+    <h3>油价反弹保留通胀尾部，地缘风险仍是利率交易的反向约束</h3>
+    <h4>新事实</h4><p>Brent周五结算83.55美元/桶，上涨1.06美元或1.3%；Reuters称霍尔木兹海峡通行安排与费用机制仍未达成可执行共识。</p>
+    <h4>跨资产表达</h4><p>同一交易日油价上涨、2Y与10Y收益率下行，说明市场短线把就业冲击放在能源通胀之前，但两条传导链正在反向拉扯。</p>
+    <h4>板块轮动</h4><p>本次未取得可满足同一口径核验的能源板块正式收盘相对收益，因此不把个别炼化企业表现外推为全板块轮动。</p>
+    <h4>产业/基本面验证</h4><p>Reuters称海峡在冲突爆发前承载全球约五分之一的石油与LNG通行，持续中断意味着商业库存仍面临消耗压力。</p>
+    <h4>未解决背离</h4><p>就业走弱压低政策利率预期，而油价与运输风险溢价仍可能抬高通胀读数；当前无法把两者简化成单一方向。</p>
+    <h4>下一验证节点</h4><p>海峡安排是否形成可执行协议，以及CPI/PPI中能源传导是否再度上升。</p>
+  </article>
 </div>
 </section>
 
 <section class="section research-only" id="research-update">
 <h2>研究更新</h2>
-<div class="research-grid">
-<div class="research-card"><span class="tag green">判断强化</span><h3 style="margin-top:8px">风险偏好扩散：由“弱化”转为“强化”</h3><p>新增证据来自周五的市场广度：NYSE上涨/下跌家数2.49:1，Nasdaq为2.07:1，且Russell 2000上涨1.1%。这比单纯的S&amp;P 500创新高更能说明风险承担向权重股以外扩散。</p><p><b>保留条件：</b>成交量169.4亿股仍低于20日均值175.6亿股，扩散尚未得到成交量同步确认。</p></div>
-<div class="research-card"><span class="tag amber">判断弱化</span><h3 style="margin-top:8px">能源冲击与利率：风险溢价持续性的假设被削弱</h3><p>新增证据不是油价本身，而是政策与航运链条出现可验证的缓和路径：美国官员称协议接近，且解除港口封锁与商业航运恢复挂钩。不过真实船流仍大幅低于战前水平，因此只能弱化“持续能源冲击”假设，不能判定风险已经消失。</p><p><b>失效条件：</b>谈判破裂、船舶攻击继续扩大、商业航运/保险恢复再次逆转。</p></div>
+<div class="research-grid" style="grid-template-columns:1fr">
+  <article class="research-card" id="R-MACRO-002">
+    <span class="tag amber">R-MACRO-002 · 弱化</span>
+    <h3>能源冲击对利率的主导性暂时下降，就业变量重新取得定价优先级</h3>
+    <p><b>新增信息：</b>Brent在8月7日上涨1.3%，但同日2Y与10Y收益率分别下降6bp、4bp；弱于预期的非农使9月加息概率降至约44%。</p>
+    <p><b>改变的基本面变量：</b>劳动需求与前值修订明显恶化，使“能源价格上行 → 通胀约束 → 利率维持更高”的传导不再能单独解释短端定价。</p>
+    <p><b>估值框架影响：</b>利率敏感资产获得阶段性折现率缓解，但这只是由就业数据触发的条件变化；若CPI/PPI重新偏热，折现率压力仍可回归。</p>
+    <p><b>与前期结论关系：</b>不是证伪能源通胀风险，而是降低其当前对政策路径的相对权重。</p>
+    <p><b>下一跟踪节点：</b>8月12日CPI、8月13日PPI、Brent走势与2Y收益率的共同方向。</p>
+  </article>
 </div>
+<p class="note">AI资本效率等其他长期研究条目本次未获得足以改变判断的新证据，未为填充栏目而重复旧结论。</p>
 </section>
 
 <section class="section research-only" id="research-track">
 <h2>研究跟踪</h2>
-<table><thead><tr><th>研究对象</th><th>本次新增证据</th><th>判断变化</th><th>下一验证节点</th></tr></thead><tbody>
-<tr><td>风险偏好扩散</td><td>指数上涨同时伴随NYSE/Nasdaq广度明显改善；小盘股亦上涨</td><td><span class="tag green">强化</span></td><td>放量延续、半导体/软件与非科技板块能否同步扩散</td></tr>
-<tr><td>能源冲击与利率</td><td>海峡协议接近，但船舶通行仍明显低于战前水平</td><td><span class="tag amber">弱化</span></td><td>实际船流、保险费率、封锁解除与能源价格期限结构</td></tr>
-</tbody></table>
+<div class="split">
+  <div class="evidence" id="M-002">
+    <span class="tag amber">M-002 · 弱化</span>
+    <h3>通胀约束回归</h3>
+    <p>新增就业数据显著偏弱，短端利率下降，削弱了“高通胀将单向推高政策利率”的短期定价强度；但工资同比3.2%与Brent反弹意味着该主题尚未被证伪。</p>
+  </div>
+  <div class="evidence" id="M-003">
+    <span class="tag green">M-003 · 强化</span>
+    <h3>风险偏好扩散</h3>
+    <p>上涨/下跌家数比与小盘指数表现均改善，支持市场广度扩散；但成交量低于20日均值、股票基金仍净流出，因此成熟度仍低于“全面资金确认”。</p>
+  </div>
+</div>
 </section>
 
-<section class="section trade-only" id="keyinfo">
+<section class="section trade-only" id="quick">
 <h2>重点信息</h2>
-<p><b>中国外需与AI链：</b>Reuters援引中国海关数据称7月出口同比增长23.9%、进口同比增长27.5%，AI相关高技术需求仍是外贸的重要支撑。由于本次未从海关英文页面直接取得可稳定复现的7月具体表格，该组数字不进入核心市场地图，仅作为经可靠媒体转述的产业背景使用。</p>
-<p><b>周末物流扰动：</b>台风“海豚”影响日本冲绳，并预计于周日晚至周一早间在浙江舟山至福建福鼎一带登陆。Reuters报道浙江港口作业暂停、宁波机场停航安排增加，上海洋山港清空船舶，长三角部分铁路服务将暂停。对短周期物流与港口作业构成扰动，但尚不足以推导中期商品供需变化。</p>
+<ol class="list">
+  <li><b>美国就业：</b>7月非农-23k，Reuters共识+80k；5月、6月合计下修103k，弱就业成为周五跨资产定价的第一驱动。</li>
+  <li><b>美国权益：</b>S&amp;P 500收于7,757.64，日涨0.62%并创收盘新高；Nasdaq Composite上涨1.30%。</li>
+  <li><b>资金流：</b>截至8月5日一周，美国股票基金净流出15.8亿美元，成长基金净流出55亿美元，价值基金净流入19.9亿美元；价格上涨尚未得到基金流同步确认。</li>
+  <li><b>能源：</b>Brent结算83.55美元/桶、上涨1.3%，霍尔木兹海峡谈判仍存在费用、通行资格与制裁执行障碍。</li>
+  <li><b>加密政策：</b>美国财政部8月7日宣布制裁Shelbit Exchange、Aban Tether等与伊朗相关的数字资产网络；这属于合规与跨境结算约束升级，不等同于对BTC或ETH现货本身的方向判断。</li>
+</ol>
 </section>
 
-<section class="section trade-only" id="flows">
+<section class="section research-only" id="flow">
 <h2>资金、仓位与产业数据</h2>
-<table><thead><tr><th>维度</th><th>已核验事实</th><th>解释</th></tr></thead><tbody>
-<tr><td>美国股票基金</td><td>截至8月5日当周净流出15.8亿美元；前一周净流入117.7亿美元</td><td>指数创新高并非简单由基金净申购推动，价格上涨与资金流存在阶段性背离。</td></tr>
-<tr><td>风格基金</td><td>成长基金净流出55亿美元；价值基金净流入19.9亿美元</td><td>周五科技强势与当周基金申赎方向并不完全一致，提示短线价格表现可能更多来自盈利预期、利率重估及仓位再平衡。</td></tr>
-<tr><td>债券与货基</td><td>债券基金净流入65.2亿美元；货币市场基金净流入556.9亿美元</td><td>风险资产上涨同时，现金与固定收益仍持续吸金，说明“全面追逐风险”并未形成。</td></tr>
-<tr><td>美国股票成交</td><td>169.4亿股，低于20日均值175.6亿股</td><td>市场广度改善，但增量成交确认不足；后续需观察是否出现量价与广度同步。</td></tr>
-<tr><td>AI/科技验证</td><td>Reuters将未来一周Cisco、Applied Materials等财报列为科技链重要验证窗口</td><td>下一阶段关键从“主题估值”转向订单、收入增速、毛利率和资本开支效率的兑现。</td></tr>
-</tbody></table>
+<div class="scroll">
+<table>
+<thead><tr><th>层级</th><th>最新证据</th><th>统计期/时点</th><th>与价格是否一致</th><th>解释边界</th></tr></thead>
+<tbody>
+<tr><td>市场资金</td><td>美国股票基金净流出15.8亿美元；成长基金-55亿美元，价值基金+19.9亿美元</td><td>截至2026-08-05一周</td><td class="amber">部分背离</td><td>周频基金流，不能替代交易所当日资金流。</td></tr>
+<tr><td>债券资金</td><td>美国债券基金净流入65.2亿美元；货币市场基金净流入556.9亿美元</td><td>截至2026-08-05一周</td><td class="neutral">偏防御</td><td>显示资金仍保留流动性与固收偏好。</td></tr>
+<tr><td>市场参与</td><td>NYSE上涨/下跌2.49:1；Nasdaq 2.07:1；成交量169.4亿股 vs 20日均值175.6亿股</td><td>2026-08-07</td><td class="amber">广度确认、量能未确认</td><td>参与度改善，但成交未显著放大。</td></tr>
+<tr><td>企业盈利</td><td>S&amp;P 500已披露的436家公司中85.1%盈利超分析师预期</td><td>截至2026-08-07早间</td><td class="up">支撑</td><td>LSEG统计由Reuters报道；不能外推为未来盈利增速。</td></tr>
+<tr><td>数字资产制度</td><td>OFAC制裁两类与伊朗相关数字资产交易网络，并强调二级制裁风险</td><td>2026-08-07</td><td class="neutral">制度约束</td><td>针对特定实体与制裁规避活动，不泛化为全行业禁令。</td></tr>
+</tbody>
+</table>
+</div>
 </section>
 
-<section class="section research-only" id="tracking-table">
+<section class="section research-only" id="ledger">
 <h2>跟踪表</h2>
-<table><thead><tr><th>验证对象</th><th>当前证据</th><th>下一节点</th><th>失效条件</th></tr></thead><tbody>
-<tr><td>美国增长—通胀再平衡</td><td>就业负增长+前值大幅下修；工资同比仍3.2%</td><td>8月12日CPI、8月13日PPI</td><td>通胀重新显著上行并推升前端利率</td></tr>
-<tr><td>权益风险偏好扩散</td><td>广度改善、Russell 2000同步上涨，但成交量偏低</td><td>下一周成交量、板块扩散与新高/新低结构</td><td>指数维持高位但广度快速收缩</td></tr>
-<tr><td>AI资本效率</td><td>科技继续领涨，但下一轮证据需要来自企业经营数据</td><td>Cisco、Applied Materials等财报与指引</td><td>订单/收入指引低于资本开支扩张速度</td></tr>
-<tr><td>霍尔木兹航运恢复</td><td>协议接近；本周船流仍显著低于战前</td><td>真实商业通航、保险与制裁执行</td><td>谈判破裂或袭击再升级</td></tr>
-<tr><td>中国AI出口链</td><td>7月高技术出口增长继续支持外贸</td><td>后续订单、出口价格与美国科技限制变化</td><td>出口高增长主要由前置出货构成且后续迅速回落</td></tr>
-</tbody></table>
+<h3>市场定价账本</h3>
+<div class="scroll">
+<table>
+<thead><tr><th>ID</th><th>主题</th><th>本次状态</th><th>新增证据</th><th>下一验证节点</th></tr></thead>
+<tbody>
+<tr><td><a href="#M-002">M-002</a></td><td>通胀约束回归</td><td><span class="tag amber">弱化</span></td><td>非农-23k、2Y/10Y下行；工资与油价仍保留通胀约束。</td><td>CPI、PPI、2Y收益率</td></tr>
+<tr><td><a href="#M-003">M-003</a></td><td>风险偏好扩散</td><td><span class="tag green">强化</span></td><td>NYSE/Nasdaq广度改善，小盘同步上涨；成交与基金流仍未确认。</td><td>成交量、成长/科技资金流、新高家数</td></tr>
+</tbody>
+</table>
+</div>
+<h3 style="margin-top:18px">基本面研究账本</h3>
+<div class="scroll">
+<table>
+<thead><tr><th>ID</th><th>研究主题</th><th>本次状态</th><th>本次是否形成增量</th><th>下一验证节点</th></tr></thead>
+<tbody>
+<tr><td><a href="#R-MACRO-002">R-MACRO-002</a></td><td>能源冲击与利率</td><td><span class="tag amber">弱化</span></td><td>是：就业冲击暂时覆盖能源对利率的主导作用。</td><td>CPI/PPI、油价、2Y</td></tr>
+<tr><td>R-AI-001</td><td>云收入与资本效率</td><td><span class="tag">延续</span></td><td>否：本次只有总体盈利超预期比例，缺少足以更新资本效率的公司级现金流/资本开支证据。</td><td>下一轮公司正式财报与现金流披露</td></tr>
+</tbody>
+</table>
+</div>
 </section>
 
 <section class="section research-only" id="review">
 <h2>前期观点复盘</h2>
-<p><b>风险偏好扩散：</b>此前判断为弱化。本次新增的美股上涨广度与小盘同步表现，使判断转为强化；但成交量未同步放大，因此仍需后续确认。</p>
-<p><b>能源冲击与利率：</b>此前处于“假设形成”。本次外交进展削弱了长期高能源风险溢价持续的概率，但真实航运仍低迷，因此只能调整为弱化，不能视为被证伪。</p>
-<p class="note">其余没有新增证据或判断变化的研究项本次不重复展示。</p>
+<div class="split">
+  <div class="evidence">
+    <h3>M-002：通胀约束回归</h3>
+    <p><b>7月31日待验证：</b>就业与后续通胀数据是否继续支持高利率约束。</p>
+    <p><b>本次结果：</b>就业端出现明显反证：非农转负且前值大幅下修，2Y收益率随之回落；但工资和能源价格没有给出同步的通胀解除信号。因此结论由偏强约束调整为“就业与通胀双向拉扯”。</p>
+  </div>
+  <div class="evidence">
+    <h3>M-003：风险偏好扩散</h3>
+    <p><b>7月31日待验证：</b>上涨广度和资金流能否共同改善。</p>
+    <p><b>本次结果：</b>广度改善得到验证，但资金流仍背离。上涨家数、小盘和科技共同走强；与此同时股票基金净流出、成交低于20日均值。当前属于价格扩散先行，资金确认滞后。</p>
+  </div>
+</div>
 </section>
 
-<section class="section trade-only" id="events">
+<section class="section trade-only" id="calendar">
 <h2>今日关注与未来7天事件</h2>
-<table><thead><tr><th>北京时间参考</th><th>事件</th><th>为何重要</th></tr></thead><tbody>
-<tr><td>周末—8月10日前后</td><td>台风“海豚”登陆路径及长三角港口/交通恢复</td><td>验证是否只是短期物流扰动，还是影响港口吞吐与区域供应链。</td></tr>
-<tr><td>持续跟踪</td><td>伊朗—阿曼霍尔木兹协议及商业航运恢复</td><td>能源风险溢价需要以实际船流、保险和封锁变化验证，而非只看外交表态。</td></tr>
-<tr><td>8月12日 20:30</td><td>美国7月CPI、实际收入</td><td>弱就业后的首个关键通胀闸门，直接检验利率预期重估是否可持续。</td></tr>
-<tr><td>8月13日 20:30</td><td>美国7月PPI</td><td>验证上游价格压力与企业成本端是否继续缓和。</td></tr>
-<tr><td>8月14日 20:30</td><td>美国7月零售销售</td><td>检验就业减速是否已经传导到消费需求。</td></tr>
-<tr><td>未来一周</td><td>科技财报窗口：Cisco、Applied Materials等</td><td>检验AI/科技行情能否由实际收入、订单和资本效率继续支撑。</td></tr>
-</tbody></table>
+<div class="scroll">
+<table>
+<thead><tr><th>日期</th><th>事件</th><th>已核验口径</th><th>主要验证问题</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">8月8日–9日</td><td>周末信息窗口</td><td>美股现金市场休市；加密连续交易不能单独触发周日晨报</td><td>霍尔木兹谈判、能源与制裁消息是否形成周一跳空风险。</td></tr>
+<tr><td class="nowrap">8月10日</td><td>主要市场进入新交易周</td><td>本晨报不预设开盘方向</td><td>弱就业后的利率下行能否继续被权益吸收，还是被通胀风险逆转。</td></tr>
+<tr><td class="nowrap">8月12日 08:30 ET</td><td>美国7月CPI、Real Earnings</td><td>BLS官方发布日历</td><td>就业降温是否伴随核心通胀继续缓和；验证9月利率路径。</td></tr>
+<tr><td class="nowrap">8月13日 08:30 ET</td><td>美国7月PPI</td><td>BLS官方发布日历</td><td>上游价格与能源冲击是否重新传导至生产端通胀。</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout"><b>主要风险：</b>当前市场同时交易“就业走弱带来的利率缓和”和“盈利仍强带来的风险偏好”，而油价与工资仍保留通胀尾部。未来一周若CPI/PPI高于市场预期，最容易被重新检验的是利率敏感资产对低加息概率的定价，而不是已经发生的就业数据本身。</div>
 </section>
 
 <section class="section" id="sources">
 <h2>来源与口径</h2>
-<p class="note">精确数值均绑定具体来源、标的、市场/发布时间与计量口径；发生时点冲突且无法解释的数值不进入核心表格。本次抓取时间统一记录为2026-08-08 17:30（北京时间）。</p>
+<p class="note">下列为本次运行进入关键数字、主线与研究增量的主要来源。所有“最新值”均绑定真实市场/发布时间；抓取窗口统一记录为2026-08-08 17:54（北京时间）前完成。本报告不使用ETF替代指数、不混用不同交易日或不同期货月份，也不以估算值补缺。</p>
+
+<details open>
+<summary>关键数据血缘</summary>
+<div class="scroll" style="margin-top:8px">
+<table>
+<thead><tr><th>数据</th><th>Source</th><th>Instrument / release</th><th>Market / release timestamp</th><th>Fetched at</th><th>Unit / Currency</th><th>Basis</th></tr></thead>
+<tbody>
+<tr><td>美国就业</td><td>BLS；Reuters共识</td><td>Employment Situation, July 2026</td><td>2026-08-07 08:30 ET</td><td>2026-08-08 17:54（北京时间）</td><td>persons / %, USD/hour</td><td>官方Actual；具名媒体调查Consensus</td></tr>
+<tr><td>S&amp;P 500</td><td>Reuters + AP</td><td>SPX cash index</td><td>2026-08-07 close</td><td>2026-08-08 17:54（北京时间）</td><td>index points / %</td><td>两独立可靠来源收盘值一致</td></tr>
+<tr><td>BTCUSDT</td><td>Binance Spot API</td><td>BTCUSDT</td><td>2026-08-07 00:00–23:59:59 UTC</td><td>2026-08-08 17:54（北京时间）</td><td>USDT</td><td>交易所完成日K；日变化由相邻两根完成日K计算</td></tr>
+<tr><td>ETHUSDT</td><td>Binance Spot API</td><td>ETHUSDT</td><td>2026-08-07 00:00–23:59:59 UTC</td><td>2026-08-08 17:54（北京时间）</td><td>USDT</td><td>交易所完成日K；日变化由相邻两根完成日K计算</td></tr>
+<tr><td>美国国债</td><td>U.S. Treasury</td><td>2Y, 10Y CMT; 10Y real CMT</td><td>2026-08-07，约15:30 ET</td><td>2026-08-08 17:54（北京时间）</td><td>% / basis points</td><td>官方日度收益率曲线；日变动由8月6日与7日官方值计算</td></tr>
+<tr><td>Brent</td><td>Reuters + AP</td><td>Brent crude futures</td><td>2026-08-07 settlement</td><td>2026-08-08 17:54（北京时间）</td><td>USD/barrel</td><td>结算价与日涨幅交叉核验</td></tr>
+<tr><td>美国基金流</td><td>Reuters / LSEG Lipper</td><td>U.S. equity/bond/money-market funds</td><td>week ended 2026-08-05</td><td>2026-08-08 17:54（北京时间）</td><td>USD</td><td>周频基金流，不当作8月7日交易所当日流量</td></tr>
+<tr><td>数字资产制裁</td><td>U.S. Treasury / OFAC + Reuters</td><td>Shelbit, Aban Tether related actions</td><td>2026-08-07</td><td>2026-08-08 17:54（北京时间）</td><td>policy event</td><td>官方制裁动作；Reuters独立报道</td></tr>
+</tbody>
+</table>
+</div>
+</details>
+
+<h3 style="margin-top:18px">主要链接</h3>
 <ul class="source-list">
-<li><b>U.S. Bureau of Labor Statistics — Employment Situation, July 2026</b>｜instrument: US nonfarm payrolls / unemployment / participation / earnings｜release: 2026-08-07 08:30 ET｜unit: persons, %, USD/hour｜basis: seasonally adjusted where applicable｜<a href="https://www.bls.gov/news.release/empsit.nr0.htm">https://www.bls.gov/news.release/empsit.nr0.htm</a></li>
-<li><b>Reuters — U.S. stocks close</b>｜instrument: S&amp;P 500, Dow, Nasdaq Composite, breadth, volume｜market timestamp: 2026-08-07 close｜unit: index points, %, shares｜currency: USD where applicable｜basis: cash-market close｜<a href="https://www.reuters.com/business/sp-500-dow-futures-muted-ahead-jobs-data-chips-software-stocks-rise-2026-08-07/">Reuters market close report</a></li>
-<li><b>Associated Press — Major U.S. indexes</b>｜instrument: S&amp;P 500, Dow, Nasdaq Composite｜market timestamp: 2026-08-07 close｜basis: independent cross-check｜<a href="https://apnews.com/article/9d586bdbf1fb230dcf1f915dcaf50858">AP market close</a></li>
-<li><b>U.S. Department of the Treasury — Daily Treasury Par Yield Curve</b>｜instrument: US2Y, US10Y｜market timestamp: 2026-08-07 approx. 15:30 ET quotations｜unit: % yield｜currency: USD｜basis: CMT, indicative bid-side quotes｜<a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&amp;field_tdr_date_value=2026">Treasury nominal curve</a></li>
-<li><b>U.S. Department of the Treasury — Daily Treasury Par Real Yield Curve</b>｜instrument: US10Y real yield｜market date: 2026-08-07｜unit: % real yield｜currency: USD｜basis: Real CMT/TIPS indicative secondary-market quotations｜<a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_real_yield_curve&amp;field_tdr_date_value=2026">Treasury real curve</a></li>
-<li><b>Binance Spot API</b>｜instrument: BTCUSDT, ETHUSDT｜market timestamp: daily candle closed 2026-08-08 00:00 UTC / 08:00 Beijing｜unit: USDT per coin｜currency: USDT｜basis: UTC 1-day spot candle｜<a href="https://api.binance.com/api/v3/klines">Binance klines endpoint</a></li>
-<li><b>Reuters — U.S. fund flows</b>｜reference period: week through 2026-08-05｜unit: USD billion｜basis: fund-flow reporting cited by Reuters｜<a href="https://www.reuters.com/business/retail-consumer/us-equity-funds-see-outflows-investors-take-profits-ahead-jobs-data-2026-08-07/">Reuters fund-flow report</a></li>
-<li><b>Reuters — Strait of Hormuz diplomacy</b>｜event timestamp: 2026-08-07｜basis: U.S. official statement; implementation explicitly conditional｜<a href="https://www.reuters.com/world/middle-east/us-official-we-expect-deal-soon-between-iran-oman-strait-hormuz-2026-08-07/">Reuters diplomacy report</a></li>
-<li><b>Reuters — Strait of Hormuz vessel traffic</b>｜measurement window: 2026-08-03 to 2026-08-06｜unit: vessels｜basis: Kpler/LSEG vessel-tracking figures as attributed by Reuters｜<a href="https://www.reuters.com/business/energy/vessel-traffic-through-hormuz-dwindles-this-week-markets-watch-iran-oman-talks-2026-08-07/">Reuters vessel-traffic report</a></li>
-<li><b>Reuters — Typhoon Dolphin</b>｜event timestamp: 2026-08-08｜basis: reported port, aviation and rail disruptions｜<a href="https://www.reuters.com/business/environment/typhoon-dolphin-hits-japans-okinawa-china-shuts-ports-ahead-landfall-2026-08-08/">Reuters typhoon report</a></li>
-<li><b>U.S. Bureau of Labor Statistics — August 2026 release schedule</b>｜events: CPI/PPI｜release times: 08:30 ET｜<a href="https://www.bls.gov/schedule/2026/08_sched_list.htm">BLS release calendar</a></li>
-<li><b>U.S. Census Bureau — Economic Indicators</b>｜event: Advance Retail and Food Services Sales｜next release: 2026-08-14｜unit: USD / % depending release table｜<a href="https://www.census.gov/economic-indicators/">Census economic indicators</a></li>
-<li><b>Reuters — Wall Street week ahead</b>｜event window: week of 2026-08-10｜basis: inflation and technology earnings watch list｜<a href="https://www.reuters.com/business/wall-st-week-ahead-inflation-data-test-record-setting-us-stocks-fed-rate-views-2026-08-07/">Reuters week-ahead report</a></li>
-<li><b>Reuters — China July trade</b>｜release date: 2026-08-07｜unit: % y/y, USD where cited｜basis: China customs data reported by Reuters; used only as contextual evidence, not core map｜<a href="https://www.reuters.com/world/asia-pacific/chinas-july-exports-climb-239-yy-imports-up-275-2026-08-07/">Reuters China trade report</a></li>
+<li><a href="https://www.bls.gov/news.release/empsit.nr0.htm" target="_blank" rel="noopener">U.S. Bureau of Labor Statistics — Employment Situation</a></li>
+<li><a href="https://www.reuters.com/business/sp-500-dow-futures-muted-ahead-jobs-data-chips-software-stocks-rise-2026-08-07/" target="_blank" rel="noopener">Reuters — S&amp;P closes at record high as soft jobs report eases rate-hike concerns</a></li>
+<li><a href="https://apnews.com/article/9d586bdbf1fb230dcf1f915dcaf50858" target="_blank" rel="noopener">AP — How major US stock indexes fared Friday 8/7/2026</a></li>
+<li><a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&amp;field_tdr_date_value=2026" target="_blank" rel="noopener">U.S. Treasury — Daily Treasury Par Yield Curve Rates</a></li>
+<li><a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_real_yield_curve&amp;field_tdr_date_value=2026" target="_blank" rel="noopener">U.S. Treasury — Daily Treasury Par Real Yield Curve Rates</a></li>
+<li><a href="https://api.binance.com/api/v3/klines?symbol=BTCUSDT&amp;interval=1d&amp;startTime=1785974400000&amp;endTime=1786147199999" target="_blank" rel="noopener">Binance Spot API — BTCUSDT completed daily bars</a></li>
+<li><a href="https://api.binance.com/api/v3/klines?symbol=ETHUSDT&amp;interval=1d&amp;startTime=1785974400000&amp;endTime=1786147199999" target="_blank" rel="noopener">Binance Spot API — ETHUSDT completed daily bars</a></li>
+<li><a href="https://www.reuters.com/business/energy/oil-rises-concerns-over-strait-hormuz-reopening-plans-2026-08-07/" target="_blank" rel="noopener">Reuters — Brent climbs on uncertainty over end to Iran war</a></li>
+<li><a href="https://www.reuters.com/business/retail-consumer/us-equity-funds-see-outflows-investors-take-profits-ahead-jobs-data-2026-08-07/" target="_blank" rel="noopener">Reuters — U.S. equity fund flows</a></li>
+<li><a href="https://home.treasury.gov/news/press-releases/sb0598" target="_blank" rel="noopener">U.S. Treasury — digital asset sanctions action, 2026-08-07</a></li>
+<li><a href="https://www.bls.gov/schedule/2026/08_sched_list.htm" target="_blank" rel="noopener">BLS — August 2026 release calendar</a></li>
+<li><a href="https://www.nyse.com/trade/hours-calendars" target="_blank" rel="noopener">NYSE — 2026 holidays and trading hours</a></li>
+<li><a href="https://www.hkex.com.hk/News/HKEX-Calendar?sc_lang=en" target="_blank" rel="noopener">HKEX — official market calendar</a></li>
 </ul>
 </section>
-<div class="footer">本报告用于市场研究与信息整理，不构成投资建议、交易指令或收益承诺。任何精确数据均应以对应原始发布机构或交易场所的最终记录为准。</div>
+
+<section class="section" id="disclaimer">
+<h2>说明</h2>
+<p>本晨报用于市场研究与信息整理，不构成投资建议、交易指令或收益承诺。任何因数据发布修订、交易所临时安排或市场结构变化而发生的后续变化，应以相应官方或一手来源的最新披露为准。</p>
+</section>
+
+<div class="footer">跨资产交易晨报｜2026-08-08</div>
 </div>
 <script>
-function setMode(mode,el){document.body.className='mode-'+mode;document.querySelectorAll('.modebar button').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function setMode(mode,btn){
+  document.body.className='mode-'+mode;
+  document.querySelectorAll('.modebar button').forEach(function(b){b.classList.remove('active')});
+  if(btn) btn.classList.add('active');
+  try{sessionStorage.setItem('brief-mode',mode)}catch(e){}
+}
+(function(){
+  var m='full';
+  try{m=sessionStorage.getItem('brief-mode')||'full'}catch(e){}
+  var b=document.querySelector('.modebar button[data-mode="'+m+'"]');
+  setMode(m,b);
+})();
+window.addEventListener('beforeprint',function(){document.body.className='mode-full'});
 </script>
-</body></html>
+</body>
+</html>
