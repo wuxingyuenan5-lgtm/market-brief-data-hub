@@ -1,8 +1,34 @@
-schema_version: 4
+schema_version: 5
 pipeline_id: cross_asset_morning_brief_v6
 status: active
-updated_at: '2026-08-04T10:05:00+08:00'
+updated_at: '2026-08-08T17:28:00+08:00'
 purpose: 计划任务与互动聊天共用同一研究与版式规则，但按运行环境选择可实现的交付方式；计划任务优先保证关联聊天正文可用，互动聊天优先交付正式HTML附件
+
+config_authority:
+  canonical_entrypoint: config/cross_asset/runtime_manifest.yaml
+  required_config_reads_is_authoritative_load_order: true
+  secondary_load_orders_may_not_override: true
+  report_yaml_is_aggregation_not_load_order_authority: true
+  on_required_config_read_failure: fail_closed
+  prohibit_last_known_rules_fallback: true
+  domain_owners:
+    data_contract: config/shared/data_contract.yaml
+    sources: config/shared/sources.yaml
+    routing: config/shared/routing.yaml
+    quality: config/shared/quality_rules.yaml
+    instruments: config/shared/instruments.yaml
+    market_calendar: config/shared/report_calendar.yaml
+    artifact_naming: config/cross_asset/artifact_naming.yaml
+    client_presentation: config/cross_asset/client_presentation.yaml
+    content_integrity: config/cross_asset/content_integrity.yaml
+    automation_delivery: config/cross_asset/automation_delivery.yaml
+    format_baseline: config/cross_asset/format_baseline.yaml
+    section_design: config/cross_asset/section_design.yaml
+    research_accumulation: config/cross_asset/research_accumulation.yaml
+    research_state: config/cross_asset/research_ledger.yaml
+    user_experience: config/cross_asset/user_experience.yaml
+    report_aggregation: config/cross_asset/report.yaml
+    data_protocol: docs/DATA_PROTOCOL.md
 
 required_config_reads:
   - vendor/upstreams.lock.yaml
@@ -53,6 +79,7 @@ hard_gates:
   scheduled_task_inline_report_required: true
   scheduled_task_attachment_required: false
   interactive_chat_direct_attachment_required: true
+  single_enabled_0800_task_rule_required: true
 
 weekly_module:
   due: monday_or_deferred_first_open_day
@@ -88,6 +115,17 @@ interactive_chat_delivery:
     - github_link_as_substitute
     - preview_wrapper
     - broken_attachment_success
+
+automation_governance:
+  scheduled_time: '08:00'
+  timezone: Asia/Shanghai
+  manager_chat: 跨资产交易晨报｜每日生产
+  rules_control_chat: 跨资产交易晨报｜规则与研究中枢
+  single_enabled_cross_asset_task_required: true
+  rules_control_chat_must_not_create_rebind_or_duplicate_task: true
+  rule_changes_must_not_recreate_task: true
+  task_prompt_policy: 保持短提示，仅要求读取runtime_manifest并执行当前pipeline，不复制长期规则正文
+  runtime_task_inventory_check_required_before_task_change: true
 
 failure_messages:
   config_or_data_gate_failed: 今日晨报未通过数据与配置校验，未发送半成品。
