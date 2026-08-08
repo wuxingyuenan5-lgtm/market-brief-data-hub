@@ -1,10 +1,17 @@
-schema_version: 4
+schema_version: 5
 report_id: cross_asset_v4
 display_name: 跨资产交易晨报
 edition: V4
 timezone: Asia/Shanghai
 scheduled_time: '08:00'
 filename_pattern: 跨资产交易晨报_{date}.html
+
+configuration_authority:
+  runtime_manifest_path: config/cross_asset/runtime_manifest.yaml
+  required_reads_owned_by_runtime_manifest: true
+  this_file_role: report_aggregation_and_content_contract
+  secondary_required_load_order_prohibited: true
+  may_not_override_domain_owner_configs: true
 
 artifact_naming:
   enforced: true
@@ -19,25 +26,12 @@ format_baseline:
   id: cross_asset_v4_2026_07_31
   name: 跨资产交易晨报2026-07-31格式
   spec_path: config/cross_asset/format_baseline.yaml
-  source_artifact: 跨资产交易晨报_2026-07-31.html
+  runtime_authority: spec_path
+  reference_artifact: 跨资产交易晨报_2026-07-31.html
+  reference_artifact_required_at_runtime: false
   locked_default: true
   change_policy: explicit_user_approval_required
   default_behavior: 保持版式、导航、模块顺序与视觉语义，只更新真实数据、研究内容、图表和来源
-
-load_order:
-  - vendor/upstreams.lock.yaml
-  - config/shared/data_contract.yaml
-  - config/shared/sources.yaml
-  - config/shared/routing.yaml
-  - config/shared/quality_rules.yaml
-  - config/shared/instruments.yaml
-  - config/cross_asset/artifact_naming.yaml
-  - config/cross_asset/format_baseline.yaml
-  - config/cross_asset/section_design.yaml
-  - config/cross_asset/research_accumulation.yaml
-  - config/cross_asset/research_ledger.yaml
-  - config/cross_asset/user_experience.yaml
-  - config/cross_asset/report.yaml
 
 coverage:
   macro: [US, CN, GLOBAL]
@@ -107,8 +101,10 @@ section_design:
     - flow_positioning_industry
     - dual_ledger
   preserve_section_order: true
+  client_visible_title_source: config/cross_asset/client_presentation.yaml
   current_pricing:
     required_count: 3
+    visible_title: 市场主线
     require_sector_rotation: true
     add_rotation_strip: true
     rotation_must_use_relative_benchmark: true
@@ -132,6 +128,7 @@ section_design:
     show_only_material_updates: true
   dual_ledger:
     preserve_two_table_layout: true
+    visible_title: 跟踪表
     trading_table_name: 市场定价账本
     research_table_name: 基本面研究账本
     require_stable_ids: true
@@ -169,14 +166,23 @@ report_sections:
   - sources_and_methodology
   - disclaimer
 
+structural_research:
+  minimum_count: 0
+  maximum_count: 4
+  material_updates_only: true
+  omit_when_no_material_update: true
+  no_repeat_old_view_to_fill_count: true
+
 research_accumulation:
   enabled: true
-  trial: true
+  status: active
+  trial: false
   config_path: config/cross_asset/research_accumulation.yaml
   ledger_path: config/cross_asset/research_ledger.yaml
-  first_review_date: '2026-08-01'
+  promoted_on: '2026-08-08'
   removable_without_format_migration: true
   display_increment_only: true
+  state_model_source: config/cross_asset/research_accumulation.yaml#canonical_state_model
 
 user_experience:
   enabled: true
@@ -189,6 +195,12 @@ user_experience:
     - traceable_claim_links
   detailed_audit_client_visible: false
 
+automation_delivery:
+  config_path: config/cross_asset/automation_delivery.yaml
+  manager_chat: 跨资产交易晨报｜每日生产
+  single_enabled_0800_task_required: true
+  rules_control_chat_must_not_manage_task: true
+
 archive_policy:
   enabled: true
   repository: wuxingyuenan5-lgtm/market-brief-data-hub
@@ -199,14 +211,15 @@ archive_policy:
   commit_message_pattern: 'archive: add cross-asset morning brief {date}'
   on_write_failure:
     deliver_report_anyway: true
-    disclose_backup_failure: true
-    do_not_claim_success: true
+    disclose_backup_failure_to_customer: false
+    internal_record_only: true
+    do_not_claim_archive_success: true
 
 chat_summary:
   include_only:
     - decision_90_seconds
     - current_pricing_three_themes
-    - top_two_structural_updates
+    - structural_updates_when_material
     - catalysts_and_risks
 
 research_requirements:
@@ -258,10 +271,12 @@ format_change_control:
   default: incremental_only
   approved_exceptions:
     - approved_on: '2026-07-31'
-      scope: 优化当下市场定价、资金仓位与产业数据及双账本内部结构，并增加板块轮动；不改变模块顺序和整体主题
+      scope: 优化市场主线、资金仓位与产业数据及跟踪表内部结构，并增加板块轮动；不改变模块顺序和整体主题
+    - approved_on: '2026-08-08'
+      scope: 规则治理收口；统一配置入口、研究状态枚举、客户可见命名、自动任务所有权及无增量研究的省略规则；不改变模块顺序和视觉主题
   user_approval_required_for:
     - section_reorder
-    - fixed_section_removal
+    - fixed_section_permanent_removal
     - navigation_change
     - market_map_column_change
     - visual_theme_replacement
@@ -283,3 +298,6 @@ quality_gate:
   format_lock_does_not_force_empty_content: true
   filename_must_match_canonical_pattern: true
   no_generic_preview_filename: true
+  no_secondary_config_load_order: true
+  archive_failure_not_client_visible: true
+  research_update_count_may_be_zero_when_no_material_increment: true
