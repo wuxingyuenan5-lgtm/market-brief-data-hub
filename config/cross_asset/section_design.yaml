@@ -1,7 +1,7 @@
-schema_version: 1
-policy_id: cross_asset_section_design_v1
+schema_version: 2
+policy_id: cross_asset_section_design_v2
 status: active
-purpose: 优化当下市场定价、资金仓位与产业数据、双账本三个模块，同时保持2026-07-31版总体结构与顺序
+purpose: 优化市场主线、资金仓位与产业数据、跟踪表三个模块，同时保持2026-07-31版总体结构与顺序；内部技术命名与客户可见标题严格分离
 
 principles:
   - 不输出仓位建议、交易指令或机械评分
@@ -9,9 +9,11 @@ principles:
   - 每个结论必须有可追溯的数据时点和来源
   - 只展示有增量的信息，不因结构固定而制造内容
   - 板块轮动用于描述市场定价，不等同于交易推荐
+  - 客户可见标题必须服从client_presentation.yaml，internal_title不得直接渲染
 
 current_pricing_three_themes:
-  title: 当下市场定价
+  internal_title: 当下市场定价
+  visible_title: 市场主线
   required_count: 3
   preserve_three_card_layout: true
   each_theme_fields:
@@ -71,7 +73,8 @@ current_pricing_three_themes:
       use_relative_performance_not_only_absolute_return: true
 
 flow_positioning_industry:
-  title: 资金、仓位与产业数据
+  internal_title: 资金、仓位与产业数据
+  visible_title: 资金、仓位与产业数据
   objective: 将市场资金、衍生品仓位和产业基本面分层展示，避免混为一张杂项表
   layers:
     market_flow:
@@ -174,7 +177,8 @@ flow_positioning_industry:
     maximum_primary_rows: 10
 
 dual_ledger:
-  title: 双账本
+  internal_title: 双账本
+  visible_title: 跟踪表
   preserve_two_table_layout: true
   trading_pricing_ledger:
     display_name: 市场定价账本
@@ -213,17 +217,9 @@ dual_ledger:
       - relation_to_market_pricing
       - next_research_node
       - last_updated
-    maturity_stages:
-      - hypothesis
-      - initial_evidence
-      - multi_source_validation
-      - market_pricing_started
-      - mature
-      - crowded_or_consensus
-      - falsification_watch
-      - closed
+    maturity_stage_source: config/cross_asset/research_accumulation.yaml#canonical_state_model.maturity_stages
   linkage_rules:
-    - 每条当下定价主线必须链接至少一个市场定价账本ID
+    - 每条市场主线必须链接至少一个市场定价账本ID
     - 每条系统研究更新应链接一个基本面研究账本ID
     - 同一主题跨日沿用稳定ID，不因标题变化新建重复条目
     - 当日报告只高亮状态变化和新增证据，历史保留在research_ledger.yaml
@@ -233,11 +229,14 @@ dual_ledger:
     collapse_unchanged_rows_when_possible: true
     preserve_full_rows_for_print: true
     no_confidence_score: true
+    internal_titles_client_visible: false
 
 quality_checks:
-  - 三条定价主线均包含板块轮动或明确写无清晰轮动
+  - 三条市场主线均包含板块轮动或明确写无清晰轮动
   - 板块轮动使用相对基准，不只比较绝对涨跌
   - 资金、仓位、产业数据的统计日期分别标注
   - 不把单源或时点错配数据包装成一致证据
-  - 双账本稳定ID与当日内容可相互跳转
+  - 跟踪表稳定ID与当日内容可相互跳转
   - 不因缺少数据而填入估算值或模板句
+  - 客户页面不得直接渲染internal_title字段
+  - 研究成熟度必须引用research_accumulation.yaml的canonical_state_model
