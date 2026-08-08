@@ -1,13 +1,48 @@
-schema_version: 1
+schema_version: 2
 module_id: cross_asset_research_accumulation_trial
-status: trial
+status: active
 start_date: '2026-08-01'
-review_after_reports: 1
 reversible: true
 removal_policy: 用户判断呈现效果不佳时，可删除本文件并从report.yaml移除引用，不影响公共数据层与格式基线
 
+review:
+  completed_at: '2026-08-08T17:28:00+08:00'
+  outcome: retain_and_promote_to_active
+  rationale:
+    - 增量展示原则与content_integrity和format_baseline一致
+    - 模块已被report、baseline和user_experience稳定引用
+    - 保留可逆删除机制，不改变主模块顺序
+  compatibility_note: module_id保留trial后缀仅为兼容既有内部锚点，不代表当前仍处于试运行状态
+
+canonical_state_model:
+  authority: this_file
+  change_statuses:
+    - new
+    - strengthened
+    - weakened
+    - falsified
+    - unchanged
+  maturity_stages:
+    - hypothesis_formed
+    - initial_evidence
+    - multi_source_validated
+    - market_pricing_started
+    - mature
+    - crowded
+    - falsification_phase
+    - closed
+  semantics:
+    change_status: 描述相较上一份有效晨报的证据变化，不等同于研究成熟度
+    maturity_stage: 描述研究主题所处的长期验证阶段，不以单日涨跌直接改变
+  prohibited_legacy_stage_values:
+    - hypothesis
+    - multi_source_validation
+    - crowded_or_consensus
+    - falsification_watch
+  migration_rule: 发现旧枚举时先映射到canonical_state_model，不得新增同义状态
+
 principles:
-  - 不改变90秒决策区和三条当下定价的原有写法
+  - 不改变90秒决策区和三条市场主线的原有写法
   - 只展示真正新增、强化、弱化或证伪的研究信息
   - 不为填满模块而重复旧结论
   - 研究积累服务于持续验证，不直接包装成交易建议
@@ -26,7 +61,7 @@ modules:
       - conditions_required
       - earliest_falsification_indicator
       - change_status
-    change_statuses: [new, strengthened, weakened, falsified, unchanged]
+    change_status_source: canonical_state_model.change_statuses
     hide_unchanged_by_default: true
 
   valuation_fundamental_bridge:
@@ -66,14 +101,7 @@ modules:
   research_maturity_stage:
     enabled: true
     display_title: 研究主题成熟度
-    stages:
-      - hypothesis_formed
-      - initial_evidence
-      - multi_source_validated
-      - market_pricing_started
-      - crowded
-      - falsification_phase
-      - closed
+    stage_source: canonical_state_model.maturity_stages
     required_fields:
       - ledger_id
       - topic
@@ -88,3 +116,4 @@ storage:
   preserve_history: true
   stable_ids_required: true
   daily_report_shows_increment_only: true
+  state_model_source: config/cross_asset/research_accumulation.yaml
