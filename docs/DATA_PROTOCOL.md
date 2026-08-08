@@ -1,28 +1,34 @@
 # 统一数据获取与报告协议
 
-本协议适用于“每日跨资产交易晨报 V4”和“纯国内交易晨报”。
+本协议适用于跨资产交易晨报和纯国内交易晨报。具体报告版本、pipeline版本和必读配置以对应报告的 `runtime_manifest.yaml` 为准，不从本文版本描述推断。
 
-## 1. 执行顺序
+## 1. 执行入口与配置权威
 
-每次生成报告前按以下顺序读取 `main` 分支配置与操作文件：
+跨资产晨报每次执行必须首先读取：
 
-1. `vendor/upstreams.lock.yaml`
-2. `config/shared/data_contract.yaml`
-3. `config/shared/sources.yaml`
-4. `config/shared/routing.yaml`
-5. `config/shared/quality_rules.yaml`
-6. `config/shared/instruments.yaml`
-7. 对应报告的 `report.yaml`
-8. `docs/DATA_PROTOCOL.md`
-9. `docs/OPERATIONS.md`
+`config/cross_asset/runtime_manifest.yaml`
 
-不得只读取 README 后自行推断规则。
+随后严格按照其中 `required_config_reads` 的当前列表和顺序读取全部文件。该列表是跨资产晨报唯一的必读配置清单；`report.yaml`、本文或其他文档不得维护一套可覆盖它的第二加载顺序。
 
-若任何必要文件无法读取，必须明确说明：
+若仓库新增、更名或删除配置，只修改 `runtime_manifest.yaml` 的 `required_config_reads`，其他文档只引用该入口。
 
-> 共享配置仓库读取失败，本次按最后已知口径执行。
+若任何 required config 无法读取，按 runtime manifest 的 hard gate **fail closed**：不得使用聊天记忆、模型记忆、README、旧缓存规则或“最后已知口径”继续生成正式晨报，也不得声称已完整执行当前 pipeline。
 
-若配置冲突，优先级为：数据契约 > 质量规则 > 路由 > 标的映射 > 报告配置 > 报告专属扩展配置。
+配置冲突按“领域所有者”处理，而不是由聚合文件覆盖专属规则：
+
+- 数据字段与口径：`config/shared/data_contract.yaml`
+- 数据质量：`config/shared/quality_rules.yaml`
+- 数据源与路由：`config/shared/sources.yaml`、`config/shared/routing.yaml`
+- 标的映射：`config/shared/instruments.yaml`
+- 交易日与发布判定：`config/shared/report_calendar.yaml`
+- 内容真实性：`config/cross_asset/content_integrity.yaml`
+- 自动交付：`config/cross_asset/automation_delivery.yaml`
+- HTML基线：`config/cross_asset/format_baseline.yaml`
+- 模块内部设计：`config/cross_asset/section_design.yaml`
+- 研究状态：`config/cross_asset/research_accumulation.yaml` 与 `research_ledger.yaml`
+- `report.yaml`：只承担报告聚合和内容合同，不得覆盖上述领域所有者。
+
+`runtime_manifest.yaml` 的 hard gates、执行上下文和 domain owner 声明优先于任何重复描述。
 
 ## 2. 上游工具包
 
@@ -43,6 +49,8 @@
 - 能核对标的、日期、单位和价格。
 
 主源失败不等于数据缺失。必须先验证请求参数和代码映射，再尝试备源。
+
+关键市场数据应遵守对应报告 `content_integrity.yaml` 中的最小核验次数和质量门槛；不能因为达到HTTP 200或返回非空结果就停止核验。
 
 ## 4. 真实取数验活
 
@@ -68,7 +76,9 @@ HTTP 200、非空 JSON 或非空 DataFrame 都不能直接证明数据有效。�
 - 期货必须注明合约月份或明确的主力合约口径。
 - 指数不得用ETF替代后写入“最新值”。
 
-## 6. 时点与口径
+## 6. 交易日、时点与口径
+
+交易日和发布判定必须使用 `config/shared/report_calendar.yaml`，并核验交易所官方日历及临时公告。不得只凭星期、政府工作日安排或通常交易习惯判断开休市。
 
 每个关键数字都应保存：
 
@@ -81,7 +91,7 @@ HTTP 200、非空 JSON 或非空 DataFrame 都不能直接证明数据有效。�
 - 数据源；
 - 质量状态。
 
-不得把不同市场的最近有效时点伪装成同一时间快照。
+不得把不同市场的最近有效时点伪装成同一时间快照。现货、期货、ETF、指数、不同期货月份、在岸与离岸汇率不得互相替代后伪装为同一标的。
 
 ## 7. 数据冲突
 
@@ -94,7 +104,7 @@ HTTP 200、非空 JSON 或非空 DataFrame 都不能直接证明数据有效。�
 5. 权威媒体；
 6. 研究机构与专业评论。
 
-若冲突来自口径不同，应同时保留并说明差异，不取平均值。
+若冲突来自口径不同，应同时保留并说明差异，不取平均值。若无法解释差异且该数据属于关键字段，则排除该数字而不是择一猜测。
 
 ## 8. 缓存
 
@@ -121,9 +131,19 @@ HTTP 200、非空 JSON 或非空 DataFrame 都不能直接证明数据有效。�
 - 发布时间；
 - 市场反应。
 
+Actual优先官方统计机构、央行、财政部门或监管机构。Consensus必须有具名来源；无可靠一致预期时省略，不得自行估算。
+
 不得混用环比、同比、年化、季调和未季调口径。
 
-## 10. 派生数据与图表
+## 10. 公司、政策与因果表述
+
+企业财务数据优先公司IR、SEC、交易所公告或法定披露文件。
+
+政策和监管事件必须准确区分提出、征求意见、审议、通过、发布、生效和执行阶段，不得将媒体讨论或提案写成正式生效政策。
+
+只有来源明确归因时才可使用确定性因果；否则必须写成判断、可能因素或待验证假设，不得由同日涨跌直接推导唯一原因。
+
+## 11. 派生数据与图表
 
 价差、基差、收益率曲线、技术指标和图表应由已验证的原始数据本地计算，并记录：
 
@@ -135,26 +155,28 @@ HTTP 200、非空 JSON 或非空 DataFrame 都不能直接证明数据有效。�
 
 没有可靠输入时不生成图表。
 
-## 11. 缺失值
+## 12. 缺失值
 
-主备源都失败后统一写：
+关键字段经过规定的主备源、映射、交易日、时区、合约和单位核验后仍无法取得，使用对应报告的数据契约缺失文本。
 
-> 未取得同一时点可核验数据
+非关键字段直接省略，不为了版面完整生成缺失卡片。
 
-可以在研究备注中列最近可靠历史值，但必须注明日期，且不得放入“最新值”列。
+可以在研究备注中列最近可靠历史值，但必须注明准确日期，且不得放入“最新值”列或冒充当日证据。
 
-## 12. 合规与安全
+## 13. 合规与安全
 
 - 官方公开数据优先。
-- 受限数据仅用于个人研究，不批量再分发原始数据库。
+- 受限数据仅用于允许的研究用途，不批量再分发原始数据库。
 - 公开仓库不得提交API密钥、Cookie、SEC联系邮箱、代理地址或账户信息。
 - 敏感配置通过本地环境变量或GitHub Secrets提供。
 
-## 13. 报告质量闸门
+## 14. 报告质量闸门
 
-进入标题、90秒决策区、市场地图和图表的数字，原则上应为：
+进入标题、90秒摘要、市场概览、主线关键数字和图表的数字，原则上应为：
 
 - `official_verified`；或
 - `cross_source_consistent`。
 
-单源行业数据可以使用，但必须标注 `single_source_pending`。疑似陈旧数据必须排除。
+专门行业数据、部分衍生品仓位等仅在专属规则允许时可以单源使用，并需保留来源和统计日期。疑似陈旧、时点错配、单位不明、合约不明的数据必须排除。
+
+正式报告通过与否最终由对应 `runtime_manifest.yaml` hard gates 及领域所有者配置共同决定。
