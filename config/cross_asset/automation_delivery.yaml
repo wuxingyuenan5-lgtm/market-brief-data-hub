@@ -1,7 +1,19 @@
-schema_version: 4
-policy_id: cross_asset_automation_delivery_v4
+schema_version: 5
+policy_id: cross_asset_automation_delivery_v5
 status: active
 purpose: 区分计划任务与互动聊天的运行能力；计划任务不得因附件能力缺失而整份失败，互动聊天仍以可下载HTML附件为正式交付
+
+automation_ownership:
+  scheduled_time: '08:00'
+  timezone: Asia/Shanghai
+  manager_chat: 跨资产交易晨报｜每日生产
+  rules_control_chat: 跨资产交易晨报｜规则与研究中枢
+  single_enabled_cross_asset_task_required: true
+  rules_control_chat_must_not_create_rebind_or_duplicate_task: true
+  rule_changes_must_not_recreate_task: true
+  task_prompt_must_remain_short: true
+  task_prompt_required_instruction: 读取config/cross_asset/runtime_manifest.yaml并按当前pipeline执行
+  before_any_task_change: 必须先核验现有跨资产08:00任务清单，避免重复启用任务
 
 execution_contexts:
   scheduled_task:
@@ -12,9 +24,13 @@ execution_contexts:
       - 90秒摘要
       - 市场概览
       - 三条市场主线
-      - 两条研究更新
       - 今日关注与风险
       - 周度模块到期时的本周交易安排与本周展望
+    conditional_material_sections:
+      研究更新:
+        minimum_count: 0
+        maximum_count: 2
+        rule: 仅在存在实质新增、强化、弱化或证伪时展示；不得为满足数量重复旧结论
     attachment_policy: best_effort
     attachment_failure_is_report_failure: false
     github_customer_link_allowed: false
@@ -49,7 +65,6 @@ common_html:
     - 数据图表
     - 市场概览
     - 市场主线
-    - 研究更新
     - 研究跟踪
     - 重点信息
     - 资金、仓位与产业数据
@@ -57,6 +72,11 @@ common_html:
     - 前期观点复盘
     - 今日关注与未来7天事件
     - 来源与口径
+  conditional_sections:
+    研究更新:
+      minimum_count: 0
+      maximum_count: 4
+      omit_when_no_material_update: true
   prohibited_visible_strings:
     - 分析已暂停
     - 仓库备份失败
@@ -82,6 +102,7 @@ background_archive:
   do_not_show_repository_path: true
   do_not_show_commit_hash: true
   archive_failure_must_not_block_valid_customer_delivery: true
+  archive_failure_recording: internal_only
 
 failure_behavior:
   scheduled_task:
