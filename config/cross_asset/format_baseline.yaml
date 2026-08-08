@@ -1,9 +1,17 @@
-schema_version: 3
+schema_version: 4
 baseline_id: cross_asset_v4_2026_07_31
 baseline_name: 跨资产交易晨报2026-07-31格式
 status: locked_default
-source_artifact: 跨资产交易晨报_2026-07-31.html
 change_policy: explicit_user_approval_required
+
+baseline_authority:
+  runtime_authority: this_yaml_spec
+  reference_artifact:
+    filename: 跨资产交易晨报_2026-07-31.html
+    repository_status: unavailable_in_current_repository
+    runtime_required: false
+    reconstruction_prohibited: true
+    note: 未取得原始HTML时不得凭配置重新创作一份并声称与原版逐像素一致；运行时以本YAML结构与视觉合同作为锁定基线
 
 purpose:
   - 固定跨资产交易晨报V4的默认HTML结构与视觉层级
@@ -172,15 +180,18 @@ section_contracts:
       describe_not_recommend: true
   structural_research_two_to_four:
     layout: two_column_cards
-    minimum_count: 2
+    minimum_count: 0
     maximum_count: 4
     details_collapsible: true
     prohibit_taxonomy_badges: true
+    material_updates_only: true
+    omit_when_no_material_update: true
   research_accumulation_trial:
     layout: compact_increment_panel
     show_changes_only: true
     removable: true
     visible_title: 研究跟踪
+    module_status_source: config/cross_asset/research_accumulation.yaml
   five_quick_updates:
     required_count: 5
     prohibit_internal_category_labels: true
@@ -244,7 +255,7 @@ allowed_without_user_approval:
   - 更新当日数据、来源、时间戳和核验状态
   - 更新研究内容和结论
   - 在既定上限内调整图表数量
-  - 在2至4条范围内调整研究更新数量
+  - 在0至4条范围内按实质增量调整研究更新数量，无新增时省略该模块内容
   - 调整卡片内文字长度以适配内容
   - 修复浏览器兼容性、打印和移动端问题
   - 按已批准的section_design优化市场主线、资金仓位产业数据和跟踪表内部呈现
@@ -253,7 +264,7 @@ allowed_without_user_approval:
 
 requires_user_approval:
   - 改变主模块顺序
-  - 删除固定模块
+  - 永久删除固定模块合同
   - 超出section_design已批准范围再次改变跟踪表结构
   - 改成深色或完全不同的视觉主题
   - 将聊天摘要替代完整HTML
@@ -265,7 +276,9 @@ quality_rules:
   - 非关键缺失数据直接省略，关键缺失数据简洁标注数据暂缺
   - 不使用历史值冒充最新值
   - 不因模块固定而强行制造无增量观点
+  - 研究更新没有实质增量时允许为0条，不得重复旧观点凑数量
   - 三条市场主线必须包含板块轮动或明确说明无清晰轮动
   - 正式下载文件名必须匹配日期，不得为preview或其他临时名称
   - 客户页面不得出现内部研究分类术语
   - 所有精确数字必须通过content_integrity核验门槛
+  - 原始2026-07-31 HTML缺失时不得伪造或重建后冒充原始baseline文件
