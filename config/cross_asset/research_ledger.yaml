@@ -1,6 +1,14 @@
-schema_version: 1
+schema_version: 2
 ledger_id: cross_asset_research_ledger
-updated_at: '2026-08-01T07:55:00+08:00'
+updated_at: '2026-08-08T17:28:00+08:00'
+state_model_source: config/cross_asset/research_accumulation.yaml#canonical_state_model
+
+maintenance:
+  reviewed_at: '2026-08-08T17:28:00+08:00'
+  latest_evidence_date_present: '2026-07-31'
+  evidence_refresh_required: true
+  stale_for_daily_increment: true
+  rule: 历史条目继续保留，但在取得新的已核验证据前不得作为当日新增、强化或弱化内容展示
 
 hypotheses:
   - stable_id: M-001
@@ -71,15 +79,9 @@ research_topics:
     last_updated: '2026-08-01'
 
 status_rules:
-  allowed_change_statuses: [new, strengthened, weakened, falsified, unchanged]
-  allowed_maturity_stages:
-    - hypothesis_formed
-    - initial_evidence
-    - multi_source_validated
-    - market_pricing_started
-    - crowded
-    - falsification_phase
-    - closed
+  change_status_source: config/cross_asset/research_accumulation.yaml#canonical_state_model.change_statuses
+  maturity_stage_source: config/cross_asset/research_accumulation.yaml#canonical_state_model.maturity_stages
   stable_id_required: true
   preserve_history: true
   no_rewrite_without_evidence: true
+  no_stale_evidence_as_daily_increment: true
