@@ -1,0 +1,203 @@
+schema_version: 1
+bundle_id: cross_asset_runtime_2026_08_10_01
+pipeline_id: cross_asset_morning_brief_v6
+status: active
+compiled_at: '2026-08-10T09:41:00+08:00'
+purpose: 每日生产端的紧凑运行合同；汇总跨资产专属内容、展示、交付与研究规则，减少重复读取和跨文件解释。共享数据层仍读取其专属配置，避免压缩后丢失数据口径。
+
+bundle_governance:
+  source_of_truth_for_rule_editing: source_configs
+  execution_snapshot_for_daily_production: this_file
+  must_match_manifest_bundle_id: true
+  regenerate_after_any_source_rule_change: true
+  may_not_be_hand_edited_without_updating_source_configs: true
+  source_configs:
+    - config/cross_asset/artifact_naming.yaml
+    - config/cross_asset/client_presentation.yaml
+    - config/cross_asset/content_integrity.yaml
+    - config/cross_asset/automation_delivery.yaml
+    - config/cross_asset/format_baseline.yaml
+    - config/cross_asset/section_design.yaml
+    - config/cross_asset/research_accumulation.yaml
+    - config/cross_asset/user_experience.yaml
+    - config/cross_asset/report.yaml
+    - docs/DATA_PROTOCOL.md
+
+shared_data_layer:
+  exact_rules_are_not_reimplemented_here: true
+  required_runtime_reads:
+    - vendor/upstreams.lock.yaml
+    - config/shared/data_contract.yaml
+    - config/shared/sources.yaml
+    - config/shared/routing.yaml
+    - config/shared/quality_rules.yaml
+    - config/shared/instruments.yaml
+    - config/shared/report_calendar.yaml
+  principles:
+    - unknown_or_unverified_values_are_omitted_or_marked_数据暂缺
+    - no_model_memory_as_current_market_data
+    - no_historical_value_as_latest
+    - no_estimate_as_actual
+    - no_proxy_for_index_or_closed_market
+    - no_cross_date_or_cross_contract_mixing
+    - critical_numbers_require_official_or_independent_cross_source_validation
+    - every_exact_number_preserves_source_instrument_timestamp_fetch_time_unit_currency_and_basis
+
+publication_calendar:
+  policy_source: config/shared/report_calendar.yaml
+  saturday: friday_summary_when_friday_was_valid_session
+  sunday: silent_by_default; crypto_continuous_trading_cannot_trigger_alone
+  monday: previous_valid_session_plus_weekend_information_and_weekly_module
+  all_primary_markets_closed_on_monday: defer_weekly_module_to_first_publishable_open_day
+  weekly_module_once_per_iso_week: true
+  special_closure_and_temporary_notice_check_required: true
+
+content_contract:
+  coverage:
+    - global_macro_and_liquidity
+    - us_equities
+    - hk_equities
+    - cn_equities
+    - gold_and_precious_metals
+    - copper
+    - lithium
+    - bitcoin_and_material_crypto
+    - ai_and_technology
+    - material_policy_and_industry_changes
+  do_not_force_every_asset_daily: true
+  market_mainlines:
+    exact_count: 3
+    required_elements_when_evidence_exists:
+      - new_fact_or_catalyst
+      - cross_asset_price_expression
+      - sector_rotation
+      - flow_or_positioning_confirmation
+      - industry_or_fundamental_confirmation
+      - pricing_stage
+      - divergence_or_unresolved_point
+      - next_validation_node
+    no_trade_recommendation: true
+    no_position_advice: true
+    no_mechanical_score: true
+  sector_rotation_benchmarks:
+    us_sectors: SPX
+    us_technology: NDX_or_SOX
+    cn_sectors: CSI300_or_suitable_broad_A_share_index
+    hk_sectors: HSI_or_HSTECH
+    commodities: matching_spot_or_explicit_futures_contract
+    no_clear_rotation_text: 未观察到具有足够证据的明显轮动。
+  research_updates:
+    minimum_count: 0
+    maximum_count: 4
+    display_only_material_increment: true
+    do_not_repeat_old_view_to_fill_count: true
+  research_state_model:
+    change_statuses: [new, strengthened, weakened, falsified, unchanged]
+    maturity_stages: [hypothesis_formed, initial_evidence, multi_source_validated, market_pricing_started, mature, crowded, falsification_phase, closed]
+    ledger_path: config/cross_asset/research_ledger.yaml
+    stale_evidence_cannot_be_daily_increment: true
+
+client_presentation:
+  report_name: 跨资产交易晨报
+  title_pattern: 跨资产交易晨报｜{date}
+  filename_pattern: 跨资产交易晨报_{date}.html
+  visible_sections:
+    - 90秒摘要
+    - 隔夜宏观
+    - 数据图表
+    - 市场概览
+    - 市场主线
+    - 研究更新
+    - 研究跟踪
+    - 重点信息
+    - 资金、仓位与产业数据
+    - 跟踪表
+    - 前期观点复盘
+    - 今日关注与未来7天事件
+    - 来源与口径
+  reading_modes: [全部, 概览, 研究]
+  prohibited_client_terms:
+    - 当下定价
+    - 系统性积累
+    - 真实数据版
+    - AI生成
+    - 主线01
+    - 主线02
+    - 主线03
+    - 分析已暂停
+    - 仓库备份失败
+    - 研究账本已同步
+    - commit
+    - SHA
+
+rendering_contract:
+  mode: deterministic_template_only
+  template_id: cross_asset_v4_2026_08_08
+  golden_reference_report: reports/cross_asset/2026/08/跨资产交易晨报_2026-08-08.html
+  template_path: templates/cross_asset/cross_asset_v4_2026_08_08.html
+  payload_schema_path: config/cross_asset/report_payload.schema.json
+  renderer_path: scripts/cross_asset/render_report.py
+  validator_path: scripts/cross_asset/validate_report.py
+  local_payload_path: /mnt/data/cross_asset_report_payload_{date}.json
+  local_output_path: /mnt/data/跨资产交易晨报_{date}.html
+  model_must_not_write_page_css_js_or_dom_shell: true
+  content_fragments_must_not_contain_style_script_or_section_tags: true
+  css_must_match_template_fingerprint: true
+  javascript_must_match_template_fingerprint: true
+  template_meta_required: cross_asset_v4_2026_08_08
+  validation_must_pass_before_archive_or_delivery: true
+  minimum_output_bytes: 12000
+
+artifact_and_delivery:
+  single_artifact_principle: true
+  create_html_once: true
+  same_output_file_used_for_chat_attachment_and_github_archive: true
+  archive_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
+  archive_is_background_only: true
+  archive_success_does_not_prove_attachment_success: true
+  scheduled_task:
+    inline_verified_report_required: true
+    downloadable_html_attachment_required: true
+    attachment_must_reference_actual_local_output_file: true
+    github_link_cannot_substitute_for_attachment: true
+    attachment_failure_is_delivery_failure: true
+  interactive_chat:
+    concise_summary_required: true
+    downloadable_html_attachment_required: true
+  customer_must_not_see:
+    - github_archive_path
+    - commit_hash
+    - internal_validation_output
+    - tool_status
+
+execution_sequence:
+  - read_runtime_manifest
+  - verify_runtime_bundle_id
+  - read_shared_data_layer_and_research_ledger
+  - resolve_official_calendar_and_publication_mode
+  - collect_and_validate_data
+  - build_verified_research_and_content
+  - create_report_payload_json_only
+  - materialize_locked_template_renderer_and_validator_exactly_from_github
+  - run_renderer_to_create_single_local_html_artifact
+  - run_validator_against_locked_template
+  - only_after_validation_archive_exact_same_html_bytes_to_github
+  - attach_exact_same_local_html_file_to_associated_chat
+  - send_verified_inline_report_and_attachment_once
+
+hard_failure_conditions:
+  - runtime_bundle_id_mismatch
+  - required_shared_config_unreadable
+  - calendar_resolution_failed
+  - critical_data_truthfulness_gate_failed
+  - renderer_unavailable_or_failed
+  - validator_unavailable_or_failed
+  - template_fingerprint_mismatch
+  - output_filename_or_title_mismatch
+  - downloadable_attachment_not_created_for_scheduled_task
+
+failure_behavior:
+  never_fall_back_to_freehand_html: true
+  never_rebuild_css_or_template_from_memory: true
+  never_use_github_archive_as_customer_download_substitute: true
+  if_render_or_attachment_fails: 保留已核验正文并明确标记HTML交付失败；不得声称正式成品交付成功
