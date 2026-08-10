@@ -1,7 +1,7 @@
-schema_version: 5
-policy_id: cross_asset_automation_delivery_v5
+schema_version: 6
+policy_id: cross_asset_automation_delivery_v6
 status: active
-purpose: 区分计划任务与互动聊天的运行能力；计划任务不得因附件能力缺失而整份失败，互动聊天仍以可下载HTML附件为正式交付
+purpose: 计划任务与互动聊天均要求真实可下载HTML附件；GitHub归档仅为后台历史记录，不得替代客户附件。HTML必须由固定模板渲染并通过硬校验后交付。
 
 automation_ownership:
   scheduled_time: '08:00'
@@ -17,7 +17,7 @@ automation_ownership:
 
 execution_contexts:
   scheduled_task:
-    primary_delivery: associated_chat_inline_report
+    primary_delivery: associated_chat_inline_report_plus_direct_html_attachment
     minimum_chinese_characters: 900
     maximum_chinese_characters: 2200
     required_sections:
@@ -31,13 +31,15 @@ execution_contexts:
         minimum_count: 0
         maximum_count: 2
         rule: 仅在存在实质新增、强化、弱化或证伪时展示；不得为满足数量重复旧结论
-    attachment_policy: best_effort
-    attachment_failure_is_report_failure: false
+    direct_attachment_required: true
+    required_local_path: /mnt/data/跨资产交易晨报_{date}.html
+    attachment_failure_is_delivery_failure: true
     github_customer_link_allowed: false
     rules:
-      - 先保证关联聊天中的报告正文可独立阅读
-      - 若运行环境能够生成并附加真实HTML文件，则同时附加
-      - 若运行环境不能创建可下载附件，不得只发送失败提示，不得以GitHub链接替代
+      - 关联聊天正文必须可独立阅读
+      - 同时必须附加通过validator的真实本地HTML文件
+      - GitHub归档成功不得替代附件成功
+      - 附件缺失、不可下载或并非本地成品文件时不得声称正式交付完成
       - 不输出完整市场表格时，市场概览至少覆盖6个已核验核心资产
 
   interactive_chat:
@@ -58,14 +60,19 @@ common_html:
   h1_pattern: 跨资产交易晨报｜{date}
   minimum_file_size_bytes: 12000
   self_contained: true
-  baseline_id: cross_asset_v4_2026_07_31
+  template_id: cross_asset_v4_2026_08_08
+  template_path: templates/cross_asset/cross_asset_v4_2026_08_08.html
+  payload_schema_path: config/cross_asset/report_payload.schema.json
+  renderer_path: scripts/cross_asset/render_report.py
+  validator_path: scripts/cross_asset/validate_report.py
+  freehand_html_generation_prohibited: true
+  css_and_javascript_owned_by_template: true
   required_sections:
     - 90秒摘要
     - 隔夜宏观
     - 数据图表
     - 市场概览
     - 市场主线
-    - 研究跟踪
     - 重点信息
     - 资金、仓位与产业数据
     - 跟踪表
@@ -77,6 +84,8 @@ common_html:
       minimum_count: 0
       maximum_count: 4
       omit_when_no_material_update: true
+    研究跟踪:
+      omit_when_no_material_change: true
   prohibited_visible_strings:
     - 分析已暂停
     - 仓库备份失败
@@ -92,11 +101,19 @@ common_html:
     - 系统性积累
     - 真实数据版
 
+single_artifact_delivery:
+  enabled: true
+  create_html_once: true
+  local_validated_file_is_canonical_delivery_artifact: true
+  chat_attachment_uses_same_file: true
+  github_archive_uses_same_bytes: true
+  archive_success_does_not_imply_attachment_success: true
+
 background_archive:
   enabled: true
   customer_visible: false
   archive_path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
-  write_method: raw_utf8_html_content
+  write_method: exact_validated_local_html_bytes
   verify_after_write: true
   do_not_show_github_link: true
   do_not_show_repository_path: true
@@ -107,7 +124,8 @@ background_archive:
 failure_behavior:
   scheduled_task:
     config_or_data_gate_failed: 今日晨报未通过数据与配置校验，未发送半成品。
-    html_or_attachment_unavailable_but_inline_verified: 发送完整已核验正文，不发送GitHub链接，不把附件缺失写入客户正文
+    rendering_or_validation_failed: 今日晨报正文已完成核验，但固定模板渲染或HTML成品校验失败，未发送错误版HTML。
+    attachment_failed_after_valid_html: 今日晨报正文已完成核验，但正式HTML附件交付失败；GitHub归档不作为下载替代。
   interactive_chat:
     attachment_failed: 今日晨报HTML附件交付失败，未以GitHub链接替代。
 
