@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cross_asset_report_payload_v1",
+  "title": "Cross-Asset Morning Brief Render Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pipeline_id", "template_id", "report_date", "kicker", "hero_sub", "sections"],
+  "properties": {
+    "pipeline_id": {"const": "cross_asset_morning_brief_v6"},
+    "template_id": {"const": "cross_asset_v4_2026_08_08"},
+    "report_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "kicker": {"type": "string", "minLength": 1, "maxLength": 80},
+    "hero_sub": {"type": "string", "minLength": 1, "maxLength": 500},
+    "sections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary", "macro", "charts", "marketmap", "themes", "quick",
+        "flow", "ledger", "review", "calendar", "sources"
+      ],
+      "properties": {
+        "summary": {"type": "string", "minLength": 1},
+        "macro": {"type": "string", "minLength": 1},
+        "charts": {"type": "string", "minLength": 1},
+        "marketmap": {"type": "string", "minLength": 1},
+        "themes": {"type": "string", "minLength": 1},
+        "research_update": {"type": ["string", "null"]},
+        "research_track": {"type": ["string", "null"]},
+        "quick": {"type": "string", "minLength": 1},
+        "flow": {"type": "string", "minLength": 1},
+        "ledger": {"type": "string", "minLength": 1},
+        "review": {"type": "string", "minLength": 1},
+        "calendar": {"type": "string", "minLength": 1},
+        "sources": {"type": "string", "minLength": 1},
+        "disclaimer": {"type": ["string", "null"]}
+      }
+    }
+  },
+  "x-rendering-rules": {
+    "section_values_are_html_fragments_only": true,
+    "forbidden_inside_fragments": ["style", "script", "link", "base", "iframe", "object", "embed", "section"],
+    "page_shell_css_js_navigation_and_section_order_are_template_owned": true,
+    "market_mainline_theme_card_count": 3,
+    "optional_when_no_material_increment": ["research_update", "research_track"]
+  }
+}
