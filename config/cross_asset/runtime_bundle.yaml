@@ -6,22 +6,29 @@ compiled_at: '2026-08-10T09:41:00+08:00'
 purpose: 每日生产端的紧凑运行合同；汇总跨资产专属内容、展示、交付与研究规则，减少重复读取和跨文件解释。共享数据层仍读取其专属配置，避免压缩后丢失数据口径。
 
 bundle_governance:
-  source_of_truth_for_rule_editing: source_configs
+  source_of_truth_for_rule_editing: active_source_configs_and_template_pipeline
   execution_snapshot_for_daily_production: this_file
   must_match_manifest_bundle_id: true
-  regenerate_after_any_source_rule_change: true
-  may_not_be_hand_edited_without_updating_source_configs: true
-  source_configs:
+  regenerate_after_any_active_source_rule_change: true
+  may_not_be_hand_edited_without_updating_active_source_rules: true
+  active_source_configs:
     - config/cross_asset/artifact_naming.yaml
     - config/cross_asset/client_presentation.yaml
     - config/cross_asset/content_integrity.yaml
     - config/cross_asset/automation_delivery.yaml
-    - config/cross_asset/format_baseline.yaml
     - config/cross_asset/section_design.yaml
     - config/cross_asset/research_accumulation.yaml
     - config/cross_asset/user_experience.yaml
+  template_pipeline_sources:
+    - templates/cross_asset/cross_asset_v4_2026_08_08.html
+    - config/cross_asset/report_payload.schema.json
+    - scripts/cross_asset/render_report.py
+    - scripts/cross_asset/validate_report.py
+  legacy_descriptive_files_not_used_by_daily_runtime:
+    - config/cross_asset/format_baseline.yaml
     - config/cross_asset/report.yaml
     - docs/DATA_PROTOCOL.md
+  rule: legacy_descriptive_files不得覆盖runtime_manifest、runtime_bundle或template_pipeline
 
 shared_data_layer:
   exact_rules_are_not_reimplemented_here: true
