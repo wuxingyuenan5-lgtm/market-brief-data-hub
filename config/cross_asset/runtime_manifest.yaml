@@ -1,34 +1,27 @@
-schema_version: 5
+schema_version: 6
 pipeline_id: cross_asset_morning_brief_v6
 status: active
-updated_at: '2026-08-08T17:28:00+08:00'
-purpose: 计划任务与互动聊天共用同一研究与版式规则，但按运行环境选择可实现的交付方式；计划任务优先保证关联聊天正文可用，互动聊天优先交付正式HTML附件
+updated_at: '2026-08-10T09:41:00+08:00'
+purpose: 网页GPT仍是每日生产系统；GitHub提供共享数据规则、紧凑运行快照、固定HTML母版、确定性渲染器、硬校验器和历史归档。模型负责研究与内容，不再自由生成页面CSS、JS或DOM骨架。
 
 config_authority:
   canonical_entrypoint: config/cross_asset/runtime_manifest.yaml
   required_config_reads_is_authoritative_load_order: true
-  secondary_load_orders_may_not_override: true
-  report_yaml_is_aggregation_not_load_order_authority: true
   on_required_config_read_failure: fail_closed
   prohibit_last_known_rules_fallback: true
-  domain_owners:
+  runtime_bundle:
+    path: config/cross_asset/runtime_bundle.yaml
+    required_bundle_id: cross_asset_runtime_2026_08_10_01
+    execution_snapshot: true
+    source_configs_remain_rule_editing_authority: true
+    bundle_id_mismatch_action: fail_closed
+  shared_data_domain_owners:
     data_contract: config/shared/data_contract.yaml
     sources: config/shared/sources.yaml
     routing: config/shared/routing.yaml
     quality: config/shared/quality_rules.yaml
     instruments: config/shared/instruments.yaml
     market_calendar: config/shared/report_calendar.yaml
-    artifact_naming: config/cross_asset/artifact_naming.yaml
-    client_presentation: config/cross_asset/client_presentation.yaml
-    content_integrity: config/cross_asset/content_integrity.yaml
-    automation_delivery: config/cross_asset/automation_delivery.yaml
-    format_baseline: config/cross_asset/format_baseline.yaml
-    section_design: config/cross_asset/section_design.yaml
-    research_accumulation: config/cross_asset/research_accumulation.yaml
-    research_state: config/cross_asset/research_ledger.yaml
-    user_experience: config/cross_asset/user_experience.yaml
-    report_aggregation: config/cross_asset/report.yaml
-    data_protocol: docs/DATA_PROTOCOL.md
 
 required_config_reads:
   - vendor/upstreams.lock.yaml
@@ -38,48 +31,74 @@ required_config_reads:
   - config/shared/quality_rules.yaml
   - config/shared/instruments.yaml
   - config/shared/report_calendar.yaml
-  - config/cross_asset/artifact_naming.yaml
-  - config/cross_asset/client_presentation.yaml
-  - config/cross_asset/content_integrity.yaml
-  - config/cross_asset/automation_delivery.yaml
-  - config/cross_asset/format_baseline.yaml
-  - config/cross_asset/section_design.yaml
-  - config/cross_asset/research_accumulation.yaml
+  - config/cross_asset/runtime_bundle.yaml
   - config/cross_asset/research_ledger.yaml
-  - config/cross_asset/user_experience.yaml
-  - config/cross_asset/report.yaml
-  - docs/DATA_PROTOCOL.md
+  - config/cross_asset/report_payload.schema.json
+  - templates/cross_asset/cross_asset_v4_2026_08_08.html
+  - scripts/cross_asset/render_report.py
+  - scripts/cross_asset/validate_report.py
 
 required_pipeline_steps:
+  - read_runtime_manifest_first
   - read_and_parse_all_required_configs
+  - verify_runtime_bundle_id_equals_manifest_required_bundle_id
   - identify_execution_context_as_scheduled_task_or_interactive_chat
   - resolve_official_market_calendars_and_special_closures
   - decide_publish_or_skip_from_shared_calendar_policy
   - if_skipped_end_without_user_message_or_artifact
   - collect_and_normalize_market_data
-  - perform_source_timestamp_unit_and_instrument_validation
+  - perform_source_timestamp_unit_instrument_and_independence_validation
   - add_weekly_outlook_on_monday_or_deferred_first_open_day
+  - update_research_reasoning_without_using_stale_evidence_as_daily_increment
   - build_verified_report_content
-  - render_self_contained_html_using_locked_baseline_when_file_tools_are_available
-  - validate_html_artifact_when_generated
-  - archive_completed_html_in_background_when_generated
-  - deliver_according_to_automation_delivery_execution_context
+  - create_structured_report_payload_json_matching_schema
+  - materialize_exact_template_renderer_and_validator_to_local_runtime
+  - run_renderer_against_locked_template_and_payload
+  - run_validator_against_rendered_html_and_locked_template
+  - if_validation_failed_do_not_archive_or_claim_html_success
+  - archive_exact_same_validated_html_bytes_in_background
+  - attach_exact_same_local_html_file_to_task_associated_chat
+  - deliver_verified_inline_report_and_downloadable_attachment_once
 
 hard_gates:
   config_read_success_required: true
+  runtime_bundle_id_match_required: true
   official_calendar_resolution_required: true
   special_closure_check_required: true
   publication_decision_required: true
   minimum_verified_market_assets: 6
-  baseline_id_required: cross_asset_v4_2026_07_31
+  template_id_required: cross_asset_v4_2026_08_08
+  deterministic_renderer_required: true
+  freehand_html_generation_prohibited: true
+  html_validator_required: true
+  css_fingerprint_match_required: true
+  javascript_fingerprint_match_required: true
   baseline_conformance_required_for_html: true
   prohibit_github_link_in_customer_delivery: true
   prohibit_summary_only_success: true
   prohibit_unverified_claim_of_pipeline_execution: true
   scheduled_task_inline_report_required: true
-  scheduled_task_attachment_required: false
+  scheduled_task_downloadable_attachment_required: true
+  scheduled_task_attachment_failure_is_delivery_failure: true
   interactive_chat_direct_attachment_required: true
   single_enabled_0800_task_rule_required: true
+
+rendering_assets:
+  template_id: cross_asset_v4_2026_08_08
+  golden_reference_report: reports/cross_asset/2026/08/跨资产交易晨报_2026-08-08.html
+  template_path: templates/cross_asset/cross_asset_v4_2026_08_08.html
+  payload_schema_path: config/cross_asset/report_payload.schema.json
+  renderer_path: scripts/cross_asset/render_report.py
+  validator_path: scripts/cross_asset/validate_report.py
+  local_payload_pattern: /mnt/data/cross_asset_report_payload_{date}.json
+  local_html_pattern: /mnt/data/跨资产交易晨报_{date}.html
+  required_execution_contract:
+    - 模型只生成payload内容片段，不重新设计HTML页面
+    - 模板、CSS、JS、导航、阅读模式和主section顺序只能来自template_path
+    - payload片段不得包含style、script、section等结构控制标签
+    - renderer必须生成唯一一次本地HTML成品
+    - validator通过前禁止归档和正式交付
+    - 不得在renderer或validator不可执行时退回自由手写HTML
 
 weekly_module:
   due: monday_or_deferred_first_open_day
@@ -92,20 +111,28 @@ weekly_module:
 artifact_identity:
   html_meta_name: market-brief-pipeline
   html_meta_content: cross_asset_morning_brief_v6
+  html_template_meta_name: market-brief-template
+  html_template_meta_content: cross_asset_v4_2026_08_08
   filename_pattern: 跨资产交易晨报_{date}.html
   local_path_pattern: /mnt/data/跨资产交易晨报_{date}.html
   archive_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
+  single_artifact_principle: true
+  archive_and_attachment_must_use_same_validated_bytes: true
 
 scheduled_task_delivery:
   destination: task_associated_chat
   required:
     - usable_inline_report
+    - direct_downloadable_html_attachment
+    - attachment_must_use_actual_local_validated_html_file
     - client_facing_copy_only
     - no_internal_process_messages
     - no_github_link
-  optional:
-    - direct_html_attachment_when_runtime_supports_real_file_creation
-  attachment_unavailable_action: send_verified_inline_report_without_failure_notice
+  prohibited:
+    - github_archive_as_attachment_substitute
+    - freehand_html_after_renderer_failure
+    - success_claim_when_attachment_is_missing_or_not_downloadable
+  attachment_failure_action: send_verified_inline_report_with_fixed_html_delivery_failure_notice_and_do_not_claim_formal_delivery_success
 
 interactive_chat_delivery:
   required:
@@ -124,9 +151,12 @@ automation_governance:
   single_enabled_cross_asset_task_required: true
   rules_control_chat_must_not_create_rebind_or_duplicate_task: true
   rule_changes_must_not_recreate_task: true
-  task_prompt_policy: 保持短提示，仅要求读取runtime_manifest并执行当前pipeline，不复制长期规则正文
+  task_prompt_policy: 保持短提示，只要求读取runtime_manifest并执行当前pipeline；不得复制长期规则正文
+  existing_short_prompt_should_continue_working_after_rule_changes: true
   runtime_task_inventory_check_required_before_task_change: true
 
 failure_messages:
   config_or_data_gate_failed: 今日晨报未通过数据与配置校验，未发送半成品。
+  rendering_failed: 今日晨报内容已完成核验，但固定模板渲染或HTML成品校验失败，未发送错误版HTML。
+  scheduled_attachment_failed: 今日晨报正文已完成核验，但正式HTML附件交付失败；GitHub归档不作为下载替代。
   interactive_attachment_failed: 今日晨报HTML附件交付失败，未以GitHub链接替代。
