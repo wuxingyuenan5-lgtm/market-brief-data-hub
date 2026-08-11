@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="market-brief-pipeline" content="cross_asset_morning_brief_v6">
+<meta name="market-brief-template" content="cross_asset_v4_2026_08_08">
+<title>跨资产交易晨报｜2026-08-11</title>
+<style>
+:root {
+  --bg:#f4f6f8; --paper:#ffffff; --ink:#16222d; --muted:#667481; --line:#dfe6ec;
+  --navy:#17324d; --blue:#315d82; --soft:#eef3f7; --green:#157347; --red:#b42318;
+  --amber:#916600; --shadow:0 10px 30px rgba(19,40,61,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;line-height:1.64;-webkit-font-smoothing:antialiased}
+.page{max-width:1160px;margin:0 auto;padding:24px 22px 64px}
+.hero{background:linear-gradient(135deg,#122a41,#234d70);color:#fff;border-radius:18px;padding:30px 34px;box-shadow:var(--shadow)}
+.hero-grid{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end}
+.hero h1{margin:2px 0 8px;font-size:34px;letter-spacing:.01em}
+.kicker{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#b9d2e6;font-weight:700}
+.sub{font-size:14px;opacity:.86}
+.modebar{display:flex;gap:8px;flex-wrap:wrap}
+.modebar button{border:1px solid rgba(255,255,255,.42);color:#fff;background:rgba(255,255,255,.08);border-radius:999px;padding:8px 14px;min-height:40px;cursor:pointer}
+.modebar button.active{background:#fff;color:var(--navy)}
+.nav{position:sticky;top:0;z-index:5;margin-top:12px;padding:10px 12px;background:rgba(244,246,248,.95);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;display:flex;gap:12px;overflow-x:auto;white-space:nowrap}
+.nav a{font-size:13px;color:var(--navy);text-decoration:none}
+.section{background:var(--paper);border:1px solid var(--line);border-radius:16px;margin-top:18px;padding:24px 26px;box-shadow:0 3px 14px rgba(19,40,61,.035)}
+h2{font-size:21px;margin:0 0 16px;color:var(--navy)} h3{font-size:17px;margin:0 0 8px;color:var(--navy)} h4{font-size:14px;margin:12px 0 4px;color:var(--navy)}
+p{margin:8px 0 0} .lede{font-size:17px} .note,.small{font-size:13px;color:var(--muted)} .muted{color:var(--muted)}
+.summary-grid,.theme-grid,.research-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.summary-card,.theme-card,.research-card{border:1px solid var(--line);border-radius:13px;padding:17px;background:#fbfcfd}
+.summary-card strong{display:block;color:var(--navy);margin-bottom:5px}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.metric{background:var(--soft);border-radius:12px;padding:13px} .metric .v{font-size:22px;font-weight:750;color:var(--navy)} .metric .l{font-size:12px;color:var(--muted)}
+.up{color:var(--green)} .down{color:var(--red)} .neutral{color:var(--muted)} .amber{color:var(--amber)}
+.callout{border-left:4px solid var(--blue);padding:12px 15px;background:#f4f8fb;border-radius:0 10px 10px 0;margin:12px 0}
+.tag{display:inline-block;font-size:12px;padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--navy);margin-right:6px}
+.tag.green{background:#e9f6ef;color:#12613b} .tag.amber{background:#fff6dd;color:#7a5200} .tag.red{background:#feeeee;color:#9a2118}
+table{width:100%;border-collapse:collapse;font-size:14px} th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);vertical-align:top} th{color:#496171;font-weight:650;background:#f8fafb}
+.nowrap{white-space:nowrap} .scroll{overflow-x:auto} .scroll table{min-width:760px}
+.chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.chart{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fbfcfd;min-height:260px}
+.bar-row{display:grid;grid-template-columns:88px 1fr 70px;gap:10px;align-items:center;margin:14px 0}
+.bar-track{height:18px;background:#e9edf1;border-radius:6px;position:relative;overflow:hidden}
+.bar{height:100%;border-radius:6px;background:#52799a} .bar.pos{margin-left:50%} .bar.neg{background:#9f5a5a;margin-left:calc(50% - var(--w));width:var(--w)!important}
+.curve-row{display:grid;grid-template-columns:60px 1fr 62px;gap:10px;align-items:center;margin:12px 0}
+.curve-track{height:15px;background:#e9edf1;border-radius:8px;overflow:hidden} .curve-fill{height:100%;background:#52799a;border-radius:8px}
+.list{margin:0;padding-left:20px} .list li{margin:8px 0}
+.source-list{padding-left:20px;margin:0} .source-list li{margin:8px 0} .source-list a{color:#315d82;word-break:break-all}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.evidence{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fbfcfd}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;background:#fbfcfd} summary{cursor:pointer;color:var(--navy);font-weight:650}
+.footer{font-size:12px;color:var(--muted);padding:20px 4px 0}
+.trade-only,.research-only{display:block}
+body.mode-trading .research-only{display:none} body.mode-research .trade-only{display:none}
+body.mode-full .trade-only,body.mode-full .research-only{display:block}
+@media(max-width:820px){
+ .page{padding:13px 11px 44px} .hero{padding:22px} .hero h1{font-size:26px} .hero-grid{grid-template-columns:1fr}
+ .summary-grid,.theme-grid,.research-grid,.metric-row,.chart-grid,.split{grid-template-columns:1fr}
+ .section{padding:19px 17px} .nav{border-radius:10px} .scroll{margin:0 -4px}
+}
+@media print{
+ body{background:#fff} .page{max-width:none;padding:0} .section,.hero{box-shadow:none;break-inside:avoid} .modebar,.nav{display:none}
+ .trade-only,.research-only{display:block!important} a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body class="mode-full">
+<div class="page">
+<header class="hero" id="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="kicker">DAILY CROSS-ASSET RESEARCH</div>
+      <h1>跨资产交易晨报｜2026-08-11</h1>
+      <div class="sub">数据截止：美国市场2026-08-10收盘/官方日度曲线；信息更新至2026-08-11 08:10（北京时间）。核心：能源风险重新推高名义与实际利率，风险偏好扩散暂时失去部分广度。</div>
+    </div>
+    <div class="modebar" aria-label="阅读模式">
+      <button class="active" data-mode="full" onclick="setMode('full',this)">全部</button>
+      <button data-mode="trading" onclick="setMode('trading',this)">概览</button>
+      <button data-mode="research" onclick="setMode('research',this)">研究</button>
+    </div>
+  </div>
+</header>
+<nav class="nav" aria-label="页面导航">
+<a href="#summary">90秒摘要</a><a href="#macro">隔夜宏观</a><a href="#charts">数据图表</a><a href="#marketmap">市场概览</a>
+<a href="#themes">市场主线</a><a href="#research-update">研究更新</a><a href="#research-track">研究跟踪</a>
+<a href="#quick">重点信息</a><a href="#flow">资金、仓位与产业数据</a><a href="#ledger">跟踪表</a>
+<a href="#review">前期观点复盘</a><a href="#calendar">今日关注与未来7天事件</a><a href="#sources">来源与口径</a>
+</nav>
+<section class="section" id="summary"><h2>90秒摘要</h2><div class="summary-grid">
+<div class="summary-card"><strong>核心变化</strong><p>上周五弱就业带来的“利率下行”交易没有直线延续。8月10日Brent单日上涨4.99%至87.72美元/桶，美国财政部10年期收益率由8月7日的4.65%升至4.72%，标普500则小幅回落0.06%。能源供给风险重新把通胀约束推回利率定价核心。</p></div>
+<div class="summary-card"><strong>价格结构</strong><p>美国风险资产不是全面转弱，而是广度收窄：标普500仅跌0.06%，Nasdaq Composite跌0.32%；与此同时，2年期、10年期和10年期实际利率分别升至4.25%、4.72%和2.43%。对高久期资产而言，实际利率重新上行比单日指数跌幅更值得跟踪。</p></div>
+<div class="summary-card"><strong>下一验证</strong><p>本周真正决定方向的是8月12日美国7月CPI。Reuters调查预期同比3.4%，低于6月官方3.5%；若油价冲击与核心通胀粘性同时偏强，市场此前因弱就业下调加息概率的逻辑会再次受到挑战。</p></div>
+</div>
+<div class="callout"><b>今日判断：</b>市场从“就业降温主导”转向“增长降温与能源通胀重新拉扯”。这不是单纯风险偏好下降，而是名义利率、实际利率、油价和科技估值之间的约束重新变紧。</div></section>
+<section class="section trade-only" id="macro"><h2>隔夜宏观</h2><p class="lede">隔夜没有新的高权重美国宏观Actual；宏观冲击主要来自能源价格与利率重定价。</p>
+<div class="scroll"><table><thead><tr><th>变量</th><th>最新已核验值</th><th>前值/比较</th><th>解读</th></tr></thead><tbody>
+<tr><td>美国2年期国债收益率</td><td>4.25%</td><td>8月7日 4.19%</td><td>+6bp，前端重新计入更强的通胀/政策约束。</td></tr>
+<tr><td>美国10年期国债收益率</td><td>4.72%</td><td>8月7日 4.65%</td><td>+7bp，弱就业后的利率下行被能源风险部分逆转。</td></tr>
+<tr><td>美国10年期实际利率</td><td>2.43%</td><td>8月7日 2.40%</td><td>+3bp，高久期权益面临的真实贴现率约束回升。</td></tr>
+<tr><td>美国7月CPI</td><td>8月12日发布</td><td>Reuters调查：同比3.4%；6月官方同比3.5%</td><td>若实际值显著高于预期，将验证油价与核心通胀对宽松预期的约束。</td></tr>
+</tbody></table></div>
+<p class="note">美债收益率采用美国财政部Daily Treasury Par Yield Curve / Real Yield Curve官方口径；与媒体盘中收益率可能因时点和方法不同，不混用。</p></section>
+<section class="section trade-only" id="charts"><h2>数据图表</h2><div class="chart-grid">
+<div class="chart"><h3>美债收益率：8月7日 → 8月10日</h3>
+<div class="curve-row"><span>2Y</span><div class="curve-track"><div class="curve-fill" style="width:85%"></div></div><b>+6bp</b></div>
+<div class="curve-row"><span>10Y</span><div class="curve-track"><div class="curve-fill" style="width:100%"></div></div><b>+7bp</b></div>
+<div class="curve-row"><span>10Y实际</span><div class="curve-track"><div class="curve-fill" style="width:43%"></div></div><b>+3bp</b></div>
+<p class="note">公式：8月10日官方收益率－8月7日官方收益率；来源：U.S. Treasury。用于观察能源冲击后贴现率约束是否重新增强。</p></div>
+<div class="chart"><h3>8月10日跨资产日变化</h3>
+<div class="bar-row"><span>Brent</span><div class="bar-track"><div class="bar pos" style="width:49%"></div></div><b class="up">+4.99%</b></div>
+<div class="bar-row"><span>S&amp;P 500</span><div class="bar-track"><div class="bar neg" style="--w:1%;width:1%"></div></div><b class="down">-0.06%</b></div>
+<div class="bar-row"><span>Nasdaq</span><div class="bar-track"><div class="bar neg" style="--w:3%;width:3%"></div></div><b class="down">-0.32%</b></div>
+<p class="note">Brent、标普500与Nasdaq Composite均由Reuters与AP独立交叉核对；不同资产使用各自正式结算/收盘时点。</p></div>
+</div></section>
+<section class="section trade-only" id="marketmap"><h2>市场概览</h2><div class="scroll"><table><thead><tr><th>资产</th><th>最新值</th><th>变化</th><th>市场时点</th><th>说明</th></tr></thead><tbody>
+<tr><td>标普500</td><td>7,753.11</td><td class="down">-0.06%</td><td>2026-08-10 美股收盘</td><td>Reuters与AP一致；从纪录高位附近小幅回落。</td></tr>
+<tr><td>Nasdaq Composite</td><td>26,605.36</td><td class="down">-0.32%</td><td>2026-08-10 美股收盘</td><td>Reuters与AP一致；科技相对标普偏弱。</td></tr>
+<tr><td>美国2年期国债收益率</td><td>4.25%</td><td class="up">+6bp</td><td>2026-08-10 官方日度曲线</td><td>美国财政部官方口径；前值4.19%。</td></tr>
+<tr><td>美国10年期国债收益率</td><td>4.72%</td><td class="up">+7bp</td><td>2026-08-10 官方日度曲线</td><td>美国财政部官方口径；前值4.65%。</td></tr>
+<tr><td>美国10年期实际利率</td><td>2.43%</td><td class="up">+3bp</td><td>2026-08-10 官方日度曲线</td><td>美国财政部TIPS实际收益率曲线；前值2.40%。</td></tr>
+<tr><td>Brent原油</td><td>87.72美元/桶</td><td class="up">+4.99%</td><td>2026-08-10 ICE结算</td><td>Reuters与AP一致；霍尔木兹海峡重开条件仍存分歧。</td></tr>
+<tr><td>美元指数</td><td>数据暂缺</td><td>—</td><td>2026-08-10</td><td>虽有可靠单源报道，但未完成独立同口径交叉验证，不进入最新值。</td></tr>
+<tr><td>现货黄金</td><td>数据暂缺</td><td>—</td><td>2026-08-10</td><td>不同报道时点存在差异，未用期金结算价替代现货。</td></tr>
+<tr><td>沪深300 / 恒生科技</td><td>数据暂缺</td><td>—</td><td>应为2026-08-10正式收盘</td><td>未取得满足同日、同标的交叉核验要求的数据；不使用ETF代理。</td></tr>
+<tr><td>BTC/USDT / ETH/USDT</td><td>数据暂缺</td><td>—</td><td>连续市场</td><td>已取得交易所报价，但当前返回字段不足以满足本报告对市场时点的完整血缘要求，因此不进入精确市场表。</td></tr>
+</tbody></table></div>
+<p class="note">核心市场地图已满足至少6个已核验市场资产的硬门槛。抓取时点：2026-08-11T08:10:18+08:00。</p></section>
+<section class="section trade-only" id="themes"><h2>市场主线</h2><div class="theme-grid">
+<div class="theme-card"><h3>能源冲击重新约束利率</h3><p><b>新事实：</b>Brent 8月10日结算上涨4.99%至87.72美元/桶；美国10年期官方收益率同步由4.65%升至4.72%。</p><p><b>跨资产表达：</b>油价急升、名义和实际利率同时上行，而标普500小幅回落，说明市场重新交易“能源→通胀→政策利率”的传导。</p><p><b>轮动：</b>未观察到具有足够证据的广泛行业轮动数据，因此不以单日个股表现替代板块证据。</p><p><b>阶段与背离：</b>能源风险溢价处于重新扩张阶段；背离在于就业已经降温，但长端利率仍被供给冲击推高。</p><p><b>下一节点：</b>8月12日CPI，以及霍尔木兹海峡通航条件是否实质落地。</p></div>
+<div class="theme-card"><h3>风险偏好扩散再次失去部分广度</h3><p><b>新事实：</b>标普500仅跌0.06%，Nasdaq Composite跌0.32%；AP显示Russell 2000跌幅更大。周五由弱就业推动的科技与小盘共同反弹没有连续强化。</p><p><b>价格表达：</b>实际利率上升3bp，高久期科技承压更明显；这更接近贴现率冲击，而非基本面突然反转。</p><p><b>轮动：</b>科技相对标普落后，小盘同样偏弱，市场集中度重新提高。</p><p><b>未解决问题：</b>若CPI温和且油价回落，广度可能迅速恢复；若实际利率继续抬升，扩散逻辑会进一步弱化。</p><p><b>下一节点：</b>CPI后的科技/小盘相对表现与市场宽度。</p></div>
+<div class="theme-card"><h3>盈利仍提供底部支撑，但估值开始更依赖资本效率</h3><p><b>新事实：</b>Reuters援引BofA称，在接近九成标普500公司披露后，剔除Alphabet和Amazon投资收益，EPS同比仍增长约30%，EPS超预期比例76%。</p><p><b>价格表达：</b>强盈利使标普在油价上涨5%的当天仅小幅回撤，但Nasdaq更弱，说明估值对利率敏感度重新上升。</p><p><b>AI验证：</b>Applied Materials将在8月13日美股盘后公布FY2026 Q3结果，直接检验半导体设备、先进封装及DRAM资本开支链条。</p><p><b>阶段：</b>盈利兑现仍强，但AI交易从“需求存在”进一步进入“投入回报率与现金流验证”。</p><p><b>下一节点：</b>AMAT订单、利润率和AI相关资本开支表述。</p></div>
+</div></section>
+<!-- OPTIONAL:research_update START --><section class="section research-only" id="research-update"><h2>研究更新</h2><div class="research-grid">
+<div class="research-card"><h3>能源冲击与利率：证据强化</h3><span class="tag amber">强化</span><p>R-MACRO-002获得8月10日新证据：Brent单日上涨近5%，同时美国2年、10年和10年实际收益率分别较8月7日上升6bp、7bp和3bp。此前“能源高位可能延长高利率环境”的假设不再只依赖7月31日旧数据，现已得到新的跨资产同步验证。</p><p><b>仍待验证：</b>油价能否持续、CPI是否体现更广泛的价格压力，以及实际收入是否受到二次影响。</p></div>
+</div></section><!-- OPTIONAL:research_update END -->
+<!-- OPTIONAL:research_track START --><section class="section research-only" id="research-track"><h2>研究跟踪</h2><div class="split"><div class="evidence"><h3>风险偏好扩散</h3><p>M-003在8月10日出现新的弱化证据：科技和小盘均未延续周五的相对强势。当前更像“盈利托底、贴现率抬升限制扩散”，而非全面风险厌恶。</p></div><div class="evidence"><h3>AI资本效率</h3><p>R-AI-001暂无新的已实现公司财务证据，不重复旧结论。下一有效节点是Applied Materials FY2026 Q3财报，重点看订单质量、先进封装/DRAM需求、毛利率和资本开支回报。</p></div></div></section><!-- OPTIONAL:research_track END -->
+<section class="section trade-only" id="quick"><h2>重点信息</h2><ol class="list">
+<li><b>油价重新成为宏观变量：</b>Brent单日上涨4.99%，使本周CPI的重要性进一步上升。</li>
+<li><b>利率反弹不是只有通胀预期：</b>10年期实际利率也从2.40%升至2.43%，说明真实贴现率约束同步增强。</li>
+<li><b>美股仍有盈利缓冲：</b>强劲财报使标普在油价剧烈上行背景下仅小幅回落，但科技相对更弱。</li>
+<li><b>AI进入资本效率验证窗口：</b>AMAT本周财报将检验设备订单、先进封装与DRAM投资是否继续兑现。</li>
+<li><b>中国、港股与加密不硬填数字：</b>未完成同日/同口径硬核验的精确报价本日直接留缺，不用ETF、旧值或不同市场代理。</li>
+</ol></section>
+<section class="section research-only" id="flow"><h2>资金、仓位与产业数据</h2><div class="scroll"><table><thead><tr><th>主题</th><th>价格信号</th><th>资金/仓位</th><th>产业/基本面</th><th>证据关系</th><th>关键缺口</th></tr></thead><tbody>
+<tr><td>能源</td><td>Brent +4.99%</td><td>本日未展示未核验CFTC仓位</td><td>霍尔木兹重开条件仍有分歧，实际供给风险未解除</td><td>价格与供给叙事相互确认</td><td>真实通航、出口流量、库存变化</td></tr>
+<tr><td>美国权益</td><td>SPX -0.06%，Nasdaq -0.32%</td><td>未取得满足时点要求的ETF流量组合</td><td>BofA口径显示盈利季仍强</td><td>盈利支撑与贴现率压力并存</td><td>CPI后估值弹性、市场宽度</td></tr>
+<tr><td>利率</td><td>2Y +6bp；10Y +7bp；10Y实际 +3bp</td><td>未用单一投机仓位数据替代曲线</td><td>能源价格冲击重新抬升通胀约束</td><td>名义与实际利率共同确认</td><td>CPI/PPI是否延续</td></tr>
+<tr><td>AI硬件</td><td>科技相对标普偏弱</td><td>未展示未核验期权拥挤度</td><td>AMAT 8月13日盘后财报待验证</td><td>价格端先反映贴现率压力</td><td>订单、利润率、资本效率</td></tr>
+</tbody></table></div></section>
+<section class="section research-only" id="ledger"><h2>跟踪表</h2><div class="scroll"><table><thead><tr><th>ID</th><th>主题</th><th>状态</th><th>今日新证据</th><th>下一验证</th></tr></thead><tbody>
+<tr><td>M-002</td><td>通胀约束</td><td><span class="tag amber">强化</span></td><td>Brent +4.99%，2Y/10Y官方收益率同步回升</td><td>7月CPI、PPI</td></tr>
+<tr><td>M-003</td><td>风险偏好扩散</td><td><span class="tag red">弱化</span></td><td>Nasdaq相对SPX更弱，小盘亦未延续周五强势</td><td>CPI后市场宽度与风格相对收益</td></tr>
+<tr><td>R-MACRO-002</td><td>能源冲击与利率</td><td><span class="tag amber">强化</span></td><td>能源、名义利率和实际利率在8月10日同向变化</td><td>油价持续性、CPI、实际收入</td></tr>
+<tr><td>R-AI-001</td><td>云收入与资本效率</td><td><span class="tag">延续</span></td><td>无新的已实现财务证据，不重复旧结论</td><td>AMAT FY2026 Q3</td></tr>
+</tbody></table></div></section>
+<section class="section research-only" id="review"><h2>前期观点复盘</h2><div class="split"><div class="evidence"><h3>弱就业→利率下行：仅部分成立</h3><p>8月7日弱就业确实压低了收益率，但8月10日油价冲击使2Y、10Y和实际利率重新上行。前期逻辑需要修正为：就业降温降低加息压力，但只有在能源与通胀不重新加速时，利率下行才具备持续性。</p></div><div class="evidence"><h3>风险偏好扩散：暂未形成连续确认</h3><p>周五科技和小盘同步反弹曾改善市场广度；周一科技和小盘相对再度转弱。当前证据更支持“盈利强、但贴现率仍决定风格扩散”，而不是稳定的全面风险偏好上行。</p></div></div></section>
+<section class="section trade-only" id="calendar"><h2>今日关注与未来7天事件</h2><div class="scroll"><table><thead><tr><th>北京时间</th><th>事件</th><th>影响市场</th><th>验证变量</th></tr></thead><tbody>
+<tr><td>8月12日 20:30</td><td>美国7月CPI、实际收入</td><td>全球利率、美元、黄金、美股</td><td>Headline CPI是否接近Reuters调查3.4%；核心通胀粘性</td></tr>
+<tr><td>8月13日 20:30</td><td>美国7月PPI</td><td>美债、美元、商品、权益</td><td>能源冲击是否向生产端广泛传导</td></tr>
+<tr><td>8月14日 04:30</td><td>Applied Materials FY2026 Q3电话会</td><td>半导体设备、AI硬件</td><td>订单、先进封装、DRAM、毛利率与资本效率</td></tr>
+<tr><td>8月14日 20:30</td><td>美国7月Advance Retail Sales</td><td>美股、美债、美元</td><td>就业降温是否已传导至居民需求</td></tr>
+</tbody></table></div>
+<p class="note">本周周度模块已在本周首个晨报展示，本日不重复。以上日程采用BLS、美国人口普查局与Applied Materials IR官方发布时间，并转换为北京时间。</p></section>
+<section class="section" id="sources"><h2>来源与口径</h2><ul class="source-list">
+<li><a href="https://www.reuters.com/world/china/global-markets-global-markets-2026-08-10/">Reuters｜Global Markets，2026-08-10</a>：SPX、Nasdaq、Brent、市场利率/美元/黄金背景及Reuters CPI调查。</li>
+<li><a href="https://apnews.com/article/37588f23787295860e468d19399b56ca">AP｜How major US stock indexes fared Monday 8/10/2026</a>：美股收盘独立交叉核对。</li>
+<li><a href="https://apnews.com/article/adb7b918b15206e38d7899d482422308">AP｜US stocks edge down after oil rises 5%</a>：Brent与市场反应独立交叉核对。</li>
+<li><a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value=2026&amp;type=daily_treasury_yield_curve">U.S. Treasury｜Daily Treasury Par Yield Curve Rates</a>：2026-08-10 2Y=4.25%、10Y=4.72%；8月7日前值4.19%、4.65%。</li>
+<li><a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value=2026&amp;type=daily_treasury_real_yield_curve">U.S. Treasury｜Daily Treasury Par Real Yield Curve Rates</a>：2026-08-10 10Y real=2.43%；8月7日2.40%。</li>
+<li><a href="https://www.bls.gov/schedule/2026/08_sched_list.htm">U.S. BLS｜August 2026 release calendar</a>：CPI 8月12日、PPI 8月13日，均08:30 ET。</li>
+<li><a href="https://www.bls.gov/cpi/">U.S. BLS｜CPI</a>：6月CPI同比3.5%、核心同比2.6%。</li>
+<li><a href="https://www.census.gov/retail/release_schedule.html">U.S. Census Bureau｜Monthly Retail Trade release schedule</a>：7月Advance Retail Sales于8月14日08:30 ET发布。</li>
+<li><a href="https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-report-fiscal-third-quarter-2026-results-aug">Applied Materials IR</a>：FY2026 Q3电话会8月13日16:30 ET。</li>
+</ul>
+<p class="note"><b>数据口径：</b>指数使用正式收盘；Brent使用ICE结算；美债使用美国财政部官方日度曲线。不同资产不伪装成同一瞬时快照。所有进入核心市场表的精确值均达到官方核验或独立来源一致标准。抓取时点：2026-08-11T08:10:18+08:00。</p></section>
+<section class="section" id="disclaimer"><h2>说明</h2><p>本晨报用于市场研究与信息整理，不构成投资建议、交易指令或收益承诺。任何因数据发布修订、交易所临时安排或市场结构变化而发生的后续变化，应以相应官方或一手来源的最新披露为准。</p></section>
+<div class="footer">跨资产交易晨报｜2026-08-11</div>
+</div>
+<script>
+function setMode(mode,btn){
+  document.body.className='mode-'+mode;
+  document.querySelectorAll('.modebar button').forEach(function(b){b.classList.remove('active')});
+  if(btn) btn.classList.add('active');
+  try{sessionStorage.setItem('brief-mode',mode)}catch(e){}
+}
+(function(){
+  var m='full';
+  try{m=sessionStorage.getItem('brief-mode')||'full'}catch(e){}
+  var b=document.querySelector('.modebar button[data-mode="'+m+'"]');
+  setMode(m,b);
+})();
+window.addEventListener('beforeprint',function(){document.body.className='mode-full'});
+</script>
+</body>
+</html>
