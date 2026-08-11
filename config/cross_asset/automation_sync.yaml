@@ -1,6 +1,6 @@
 schema_version: 1
-status: pending_sync
-updated_at: '2026-08-11T09:08:00+08:00'
+status: synced
+updated_at: '2026-08-11T09:03:33+08:00'
 
 task:
   title: 跨资产交易晨报
@@ -10,7 +10,8 @@ task:
 prompt:
   source_path: config/cross_asset/scheduled_task_prompt.md
   expected_version: cross_asset_embedded_2026_08_11_01
-  live_version: pending
+  live_version: cross_asset_embedded_2026_08_11_01
+  synced_to_existing_task: true
 
 activation_rule:
   github_rule_change_is_not_live_until_task_prompt_sync: true
