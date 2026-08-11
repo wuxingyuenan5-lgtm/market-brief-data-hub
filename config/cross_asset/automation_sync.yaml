@@ -1,0 +1,24 @@
+schema_version: 1
+status: pending_sync
+updated_at: '2026-08-11T09:08:00+08:00'
+
+task:
+  title: 跨资产交易晨报
+  id: 6a4f8f4735348191af34a90274406e98
+  schedule: '08:00 Asia/Shanghai daily'
+
+prompt:
+  source_path: config/cross_asset/scheduled_task_prompt.md
+  expected_version: cross_asset_embedded_2026_08_11_01
+  live_version: pending
+
+activation_rule:
+  github_rule_change_is_not_live_until_task_prompt_sync: true
+  normal_sync_owner: 跨资产交易晨报｜规则与研究中枢
+  normal_sync_method: update_existing_automation_prompt_in_place
+  create_new_task: false
+  daily_github_rule_polling: false
+
+external_edit_behavior:
+  description: 若用户或其他工具直接修改GitHub源规则而未经过规则中枢，现有08:00任务继续使用上一次已同步Prompt。
+  required_action: 在规则中枢执行“同步跨资产晨报规则到自动任务”。
