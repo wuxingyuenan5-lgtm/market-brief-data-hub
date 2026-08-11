@@ -1,36 +1,28 @@
-schema_version: 3
-bundle_id: cross_asset_runtime_2026_08_11_02
-pipeline_id: cross_asset_morning_brief_v6
-status: active
-compiled_at: '2026-08-11T08:50:00+08:00'
-purpose: 每日生产端紧凑运行合同。网页GPT负责研究、核验、结构化payload和计划任务唯一HTML成品；GitHub保存规则与唯一正式HTML归档。计划任务最终聊天只发送冻结正文和该唯一已验证成品入口，不再生成附件或第二份HTML。
+schema_version: 4
+bundle_id: cross_asset_rule_compile_2026_08_11_01
+pipeline_id: cross_asset_morning_brief_v7
+status: maintenance_only
+updated_at: '2026-08-11T09:08:00+08:00'
+purpose: 保留为规则中枢的编译与审计参考，不再由08:00计划任务每日读取。计划任务的实际运行副本为config/cross_asset/scheduled_task_prompt.md同步到现有Automation Prompt后的内容。
 
-bundle_governance:
-  source_of_truth_for_rule_editing: active_source_configs_and_template_pipeline
-  execution_snapshot_for_daily_production: this_file
-  must_match_manifest_bundle_id: true
-  regenerate_after_any_active_source_rule_change: true
-  active_source_configs:
-    - config/cross_asset/artifact_naming.yaml
-    - config/cross_asset/client_presentation.yaml
-    - config/cross_asset/content_integrity.yaml
-    - config/cross_asset/automation_delivery.yaml
-    - config/cross_asset/section_design.yaml
-    - config/cross_asset/research_accumulation.yaml
-    - config/cross_asset/user_experience.yaml
-  template_pipeline_sources:
-    - templates/cross_asset/cross_asset_v4_2026_08_08.html
-    - config/cross_asset/report_payload.schema.json
-    - scripts/cross_asset/render_report.py
-    - scripts/cross_asset/validate_report.py
-  legacy_descriptive_files_not_used_by_daily_runtime:
-    - config/cross_asset/format_baseline.yaml
-    - config/cross_asset/report.yaml
-    - docs/DATA_PROTOCOL.md
+runtime_role:
+  used_by_scheduled_task_daily: false
+  scheduled_task_rule_read_prohibited: true
+  used_by_rules_control_chat_for_compilation: true
+  source_of_truth: false
+  source_configs_are_authority: true
+  compiled_task_prompt_is_live_runtime_copy: true
 
-shared_data_layer:
-  exact_rules_are_not_reimplemented_here: true
-  required_runtime_reads:
+active_runtime:
+  prompt_path: config/cross_asset/scheduled_task_prompt.md
+  prompt_version: cross_asset_embedded_2026_08_11_01
+  task_title: 跨资产交易晨报
+  task_id: 6a4f8f4735348191af34a90274406e98
+  normal_daily_github_rule_reads: 0
+  normal_daily_github_archive_writes_maximum: 1
+
+compilation_sources:
+  shared:
     - vendor/upstreams.lock.yaml
     - config/shared/data_contract.yaml
     - config/shared/sources.yaml
@@ -38,181 +30,64 @@ shared_data_layer:
     - config/shared/quality_rules.yaml
     - config/shared/instruments.yaml
     - config/shared/report_calendar.yaml
-  principles:
-    - unknown_or_unverified_values_are_omitted_or_marked_数据暂缺
-    - no_model_memory_as_current_market_data
-    - no_historical_value_as_latest
-    - no_estimate_as_actual
-    - no_proxy_for_index_or_closed_market
-    - no_cross_date_or_cross_contract_mixing
-    - critical_numbers_require_official_or_independent_cross_source_validation
-    - every_exact_number_preserves_source_instrument_timestamp_fetch_time_unit_currency_and_basis
+  cross_asset:
+    - config/cross_asset/artifact_naming.yaml
+    - config/cross_asset/client_presentation.yaml
+    - config/cross_asset/content_integrity.yaml
+    - config/cross_asset/section_design.yaml
+    - config/cross_asset/research_accumulation.yaml
+    - config/cross_asset/user_experience.yaml
+  visual:
+    - templates/cross_asset/cross_asset_v4_2026_08_08.html
 
-publication_calendar:
-  policy_source: config/shared/report_calendar.yaml
-  saturday: friday_summary_when_friday_was_valid_session
-  sunday: silent_by_default; crypto_continuous_trading_cannot_trigger_alone
-  monday: previous_valid_session_plus_weekend_information_and_weekly_module
-  all_primary_markets_closed_on_monday: defer_weekly_module_to_first_publishable_open_day
-  weekly_module_once_per_iso_week: true
-  special_closure_and_temporary_notice_check_required: true
+compile_contract:
+  include_in_task_prompt:
+    - publication_calendar_rules
+    - data_source_priority_and_truthfulness_rules
+    - exact_three_market_mainlines_contract
+    - research_update_rules
+    - client_visible_section_contract
+    - fixed_html_template_shell
+    - local_html_validation_checks
+    - direct_attachment_delivery_rules
+    - best_effort_archive_rule
+  do_not_require_task_to_read_source_configs: true
+  template_must_be_embedded_in_prompt: true
+  archive_must_happen_after_customer_artifact_is_frozen: true
 
-content_contract:
-  coverage:
-    - global_macro_and_liquidity
-    - us_equities
-    - hk_equities
-    - cn_equities
-    - gold_and_precious_metals
-    - copper
-    - lithium
-    - bitcoin_and_material_crypto
-    - ai_and_technology
-    - material_policy_and_industry_changes
-  do_not_force_every_asset_daily: true
-  market_mainlines:
-    exact_count: 3
-    required_elements_when_evidence_exists:
-      - new_fact_or_catalyst
-      - cross_asset_price_expression
-      - sector_rotation
-      - flow_or_positioning_confirmation
-      - industry_or_fundamental_confirmation
-      - pricing_stage
-      - divergence_or_unresolved_point
-      - next_validation_node
-    no_trade_recommendation: true
-    no_position_advice: true
-    no_mechanical_score: true
-  sector_rotation_benchmarks:
-    us_sectors: SPX
-    us_technology: NDX_or_SOX
-    cn_sectors: CSI300_or_suitable_broad_A_share_index
-    hk_sectors: HSI_or_HSTECH
-    commodities: matching_spot_or_explicit_futures_contract
-    no_clear_rotation_text: 未观察到具有足够证据的明显轮动。
-  research_updates:
-    minimum_count: 0
-    maximum_count: 4
-    display_only_material_increment: true
-    do_not_repeat_old_view_to_fill_count: true
-  research_state_model:
-    change_statuses: [new, strengthened, weakened, falsified, unchanged]
-    maturity_stages: [hypothesis_formed, initial_evidence, multi_source_validated, market_pricing_started, mature, crowded, falsification_phase, closed]
-    ledger_path: config/cross_asset/research_ledger.yaml
-    stale_evidence_cannot_be_daily_increment: true
+activation_contract:
+  steps:
+    - update_source_configs
+    - compile_scheduled_task_prompt
+    - review_prompt_version
+    - update_existing_0800_task_prompt_in_place
+    - record_sync_state
+  github_source_change_without_prompt_sync_is_not_live_for_scheduled_task: true
+  no_daily_polling: true
 
-client_presentation:
-  report_name: 跨资产交易晨报
-  title_pattern: 跨资产交易晨报｜{date}
-  filename_pattern: 跨资产交易晨报_{date}.html
-  visible_sections:
-    - 90秒摘要
-    - 隔夜宏观
-    - 数据图表
-    - 市场概览
-    - 市场主线
-    - 研究更新
-    - 研究跟踪
-    - 重点信息
-    - 资金、仓位与产业数据
-    - 跟踪表
-    - 前期观点复盘
-    - 今日关注与未来7天事件
-    - 来源与口径
-  reading_modes: [全部, 概览, 研究]
-  prohibited_client_terms:
-    - 当下定价
-    - 系统性积累
-    - 真实数据版
-    - AI生成
-    - 主线01
-    - 主线02
-    - 主线03
-    - 分析已暂停
-    - 仓库备份失败
-    - 研究账本已同步
-    - commit
-    - SHA
+core_data_principles:
+  - unknown_or_unverified_values_are_omitted_or_marked_数据暂缺
+  - no_model_memory_as_current_market_data
+  - no_historical_value_as_latest
+  - no_estimate_as_actual
+  - no_proxy_for_closed_market_or_index
+  - no_cross_date_or_cross_contract_mixing
+  - critical_numbers_require_official_or_independent_cross_source_validation
+  - every_exact_number_preserves_instrument_timestamp_unit_currency_and_basis
 
-payload_contract:
-  schema_path: config/cross_asset/report_payload.schema.json
-  required_delivery_field: scheduled_inline_report
-  scheduled_inline_report_rule: 完成研究与核验后一次性冻结，之后最终聊天逐字发送，不允许重新总结或增加新的判断。
-  sections_are_html_fragments_only: true
-  structural_tags_in_fragments_prohibited: true
+content_principles:
+  exact_market_mainlines: 3
+  research_updates_minimum: 0
+  research_updates_maximum: 4
+  material_increment_only: true
+  no_position_or_trade_advice: true
+  no_mechanical_score: true
 
-rendering_contract:
-  mode: locked_template_single_artifact
+html_principles:
   template_id: cross_asset_v4_2026_08_08
-  golden_reference_report: reports/cross_asset/2026/08/跨资产交易晨报_2026-08-08.html
-  template_path: templates/cross_asset/cross_asset_v4_2026_08_08.html
-  renderer_path: scripts/cross_asset/render_report.py
-  validator_path: scripts/cross_asset/validate_report.py
-  model_must_not_write_new_page_css_js_or_dom_shell: true
-  css_and_javascript_must_come_from_template: true
-  template_meta_required: cross_asset_v4_2026_08_08
-  minimum_output_bytes: 12000
-
-execution_contexts:
-  scheduled_task:
-    purpose: 消除计划任务后台归档与聊天最终输出之间的双成品分叉。
-    html_path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
-    report_url_pattern: https://github.com/wuxingyuenan5-lgtm/market-brief-data-hub/blob/main/reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html?raw=1
-    sequence:
-      - 完成研究、数据核验和完整report payload。
-      - 在payload内冻结scheduled_inline_report。
-      - 使用锁定template作为唯一页面骨架生成一次正式HTML，不重新设计CSS、JS、导航或section结构。
-      - 写入GitHub正式archive_path；不得另外生成聊天HTML。
-      - 回读刚写入的正式HTML，核验pipeline/template meta、title/H1、三档阅读模式、固定section顺序、三条theme-card与无未解析token。
-      - 只有回读校验通过才允许正式交付。
-      - 最终聊天逐字发送scheduled_inline_report，再附唯一正式HTML成品入口。
-    prohibited:
-      - direct_chat_attachment_attempt
-      - sandbox_link
-      - second_html
-      - second_summary
-      - model_rewrite_after_inline_copy_freeze
-      - unvalidated_report_link
-
-  interactive_chat:
-    sequence:
-      - 完成同一report payload并冻结scheduled_inline_report。
-      - 在本地运行固定renderer。
-      - 在本地运行validator。
-      - 生成并交付真实可下载HTML附件。
-      - 后台归档同一已验证字节。
-    direct_attachment_required: true
-
-scheduled_readback_validation:
-  required_pipeline_meta: cross_asset_morning_brief_v6
-  required_template_meta: cross_asset_v4_2026_08_08
-  required_reading_modes: [全部, 概览, 研究]
-  required_section_ids_in_order: [summary, macro, charts, marketmap, themes, quick, flow, ledger, review, calendar, sources, disclaimer]
-  optional_sections_between_themes_and_quick: [research-update, research-track]
-  exact_theme_card_count: 3
-  unresolved_template_tokens_forbidden: true
-  external_script_or_stylesheet_forbidden: true
-
-hard_failure_conditions:
-  common:
-    - runtime_bundle_id_mismatch
-    - required_shared_config_unreadable
-    - calendar_resolution_failed
-    - critical_data_truthfulness_gate_failed
-  scheduled_task:
-    - canonical_html_generation_failed
-    - archive_write_failed
-    - archive_readback_failed
-    - archive_readback_identity_or_structure_validation_failed
-  interactive_chat:
-    - renderer_unavailable_or_failed
-    - validator_unavailable_or_failed
-    - template_fingerprint_mismatch
-    - downloadable_attachment_not_created
-
-failure_behavior:
-  never_fall_back_to_freehand_alternate_html: true
-  never_rebuild_css_or_template_from_memory: true
-  scheduled_task_never_claims_direct_attachment: true
-  scheduled_task_never_rewrites_canonical_inline_copy_after_payload_freeze: true
+  fixed_reading_modes: [全部, 概览, 研究]
+  fixed_visual_shell: true
+  model_must_not_redesign_css_js_or_dom: true
+  one_local_html_artifact_per_run: true
+  direct_attachment_is_primary_delivery: true
+  github_archive_is_background_only: true
