@@ -1,80 +1,62 @@
-schema_version: 8
-policy_id: cross_asset_automation_delivery_v8
+schema_version: 9
+policy_id: cross_asset_automation_delivery_v9
 status: active
-updated_at: '2026-08-11T08:50:00+08:00'
-purpose: 计划任务与互动聊天使用同一研究规则和同一HTML母版，但按实际运行能力采用不同交付方式。计划任务只保留GitHub中的一份正式HTML成品，不再生成或伪装聊天附件；互动聊天继续交付真实可下载HTML附件。
-
-runtime_capability_boundary:
-  observed_on: '2026-08-11'
-  scheduled_tasks:
-    reliable_direct_generated_file_attachment_is_not_assumed: true
-    consequence: 计划任务不得把本地/sandbox附件作为正式交付要求；正式文件以已回读校验的GitHub唯一HTML成品为准。
-  interactive_chat:
-    local_file_creation_and_direct_attachment_may_be_used_when_available: true
+updated_at: '2026-08-11T09:08:00+08:00'
+purpose: 恢复计划任务原本更稳定的“内置规则直接生产”模式。GitHub不参与日常规则读取和中间生产，只在客户成品冻结后做一次best-effort历史归档。
 
 automation_ownership:
   scheduled_time: '08:00'
   timezone: Asia/Shanghai
-  manager_chat: 跨资产交易晨报｜每日生产
-  rules_control_chat: 跨资产交易晨报｜规则与研究中枢
+  task_title: 跨资产交易晨报
+  task_id: 6a4f8f4735348191af34a90274406e98
   single_enabled_cross_asset_task_required: true
-  rules_control_chat_must_not_create_rebind_or_duplicate_task: true
-  rule_changes_must_not_recreate_task: true
-  task_prompt_must_remain_short: true
-  task_prompt_required_instruction: 读取config/cross_asset/runtime_manifest.yaml并按当前execution_context执行
-  before_any_task_change: 必须先核验现有跨资产08:00任务清单，避免重复启用任务
+  update_existing_task_in_place: true
+  duplicate_task_prohibited: true
+  live_prompt_path_for_audit: config/cross_asset/scheduled_task_prompt.md
+  live_prompt_version: cross_asset_embedded_2026_08_11_01
 
-execution_contexts:
-  scheduled_task:
-    production_mode: one_canonical_github_html
-    primary_delivery: canonical_inline_report_plus_validated_html_artifact_link
-    html_archive_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
-    required_sections_in_inline_report:
-      - 90秒摘要
-      - 市场概览
-      - 三条市场主线
-      - 今日关注与风险
-      - 周度模块到期时的本周交易安排与本周展望
-    canonical_inline_copy_source: report_payload.scheduled_inline_report
-    canonical_inline_copy_must_be_sent_verbatim: true
-    second_summary_generation_after_payload_is_prohibited: true
-    direct_chat_attachment_required: false
-    direct_chat_attachment_attempt_prohibited: true
-    validated_html_artifact_link_required: true
-    validated_html_artifact_link_may_only_be_sent_after_archive_readback_validation: true
-    rules:
-      - 计划任务先完成研究、数据核验和report payload，并冻结scheduled_inline_report。
-      - 只使用锁定template生成一次正式HTML，并写入GitHub正式归档路径。
-      - 写入后必须回读同一HTML，按runtime_manifest的scheduled_readback_validation核验身份和结构。
-      - 聊天正文必须逐字使用payload中的scheduled_inline_report，不得在最后一步重新概括、改写或追加新的市场判断。
-      - 最终不得创建sandbox附件、伪附件、preview文件或第二份HTML。
-      - 回读校验失败时发送固定失败信息，不得退回自由手写另一套HTML。
+scheduled_task:
+  runtime_rule_source: embedded_automation_prompt
+  github_rule_reads_per_run: 0
+  github_template_reads_per_run: 0
+  github_research_ledger_reads_per_run: 0
+  primary_delivery: frozen_inline_report_plus_direct_html_attachment
+  direct_attachment_required: true
+  required_local_path: /mnt/data/跨资产交易晨报_{date}.html
+  attachment_name_pattern: 跨资产交易晨报_{date}.html
+  rules:
+    - 先依据内置规则完成交易日判断、研究、数据核验和写作。
+    - 在任何GitHub交互前冻结FINAL_CHAT_COPY。
+    - 在任何GitHub交互前使用内嵌固定母版生成并校验真实HTML文件。
+    - 将FINAL_CHAT_COPY与本地HTML视为已经完成的客户成品，后续不得重写。
+    - 最后最多进行一次GitHub归档写入；归档不属于客户交付链。
+    - GitHub归档成功、失败或同名文件冲突均不得触发第二次总结、第二份HTML或附件替换。
+    - 最终必须发送冻结正文和真实本地HTML附件。
+  prohibited:
+    - read_runtime_manifest_during_daily_run
+    - read_runtime_bundle_during_daily_run
+    - read_template_from_github_during_daily_run
+    - read_research_ledger_from_github_during_daily_run
+    - github_link_as_attachment_substitute
+    - second_html_after_archive
+    - second_summary_after_archive
+    - regenerate_customer_output_due_to_archive_result
 
-  interactive_chat:
-    production_mode: local_deterministic_render_when_file_runtime_available
-    primary_delivery: canonical_inline_report_plus_direct_html_attachment
-    canonical_inline_copy_source: report_payload.scheduled_inline_report
-    direct_attachment_required: true
-    required_local_path: /mnt/data/跨资产交易晨报_{date}.html
-    github_customer_link_allowed: false
-    rules:
-      - 正式HTML附件必须由固定template、renderer和validator生成并可直接下载。
-      - 附件名称必须为跨资产交易晨报_{date}.html。
-      - 附件失败不得声称完成。
+interactive_chat:
+  primary_delivery: concise_summary_plus_direct_html_attachment
+  direct_attachment_required: true
+  required_local_path: /mnt/data/跨资产交易晨报_{date}.html
+  may_read_current_github_rules_when_user_requests_repo_or_rule_work: true
 
 common_html:
   canonical_filename: 跨资产交易晨报_{date}.html
   title_pattern: 跨资产交易晨报｜{date}
   h1_pattern: 跨资产交易晨报｜{date}
-  minimum_file_size_bytes: 12000
   self_contained: true
   template_id: cross_asset_v4_2026_08_08
-  template_path: templates/cross_asset/cross_asset_v4_2026_08_08.html
-  payload_schema_path: config/cross_asset/report_payload.schema.json
-  renderer_path: scripts/cross_asset/render_report.py
-  validator_path: scripts/cross_asset/validate_report.py
-  freehand_html_generation_prohibited: true
-  css_and_javascript_owned_by_template: true
+  visual_contract_compiled_into_task_prompt: true
+  fixed_reading_modes: [全部, 概览, 研究]
+  exact_theme_card_count: 3
   required_sections:
     - 90秒摘要
     - 隔夜宏观
@@ -88,55 +70,29 @@ common_html:
     - 今日关注与未来7天事件
     - 来源与口径
   conditional_sections:
-    研究更新:
-      minimum_count: 0
-      maximum_count: 4
-      omit_when_no_material_update: true
-    研究跟踪:
-      omit_when_no_material_change: true
-  prohibited_visible_strings:
-    - 分析已暂停
-    - 仓库备份失败
-    - 研究账本已同步
-    - 提交为
-    - commit
-    - SHA
-    - preview
-    - 主线01
-    - 主线02
-    - 主线03
-    - 当下定价
-    - 系统性积累
-    - 真实数据版
+    研究更新: material_increment_only
+    研究跟踪: changed_items_only
+  external_dependencies_prohibited: true
 
-single_artifact_delivery:
+archive:
   enabled: true
-  one_html_artifact_per_report_date: true
-  scheduled_task_canonical_artifact: readback_validated_github_archive
-  interactive_chat_canonical_artifact: validated_local_output
-  second_html_generation_after_formal_artifact_created_prohibited: true
-
-background_archive:
-  enabled: true
-  scheduled_write_owner: scheduled_chat_after_template_conformance
-  interactive_write_owner: interactive_chat_after_local_validation
-  archive_path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
-  verify_after_write: true
-  do_not_show_repository_path: true
-  do_not_show_commit_hash: true
+  mode: best_effort_after_customer_artifact_freeze
+  repository: wuxingyuenan5-lgtm/market-brief-data-hub
+  branch: main
+  path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
+  content_must_match_local_html: true
+  maximum_github_writes_per_normal_run: 1
+  archive_readback_required: false
+  archive_failure_blocks_delivery: false
+  archive_failure_customer_visible: false
+  archive_result_may_not_change_final_copy_or_attachment: true
 
 failure_behavior:
-  scheduled_task:
-    config_or_data_gate_failed: 今日晨报未通过数据与配置校验，未发送半成品。
-    html_or_archive_failed: 今日晨报内容已完成核验，但正式HTML生成或归档失败，未发送错误版成品。
-    readback_validation_failed: 今日晨报内容已完成核验，但正式HTML回读校验未通过，未发送未验证成品。
-  interactive_chat:
-    attachment_failed: 今日晨报HTML附件交付失败，未以GitHub链接替代。
+  data_gate_failed: 今日晨报未通过数据核验，未发送半成品。
+  html_or_attachment_failed: 今日晨报HTML成品校验失败，未发送错误版文件。
+  archive_failed: internal_only_continue_valid_customer_delivery
 
-customer_quality:
-  client_facing_language_only: true
-  exact_numbers_require_source_timestamp_unit_and_basis: true
-  inference_must_be_labeled_as_judgment: true
-  unresolved_source_conflicts_must_be_excluded: true
-  noncritical_missing_items_should_be_omitted: true
-  never_claim_success_without_actual_delivery: true
+rule_sync:
+  daily_polling_for_github_rule_changes: false
+  rule_update_from_rules_control_chat: GitHub规则提交后同一轮重新编译scheduled_task_prompt并更新现有08:00任务Prompt
+  external_github_edit: 需在规则中枢执行一次同步后才进入自动任务
