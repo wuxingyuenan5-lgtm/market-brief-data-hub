@@ -1,15 +1,14 @@
-schema_version: 7
-policy_id: cross_asset_automation_delivery_v7
+schema_version: 8
+policy_id: cross_asset_automation_delivery_v8
 status: active
-updated_at: '2026-08-11T08:37:00+08:00'
-purpose: 计划任务与互动聊天使用同一研究规则和同一HTML母版，但按实际运行能力采用不同交付方式。计划任务不得再生成或伪装聊天附件；互动聊天继续交付真实可下载HTML附件。
+updated_at: '2026-08-11T08:50:00+08:00'
+purpose: 计划任务与互动聊天使用同一研究规则和同一HTML母版，但按实际运行能力采用不同交付方式。计划任务只保留GitHub中的一份正式HTML成品，不再生成或伪装聊天附件；互动聊天继续交付真实可下载HTML附件。
 
 runtime_capability_boundary:
   observed_on: '2026-08-11'
   scheduled_tasks:
-    direct_generated_file_attachment_is_not_a_supported_success_assumption: true
-    project_files_are_not_runtime_inputs: true
-    consequence: 计划任务必须以GitHub中机器渲染并通过validator的唯一HTML成品为正式文件，不得创建第二份聊天HTML或虚构附件。
+    reliable_direct_generated_file_attachment_is_not_assumed: true
+    consequence: 计划任务不得把本地/sandbox附件作为正式交付要求；正式文件以已回读校验的GitHub唯一HTML成品为准。
   interactive_chat:
     local_file_creation_and_direct_attachment_may_be_used_when_available: true
 
@@ -27,10 +26,8 @@ automation_ownership:
 
 execution_contexts:
   scheduled_task:
-    production_mode: research_payload_to_github_actions
-    primary_delivery: canonical_inline_report_plus_validated_html_link
-    payload_repository_pattern: production/cross_asset/payloads/{year}/{month}/report_payload_{date}.json
-    validation_receipt_pattern: production/cross_asset/receipts/{year}/{month}/render_{date}.json
+    production_mode: one_canonical_github_html
+    primary_delivery: canonical_inline_report_plus_validated_html_artifact_link
     html_archive_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
     required_sections_in_inline_report:
       - 90秒摘要
@@ -43,17 +40,15 @@ execution_contexts:
     second_summary_generation_after_payload_is_prohibited: true
     direct_chat_attachment_required: false
     direct_chat_attachment_attempt_prohibited: true
-    validated_html_link_required: true
-    validated_html_link_may_only_be_sent_after_receipt_status_validated: true
-    github_link_exception_scope: only_the_validated_report_artifact
-    github_repository_paths_commit_hashes_and_tool_status_remain_hidden: true
+    validated_html_artifact_link_required: true
+    validated_html_artifact_link_may_only_be_sent_after_archive_readback_validation: true
     rules:
-      - 计划任务先完成研究、数据核验和report payload，不直接编写完整HTML。
-      - payload必须写入GitHub指定生产目录，以触发GitHub Actions固定renderer和validator。
-      - 在validation receipt出现且status=validated前不得发送正式成品链接。
+      - 计划任务先完成研究、数据核验和report payload，并冻结scheduled_inline_report。
+      - 只使用锁定template生成一次正式HTML，并写入GitHub正式归档路径。
+      - 写入后必须回读同一HTML，按runtime_manifest的scheduled_readback_validation核验身份和结构。
       - 聊天正文必须逐字使用payload中的scheduled_inline_report，不得在最后一步重新概括、改写或追加新的市场判断。
       - 最终不得创建sandbox附件、伪附件、preview文件或第二份HTML。
-      - 若Actions渲染失败或receipt未通过，则发送固定失败信息，不得退回自由手写HTML。
+      - 回读校验失败时发送固定失败信息，不得退回自由手写另一套HTML。
 
   interactive_chat:
     production_mode: local_deterministic_render_when_file_runtime_available
@@ -78,7 +73,6 @@ common_html:
   payload_schema_path: config/cross_asset/report_payload.schema.json
   renderer_path: scripts/cross_asset/render_report.py
   validator_path: scripts/cross_asset/validate_report.py
-  scheduled_renderer: .github/workflows/cross_asset_render_report.yml
   freehand_html_generation_prohibited: true
   css_and_javascript_owned_by_template: true
   required_sections:
@@ -118,14 +112,13 @@ common_html:
 single_artifact_delivery:
   enabled: true
   one_html_artifact_per_report_date: true
-  scheduled_task_canonical_artifact: validated_github_actions_output
+  scheduled_task_canonical_artifact: readback_validated_github_archive
   interactive_chat_canonical_artifact: validated_local_output
-  github_archive_must_match_template_and_validator: true
-  second_html_generation_after_validation_prohibited: true
+  second_html_generation_after_formal_artifact_created_prohibited: true
 
 background_archive:
   enabled: true
-  scheduled_write_owner: github_actions
+  scheduled_write_owner: scheduled_chat_after_template_conformance
   interactive_write_owner: interactive_chat_after_local_validation
   archive_path_pattern: reports/cross_asset/{year}/{month}/跨资产交易晨报_{date}.html
   verify_after_write: true
@@ -135,9 +128,8 @@ background_archive:
 failure_behavior:
   scheduled_task:
     config_or_data_gate_failed: 今日晨报未通过数据与配置校验，未发送半成品。
-    payload_write_failed: 今日晨报内容已完成核验，但生产payload未成功提交，未生成正式HTML。
-    render_or_validation_failed: 今日晨报内容已完成核验，但固定模板渲染或HTML校验失败，未发送错误版HTML。
-    receipt_timeout_or_missing: 今日晨报内容已完成核验，但正式HTML尚未取得机器校验通过凭证，未发送未验证成品。
+    html_or_archive_failed: 今日晨报内容已完成核验，但正式HTML生成或归档失败，未发送错误版成品。
+    readback_validation_failed: 今日晨报内容已完成核验，但正式HTML回读校验未通过，未发送未验证成品。
   interactive_chat:
     attachment_failed: 今日晨报HTML附件交付失败，未以GitHub链接替代。
 
