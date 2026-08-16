@@ -24,6 +24,14 @@ hard_fail_rules:
   - stale_cache_used_as_latest
   - old_bse_symbol_returns_zombie_quote
   - endpoint_error_hidden_as_empty_array
+  - futures_latest_value_missing_exact_contract
+  - dominant_contract_fixed_month_hardcode
+  - mixed_futures_contract_months
+  - spot_value_labeled_as_futures
+  - futures_value_labeled_as_spot
+  - industry_labeled_with_non_sw2021_taxonomy
+  - concept_or_theme_labeled_as_industry
+  - sw_membership_effective_date_missing
 
 symbol_rules:
   cn:
@@ -109,6 +117,43 @@ market_data_rules:
   proxies:
     allowed_only_if_labeled: true
     prohibited_in_latest_value_column: true
+
+futures_rules:
+  exact_contract_required_for_latest_value: true
+  product_alias_only_for_grouping: true
+  dominant_contract:
+    derive_from_validated_open_interest_and_volume: true
+    fixed_month_hardcode_prohibited: true
+    roll_guard_required: true
+    preserve_previous_and_new_contract: true
+  session:
+    trading_day_and_night_session_both_required: true
+    night_session_belongs_to_exchange_trading_day: true
+  settlement:
+    close_and_settlement_must_be_separate: true
+  basis_and_spread:
+    local_calculation_required: true
+    same_product_grade_and_unit_required: true
+    input_timestamps_required: true
+    time_mismatch_excluded_from_latest_comparison: true
+  warrant_inventory:
+    warrant_and_social_inventory_separate: true
+    exchange_warehouse_and_industry_region_required: true
+
+industry_rules:
+  canonical_taxonomy: SW2021
+  only_canonical_taxonomy_may_be_labeled_industry: true
+  market_rotation_level: level1
+  research_drilldown_level: level2
+  membership_as_of_report_date_required: true
+  classification_history_required: true
+  mapping_version_required: true
+  themes_and_concepts_must_be_separate: true
+  portal_industry_labels_may_only_be_cross_check: true
+  aggregation:
+    turnover_breadth_stock_count: local_from_constituents
+    fund_flow: local_from_individual_stock_flow
+    official_sw_index_return_preferred: true
 
 unit_rules:
   explicit_currency_required: true

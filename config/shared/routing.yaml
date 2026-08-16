@@ -38,17 +38,36 @@ routes:
     fallback: [tencent_finance, sse, szse]
     validations: [universe_definition, trading_date, total_count_consistency]
 
+  cn_industry_taxonomy:
+    implementation: sw2021_effective_date_mapping
+    primary: [swsresearch]
+    fallback: []
+    validations: [taxonomy_version_sw2021, effective_date, stock_code, industry_code, update_date]
+    official_provider_policy: accept_direct_provider_file
+    empty_result_requires_hard_fail: true
+
   cn_sector_performance:
-    implementation: a_stock_data
-    primary: [eastmoney]
-    fallback: [ths]
-    validations: [sector_type, ranking_field, trading_date]
+    implementation: sw_index_or_local_aggregation
+    taxonomy: SW2021
+    primary: [swsresearch]
+    fallback: [tencent_finance, eastmoney]
+    fallback_method: aggregate_validated_equity_quotes_by_sw2021_membership
+    validations: [taxonomy_version, industry_level, trading_date, constituent_effective_date, ranking_field]
 
   cn_sector_fund_flow:
-    implementation: a_stock_data
+    implementation: local_aggregation_by_sw2021
+    taxonomy: SW2021
     primary: [eastmoney]
     fallback: []
-    validations: [period, fund_flow_bucket_sum, trading_date]
+    raw_dataset: individual_stock_fund_flow
+    validations: [constituent_effective_date, period, fund_flow_bucket_sum, trading_date, aggregation_unit]
+    single_source_policy: disclose
+
+  cn_theme_performance:
+    implementation: a_stock_data
+    primary: [eastmoney, ths]
+    fallback: []
+    validations: [theme_label, trading_date, no_industry_mislabel]
     single_source_policy: disclose
 
   cn_margin_financing:
@@ -75,6 +94,70 @@ routes:
     primary: [eastmoney, ths]
     fallback: []
     validations: [trading_date, board_type, duplicate_symbol]
+
+  cn_futures_intraday_quote:
+    implementation: exchange_specific_router
+    primary: [shfe, gfex, dce, czce]
+    fallback: [eastmoney, sina_finance]
+    validations: [exchange, exact_contract, trading_day, session, timestamp, price_unit, ohlc_consistency, volume_nonnegative, stale_quote]
+    cross_source_required_for_market_map: true
+
+  cn_futures_daily_settlement:
+    implementation: exchange_specific_router
+    primary: [shfe, gfex, dce, czce]
+    fallback: [eastmoney]
+    validations: [exchange, exact_contract, trading_date, settlement_vs_close, price_unit, volume_open_interest_unit]
+
+  cn_futures_volume_open_interest:
+    implementation: exchange_specific_router
+    primary: [shfe, gfex, dce, czce]
+    fallback: [eastmoney]
+    validations: [exchange, exact_contract, trading_date, volume_nonnegative, open_interest_nonnegative, unit]
+
+  cn_futures_warrant_inventory:
+    implementation: exchange_specific_router
+    primary: [shfe, gfex, dce, czce]
+    fallback: [smm, mysteel]
+    validations: [exchange, product, grade, warehouse_or_region, warrant_vs_inventory, unit, statistical_date]
+    fallback_industry_data_must_be_labeled: true
+
+  cn_futures_dominant_contract:
+    implementation: local_derived
+    inputs: [cn_futures_volume_open_interest]
+    selection_rule: highest_open_interest_then_volume_with_roll_guard
+    validations: [exact_contract, no_fixed_month_hardcode, roll_date, input_lineage]
+
+  cn_futures_term_structure:
+    implementation: local_derived
+    inputs: [cn_futures_intraday_quote, cn_futures_daily_settlement]
+    validations: [same_exchange, same_product, exact_contract_months, same_price_type, timestamp_alignment]
+
+  cn_metals_spot:
+    primary: [smm]
+    fallback: [sge, eastmoney]
+    validations: [metal, grade, location, spot_not_futures, tax_inclusion, unit, statistical_date]
+    single_source_policy: disclose
+
+  cn_ferrous_industry:
+    primary: [mysteel]
+    fallback: [eastmoney]
+    validations: [product, grade, region, inventory_definition, production_definition, unit, statistical_date]
+    single_source_policy: disclose
+
+  cn_futures_basis:
+    implementation: local_derived
+    inputs: [cn_futures_intraday_quote, cn_metals_spot, cn_ferrous_industry]
+    validations: [same_product_grade, exact_futures_contract, compatible_tax_basis, compatible_unit, timestamp_alignment, formula_lineage]
+    time_mismatch_action: exclude_from_latest_comparison
+
+  metals_cn:
+    deprecated: true
+    compatibility_alias_of: cn_metals_spot
+    notes: 不再混合期货行情与产业现货
+
+  ferrous_cn:
+    deprecated: true
+    compatibility_alias_of: cn_ferrous_industry
 
   us_equity_quote:
     implementation: global_stock_data
@@ -140,16 +223,6 @@ routes:
     primary: [reuters]
     fallback: [sina_finance, eastmoney]
     validations: [spot_vs_futures, contract_month, currency, settlement_vs_intraday, timestamp]
-
-  metals_cn:
-    primary: [smm]
-    fallback: [eastmoney, sina_finance]
-    validations: [spot_vs_futures, grade, location, tax_inclusion, unit, statistical_date]
-
-  ferrous_cn:
-    primary: [mysteel]
-    fallback: [eastmoney]
-    validations: [contract, region, inventory_definition, unit, statistical_date]
 
   macro_release:
     primary: [official_release]
