@@ -1,0 +1,16 @@
+{
+  "project": "统一交易晨报",
+  "prompt_version": "unified_morning_experiment_v1",
+  "pipeline_id": "unified_morning_brief_experiment_v1",
+  "timezone": "Asia/Shanghai",
+  "default_report_time": "08:00",
+  "repository": "wuxingyuenan5-lgtm/market-brief-data-hub",
+  "root": "unified_morning/",
+  "production_rules": "unified_morning/config/production_rules.md",
+  "report_schema": "unified_morning/config/report_schema.json",
+  "quality_rules": "unified_morning/config/quality_rules.yaml",
+  "archive_root": "unified_morning/reports/",
+  "consumer_repository": "wuxingyuenan5-lgtm/Astock_study",
+  "consumer_role": "display_history_download_only",
+  "updated_at": "2026-08-16T17:00:00+08:00"
+}

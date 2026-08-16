@@ -1,0 +1,62 @@
+version: unified_morning_quality_v1
+report_name: 统一交易晨报
+
+hard_fail:
+  - core_market_facts_unverifiable
+  - wrong_report_cutoff_or_time_travel
+  - fabricated_or_placeholder_numbers
+  - html_not_generated_from_frozen_content
+
+truth_rules:
+  search_snippet_as_evidence: forbidden
+  stale_value_as_current: forbidden
+  estimated_value_as_fact: forbidden
+  exact_number_requires_provenance: true
+  dual_source_claim_requires_independent_sources: true
+
+source_priority:
+  - official_regulator_exchange_central_bank_statistics_company
+  - primary_exchange_or_major_data_vendor
+  - mature_market_data_portal
+  - reuters_bloomberg_ft_wsj_ap
+  - research_institution
+  - specialist_industry_media
+
+a_share:
+  industry_classification: SW2021
+  full_required:
+    - total_turnover
+    - core_breadth
+    - major_style_matrix
+    - sw1_31_industries
+    - industry_turnover_or_reliable_substitute
+    - turnover_concentration
+    - correct_trading_date
+  fallback_label: A股核心行情简版
+
+mainlines:
+  exact_count: 3
+  require_counter_evidence: true
+  require_today_validation: true
+
+html:
+  self_contained: true
+  utf8: true
+  responsive: true
+  print_friendly: true
+  external_cdn: forbidden
+  external_font: forbidden
+  external_script: forbidden
+  direction_colors: 红涨绿跌
+  signed_changes_required: true
+
+pdf:
+  required_with_html: true
+  same_frozen_content_as_html: true
+  page_size: A4
+  visual_qa_required: true
+
+archive:
+  root: unified_morning/reports
+  html_pattern: 统一交易晨报_YYYY-MM-DD.html
+  pdf_pattern: 统一交易晨报_YYYY-MM-DD.pdf
